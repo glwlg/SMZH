@@ -1,0 +1,18 @@
+{
+  "name": "XTD.Editor",
+  "rootNamespace": "XTD.Editor",
+  "references": [
+    "XTD.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
