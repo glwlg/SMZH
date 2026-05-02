@@ -30,8 +30,8 @@ namespace XTD.Content
             var militia = Unit(catalog, "unit_militia", "香火民兵", Faction.Player, UnitRole.Soldier, 16, 4, 1.1f, 0.75f, 1.2f, 1, new Color(0.65f, 0.85f, 1f), "Assets/_Project/Art/AI/Battle/unit_militia_battle.png");
             var archer = Unit(catalog, "unit_archer", "灵弩射手", Faction.Player, UnitRole.Soldier, 12, 3, 1.2f, 2.15f, 0.85f, 1, new Color(0.75f, 1f, 0.6f), "Assets/_Project/Art/AI/Battle/unit_archer_battle.png");
             var shieldGuard = Unit(catalog, "unit_shield_guard", "金甲天将", Faction.Player, UnitRole.Elite, 58, 6, 1.2f, 0.85f, 0.72f, 4, new Color(0.55f, 0.65f, 1f), "Assets/_Project/Art/AI/Battle/unit_heaven_general_battle.png");
-            var monkeyHero = Unit(catalog, "unit_monkey_vanguard", "齐天先锋", Faction.Player, UnitRole.Hero, 145, 15, 0.85f, 1.05f, 0.92f, 8, new Color(1f, 0.80f, 0.36f), "Assets/_Project/Art/AI/Battle/unit_heaven_general_battle.png");
-            var thunderGuard = Unit(catalog, "unit_thunder_guard", "雷鼓卫", Faction.Player, UnitRole.Soldier, 24, 5, 1.0f, 1.05f, 0.95f, 2, new Color(0.70f, 0.95f, 1f), "Assets/_Project/Art/AI/Battle/unit_heaven_general_battle.png");
+            var monkeyHero = Unit(catalog, "unit_monkey_vanguard", "齐天先锋", Faction.Player, UnitRole.Hero, 145, 15, 0.85f, 1.05f, 0.92f, 8, new Color(1f, 0.80f, 0.36f), "Assets/_Project/Art/AI/Battle/unit_monkey_vanguard_battle.png");
+            var thunderGuard = Unit(catalog, "unit_thunder_guard", "雷鼓卫", Faction.Player, UnitRole.Soldier, 24, 5, 1.0f, 1.05f, 0.95f, 2, new Color(0.70f, 0.95f, 1f), "Assets/_Project/Art/AI/Battle/unit_thunder_guard_battle.png");
             monkeyHero.art ??= shieldGuard.art;
             thunderGuard.art ??= shieldGuard.art;
 
@@ -48,7 +48,7 @@ namespace XTD.Content
             var roadblock = Unit(catalog, "unit_roadblock", "八卦石垒", Faction.Player, UnitRole.Structure, 90, 0, 99f, 0f, 0f, 3, new Color(0.75f, 0.55f, 0.35f), "Assets/_Project/Art/AI/Battle/unit_bagua_wall_battle.png");
             roadblock.blocksMovement = true;
 
-            var thunderTower = Unit(catalog, "unit_thunder_drum_tower", "雷鼓台", Faction.Player, UnitRole.Structure, 70, 0, 99f, 0f, 0f, 5, new Color(0.66f, 0.86f, 1f), "Assets/_Project/Art/AI/Battle/unit_spirit_arrow_altar_battle.png");
+            var thunderTower = Unit(catalog, "unit_thunder_drum_tower", "雷鼓台", Faction.Player, UnitRole.Structure, 70, 0, 99f, 0f, 0f, 5, new Color(0.66f, 0.86f, 1f), "Assets/_Project/Art/AI/Battle/unit_thunder_drum_tower_battle.png");
             thunderTower.producedUnit = thunderGuard;
             thunderTower.productionInterval = 4.2f;
             thunderTower.productionCount = 1;
@@ -56,15 +56,15 @@ namespace XTD.Content
 
             var grunt = Unit(catalog, "enemy_grunt", "山魈爪牙", Faction.Enemy, UnitRole.Monster, 16, 4, 1.2f, 0.75f, 0.95f, 0, new Color(1f, 0.55f, 0.45f), "Assets/_Project/Art/AI/Battle/enemy_grunt_battle.png");
             var brute = Unit(catalog, "enemy_brute", "蛮兽", Faction.Enemy, UnitRole.Monster, 42, 8, 1.5f, 0.8f, 0.55f, 0, new Color(1f, 0.35f, 0.25f), "Assets/_Project/Art/AI/Battle/enemy_brute_battle.png");
-            var impArcher = Unit(catalog, "enemy_imp_archer", "骨弩小妖", Faction.Enemy, UnitRole.Monster, 18, 4, 1.25f, 2.05f, 0.72f, 0, new Color(1f, 0.68f, 0.45f), "Assets/_Project/Art/AI/Battle/enemy_grunt_battle.png");
-            var venomShaman = Unit(catalog, "enemy_venom_shaman", "毒雾祭司", Faction.Enemy, UnitRole.Monster, 36, 7, 1.45f, 2.65f, 0.45f, 0, new Color(0.75f, 1f, 0.45f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
+            var impArcher = Unit(catalog, "enemy_imp_archer", "骨弩小妖", Faction.Enemy, UnitRole.Monster, 18, 4, 1.25f, 2.05f, 0.72f, 0, new Color(1f, 0.68f, 0.45f), "Assets/_Project/Art/AI/Battle/enemy_imp_archer_battle.png");
+            var venomShaman = Unit(catalog, "enemy_venom_shaman", "毒雾祭司", Faction.Enemy, UnitRole.Monster, 36, 7, 1.45f, 2.65f, 0.45f, 0, new Color(0.75f, 1f, 0.45f), "Assets/_Project/Art/AI/Battle/enemy_venom_shaman_battle.png");
 
-            var wolfElite = Unit(catalog, "enemy_wolf_elite", "妖狼先锋", Faction.Enemy, UnitRole.Boss, 180, 11, 0.95f, 5.2f, 0f, 0, new Color(1f, 0.32f, 0.50f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
-            var boneElite = Unit(catalog, "enemy_bone_elite", "白骨督军", Faction.Enemy, UnitRole.Boss, 230, 13, 1.15f, 5.2f, 0f, 0, new Color(0.92f, 0.90f, 1f), "Assets/_Project/Art/AI/Battle/enemy_brute_battle.png");
-            var oxElite = Unit(catalog, "enemy_ox_elite", "牛魔校尉", Faction.Enemy, UnitRole.Boss, 270, 16, 1.35f, 5.2f, 0f, 0, new Color(1f, 0.50f, 0.28f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
-            var blackWindBoss = Unit(catalog, "boss_black_wind", "黑风小圣", Faction.Enemy, UnitRole.Boss, 360, 18, 1.05f, 5.2f, 0f, 0, new Color(0.70f, 0.55f, 1f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
-            var boneQueenBoss = Unit(catalog, "boss_bone_queen", "白骨军主", Faction.Enemy, UnitRole.Boss, 430, 21, 1.20f, 5.2f, 0f, 0, new Color(1f, 0.72f, 0.92f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
-            var finalBoss = Unit(catalog, "boss_chaos_lord", "混沌魔君", Faction.Enemy, UnitRole.Boss, 620, 26, 0.95f, 5.2f, 0f, 0, new Color(1f, 0.22f, 0.20f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
+            var wolfElite = Unit(catalog, "enemy_wolf_elite", "妖狼先锋", Faction.Enemy, UnitRole.Boss, 180, 11, 0.95f, 5.2f, 0f, 0, new Color(1f, 0.32f, 0.50f), "Assets/_Project/Art/AI/Battle/enemy_wolf_elite_battle.png");
+            var boneElite = Unit(catalog, "enemy_bone_elite", "白骨督军", Faction.Enemy, UnitRole.Boss, 230, 13, 1.15f, 5.2f, 0f, 0, new Color(0.92f, 0.90f, 1f), "Assets/_Project/Art/AI/Battle/enemy_bone_elite_battle.png");
+            var oxElite = Unit(catalog, "enemy_ox_elite", "牛魔校尉", Faction.Enemy, UnitRole.Boss, 270, 16, 1.35f, 5.2f, 0f, 0, new Color(1f, 0.50f, 0.28f), "Assets/_Project/Art/AI/Battle/enemy_ox_elite_battle.png");
+            var blackWindBoss = Unit(catalog, "boss_black_wind", "黑风小圣", Faction.Enemy, UnitRole.Boss, 360, 18, 1.05f, 5.2f, 0f, 0, new Color(0.70f, 0.55f, 1f), "Assets/_Project/Art/AI/Battle/boss_black_wind_battle.png");
+            var boneQueenBoss = Unit(catalog, "boss_bone_queen", "白骨军主", Faction.Enemy, UnitRole.Boss, 430, 21, 1.20f, 5.2f, 0f, 0, new Color(1f, 0.72f, 0.92f), "Assets/_Project/Art/AI/Battle/boss_bone_queen_battle.png");
+            var finalBoss = Unit(catalog, "boss_chaos_lord", "混沌魔君", Faction.Enemy, UnitRole.Boss, 620, 26, 0.95f, 5.2f, 0f, 0, new Color(1f, 0.22f, 0.20f), "Assets/_Project/Art/AI/Battle/boss_chaos_lord_battle.png");
             impArcher.art ??= grunt.art;
             venomShaman.art ??= wolfElite.art;
             wolfElite.art ??= catalog.FindUnit("enemy_alpha")?.art ?? brute.art;
@@ -97,7 +97,7 @@ namespace XTD.Content
                 return card;
             });
 
-            UpsertLeveledCard(catalog, "card_thunder_drum_tower", "雷鼓台", CardType.Structure, 4, CardReleaseRule.PlayerSide, "放置后持续生产近战雷鼓卫。", "Assets/_Project/Art/AI/Cards/card_rally.png", level =>
+            UpsertLeveledCard(catalog, "card_thunder_drum_tower", "雷鼓台", CardType.Structure, 4, CardReleaseRule.PlayerSide, "放置后持续生产近战雷鼓卫。", "Assets/_Project/Art/AI/Cards/card_thunder_drum_tower.png", level =>
             {
                 var card = CreateCardPayload(level);
                 card.spawns.Add(Spawn(thunderTower, 1));
@@ -120,7 +120,7 @@ namespace XTD.Content
                 return card;
             });
 
-            UpsertLeveledCard(catalog, "card_monkey_hero", "齐天先锋", CardType.Hero, 6, CardReleaseRule.PlayerSide, "召来一名高统率英雄士兵。", "Assets/_Project/Art/AI/Cards/card_heaven_general_order.png", level =>
+            UpsertLeveledCard(catalog, "card_monkey_hero", "齐天先锋", CardType.Hero, 6, CardReleaseRule.PlayerSide, "召来一名高影响力英雄士兵。", "Assets/_Project/Art/AI/Cards/card_monkey_hero.png", level =>
             {
                 var card = CreateCardPayload(level);
                 card.spawns.Add(Spawn(monkeyHero, 1));
@@ -135,7 +135,7 @@ namespace XTD.Content
                 return card;
             });
 
-            UpsertLeveledCard(catalog, "card_thunder_talisman", "掌心雷符", CardType.Spell, 2, CardReleaseRule.Anywhere, "对目标点附近敌人造成雷击伤害。", "Assets/_Project/Art/AI/Cards/card_fireball.png", level =>
+            UpsertLeveledCard(catalog, "card_thunder_talisman", "掌心雷符", CardType.Spell, 2, CardReleaseRule.Anywhere, "对目标点附近敌人造成雷击伤害。", "Assets/_Project/Art/AI/Cards/card_thunder_talisman.png", level =>
             {
                 var card = CreateCardPayload(level);
                 card.effects.Add(Effect(EffectType.Damage, TargetRule.AllEnemies, 24 + level * 14, 0, 0.9f + level * 0.15f));
@@ -150,7 +150,7 @@ namespace XTD.Content
                 return card;
             });
 
-            UpsertLeveledCard(catalog, "card_golden_barrier", "护阵金光", CardType.Tactic, 2, CardReleaseRule.None, "为己方单位附加护盾。", "Assets/_Project/Art/AI/Cards/card_roadblock.png", level =>
+            UpsertLeveledCard(catalog, "card_golden_barrier", "护阵金光", CardType.Tactic, 2, CardReleaseRule.None, "为己方单位附加护盾。", "Assets/_Project/Art/AI/Cards/card_golden_barrier.png", level =>
             {
                 var card = CreateCardPayload(level);
                 card.effects.Add(Effect(EffectType.Shield, TargetRule.AllFriendlyUnits, 12 + level * 12, 0, 99f));
@@ -163,12 +163,12 @@ namespace XTD.Content
             CopyLeveledCardArt(catalog, "card_heaven_general_order", "card_heaven_general_order");
             CopyLeveledCardArt(catalog, "card_fireball", "card_fireball");
             CopyLeveledCardArt(catalog, "card_rally", "card_rally");
-            CopyLeveledCardArt(catalog, "card_thunder_drum_tower", "card_rally");
-            CopyLeveledCardArt(catalog, "card_monkey_hero", "card_heaven_general_order");
-            CopyLeveledCardArt(catalog, "card_thunder_talisman", "card_fireball");
-            CopyLeveledCardArt(catalog, "card_golden_barrier", "card_roadblock");
+            CopyLeveledCardArt(catalog, "card_thunder_drum_tower", "card_thunder_drum_tower");
+            CopyLeveledCardArt(catalog, "card_monkey_hero", "card_monkey_hero");
+            CopyLeveledCardArt(catalog, "card_thunder_talisman", "card_thunder_talisman");
+            CopyLeveledCardArt(catalog, "card_golden_barrier", "card_golden_barrier");
 
-            Artifact(catalog, "artifact_long_banner", "长旗", ArtifactRarity.Common, "统率上限 +5。");
+            Artifact(catalog, "artifact_long_banner", "长旗", ArtifactRarity.Common, "阵位上限 +5。");
             Artifact(catalog, "artifact_field_purse", "战地钱袋", ArtifactRarity.Common, "金币收益 +20%。");
             Artifact(catalog, "artifact_war_drum", "战鼓", ArtifactRarity.Rare, "每 4 个己方士兵触发 1 点士气。");
             Artifact(catalog, "artifact_heaven_seal", "天庭符印", ArtifactRarity.Rare, "费用上限 +2，开局费用 +1。");
@@ -179,12 +179,12 @@ namespace XTD.Content
             Artifact(catalog, "artifact_market_token", "通宝令", ArtifactRarity.Common, "商店购买价格 -20%。");
             Artifact(catalog, "artifact_artifact_eye", "观星镜", ArtifactRarity.Epic, "神器层可选神器 +1。");
             Artifact(catalog, "artifact_dragon_bone", "龙骨", ArtifactRarity.Rare, "己方士兵攻击 +12%。");
-            Artifact(catalog, "artifact_command_seal", "兵符", ArtifactRarity.Common, "统率上限 +3，战斗开始抽牌 +1。");
+            Artifact(catalog, "artifact_command_seal", "兵符", ArtifactRarity.Common, "阵位上限 +3，战斗开始抽牌 +1。");
             Artifact(catalog, "artifact_fox_coin", "狐仙钱", ArtifactRarity.Rare, "机遇和神秘奖励额外 +15 金币。");
             Artifact(catalog, "artifact_taiji_map", "太极图残卷", ArtifactRarity.Epic, "休息回血提升，三合一后额外获得 20 金币。");
             Artifact(catalog, "artifact_star_sand", "星砂", ArtifactRarity.Common, "战斗开始获得 1 点费用。");
             Artifact(catalog, "artifact_battle_scripture", "斗战经", ArtifactRarity.Epic, "英雄和精兵攻击 +20%。");
-            Artifact(catalog, "artifact_vajra", "金刚杵", ArtifactRarity.Legendary, "主角生命上限 +35，统率上限 +8。");
+            Artifact(catalog, "artifact_vajra", "金刚杵", ArtifactRarity.Legendary, "主角生命上限 +35，阵位上限 +8。");
             Artifact(catalog, "artifact_permanent_relic", "通关遗珍", ArtifactRarity.Legendary, "最终首领掉落的永久神器占位。");
 
             Encounter(catalog, "encounter_training_camp", "妖物营地", MapNodeType.NormalMonster, 100, 140, 2.2f, 25, null,

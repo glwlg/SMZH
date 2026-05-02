@@ -1,681 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-9116635590093556401
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
-  m_Name: encounter_elite_wolf
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
-  id: encounter_elite_wolf
-  displayName: "\u5996\u72FC\u5148\u950B"
-  nodeType: 1
-  playerBaseMaxHp: 105
-  enemyBaseMaxHp: 220
-  enemySpawnInterval: 2
-  rewardGold: 58
-  enemySpawns:
-  - unit: {fileID: -7703281138408042429}
-    count: 2
-    interval: 1.2
-  - unit: {fileID: -8492401376764403717}
-    count: 1
-    interval: 1.2
-  coreEnemy: {fileID: -5140725619609882149}
---- !u!114 &-8975390834879579105
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_roadblock_lv2
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_roadblock_lv2
-  displayName: "\u516B\u5366\u77F3\u5792+1"
-  type: 6
-  rarity: 1
-  level: 2
-  cost: 2
-  releaseRule: 1
-  description: "\u653E\u7F6E\u4E00\u9053\u4E34\u65F6\u9632\u7EBF\uFF0C\u963B\u6321\u654C\u4EBA\u63A8\u8FDB\u3002"
-  art: {fileID: 21300000, guid: 49057f8b1ee1cce42b328642edc372d4, type: 3}
-  unitSpawns:
-  - unit: {fileID: -3654724210278625260}
-    count: 2
-    spacing: 0.35
-    yJitter: 0.25
-  effects: []
---- !u!114 &-8896178121605052808
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_incense_barracks_lv2
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_incense_barracks_lv2
-  displayName: "\u9999\u706B\u5175\u8425+1"
-  type: 6
-  rarity: 1
-  level: 2
-  cost: 3
-  releaseRule: 1
-  description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u9999\u706B\u6C11\u5175\u3002"
-  art: {fileID: 21300000, guid: f53ecea5d9f1c6c48a48c6d7edf3d140, type: 3}
-  unitSpawns:
-  - unit: {fileID: 5538354183817941540}
-    count: 1
-    spacing: 0.35
-    yJitter: 0.25
-  effects:
-  - effectType: 4
-    targetRule: 5
-    value: 16
-    duration: 0
-    radius: 99
-    statusId: 
---- !u!114 &-8495442962085276183
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: unit_spirit_arrow_altar
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: unit_spirit_arrow_altar
-  displayName: "\u7075\u5F29\u575B"
-  faction: 0
-  role: 3
-  maxHp: 58
-  attack: 0
-  attackInterval: 99
-  range: 0
-  moveSpeed: 0
-  commandCost: 4
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 787c7a5ab451af5459a269970f41f235, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 4272403505961078123}
-  productionInterval: 3.2
-  productionCount: 1
-  productionSpread: 0.4
---- !u!114 &-8492401376764403717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: enemy_imp_archer
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: enemy_imp_archer
-  displayName: "\u9AA8\u5F29\u5C0F\u5996"
-  faction: 1
-  role: 4
-  maxHp: 18
-  attack: 4
-  attackInterval: 1.25
-  range: 3.2
-  moveSpeed: 0.72
-  commandCost: 0
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 1800770e923472b41a982a95d57d6538, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &-8311397536562294016
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_thunder_talisman
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_thunder_talisman
-  displayName: "\u638C\u5FC3\u96F7\u7B26"
-  type: 3
-  rarity: 0
-  level: 1
-  cost: 2
-  releaseRule: 2
-  description: "\u5BF9\u76EE\u6807\u70B9\u9644\u8FD1\u654C\u4EBA\u9020\u6210\u96F7\u51FB\u4F24\u5BB3\u3002"
-  art: {fileID: 21300000, guid: 0a05d67501431a94b86f611c4a97f617, type: 3}
-  unitSpawns: []
-  effects:
-  - effectType: 1
-    targetRule: 3
-    value: 38
-    duration: 0
-    radius: 1.05
-    statusId: 
---- !u!114 &-8271073921784889426
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_golden_barrier
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_golden_barrier
-  displayName: "\u62A4\u9635\u91D1\u5149"
-  type: 4
-  rarity: 0
-  level: 1
-  cost: 2
-  releaseRule: 0
-  description: "\u4E3A\u5DF1\u65B9\u5355\u4F4D\u9644\u52A0\u62A4\u76FE\u3002"
-  art: {fileID: 21300000, guid: 49057f8b1ee1cce42b328642edc372d4, type: 3}
-  unitSpawns: []
-  effects:
-  - effectType: 4
-    targetRule: 5
-    value: 24
-    duration: 0
-    radius: 99
-    statusId: 
---- !u!114 &-8126306139051607312
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_field_purse
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_field_purse
-  displayName: "\u6218\u5730\u94B1\u888B"
-  rarity: 0
-  trigger: 0
-  description: "\u91D1\u5E01\u6536\u76CA +20%\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &-7703281138408042429
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: enemy_grunt
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: enemy_grunt
-  displayName: "\u5C71\u9B48\u722A\u7259"
-  faction: 1
-  role: 4
-  maxHp: 16
-  attack: 4
-  attackInterval: 1.2
-  range: 0.75
-  moveSpeed: 0.95
-  commandCost: 0
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 1800770e923472b41a982a95d57d6538, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &-7460862354766317722
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_monkey_hero
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_monkey_hero
-  displayName: "\u9F50\u5929\u5148\u950B"
-  type: 2
-  rarity: 0
-  level: 1
-  cost: 6
-  releaseRule: 1
-  description: "\u53EC\u6765\u4E00\u540D\u9AD8\u7EDF\u7387\u82F1\u96C4\u58EB\u5175\u3002"
-  art: {fileID: 21300000, guid: 71d0e8665a479ec41b66353236d38bbd, type: 3}
-  unitSpawns:
-  - unit: {fileID: 6761378987431038314}
-    count: 1
-    spacing: 0.35
-    yJitter: 0.25
-  effects:
-  - effectType: 5
-    targetRule: 5
-    value: 0.19999999
-    duration: 5
-    radius: 99
-    statusId: 
---- !u!114 &-7400422708545768902
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_spirit_arrow_altar
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_spirit_arrow_altar
-  displayName: "\u7075\u5F29\u575B"
-  type: 6
-  rarity: 0
-  level: 1
-  cost: 3
-  releaseRule: 1
-  description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u7075\u5F29\u5C04\u624B\u3002"
-  art: {fileID: 21300000, guid: db8971086f04ad34cacf0fb1fd4a1fb4, type: 3}
-  unitSpawns:
-  - unit: {fileID: -8495442962085276183}
-    count: 1
-    spacing: 0.35
-    yJitter: 0.25
-  effects: []
---- !u!114 &-7328212897965003581
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_war_drum
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_war_drum
-  displayName: "\u6218\u9F13"
-  rarity: 1
-  trigger: 0
-  description: "\u6BCF 4 \u4E2A\u5DF1\u65B9\u58EB\u5175\u89E6\u53D1 1 \u70B9\u58EB\u6C14\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &-7294332647960866807
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_taiji_map
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_taiji_map
-  displayName: "\u592A\u6781\u56FE\u6B8B\u5377"
-  rarity: 2
-  trigger: 0
-  description: "\u4F11\u606F\u56DE\u8840\u63D0\u5347\uFF0C\u4E09\u5408\u4E00\u540E\u989D\u5916\u83B7\u5F97
-    20 \u91D1\u5E01\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &-7149470964562052567
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_long_banner
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_long_banner
-  displayName: "\u957F\u65D7"
-  rarity: 0
-  trigger: 0
-  description: "\u7EDF\u7387\u4E0A\u9650 +5\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &-7149126232107592296
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_heaven_general_order
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_heaven_general_order
-  displayName: "\u5929\u5C06\u4EE4"
-  type: 1
-  rarity: 0
-  level: 1
-  cost: 4
-  releaseRule: 1
-  description: "\u4E00\u6B21\u6027\u53EC\u6765\u6570\u540D\u91D1\u7532\u5929\u5C06\u3002"
-  art: {fileID: 21300000, guid: 71d0e8665a479ec41b66353236d38bbd, type: 3}
-  unitSpawns:
-  - unit: {fileID: 1874322892906706590}
-    count: 2
-    spacing: 0.35
-    yJitter: 0.25
-  effects: []
---- !u!114 &-7011601440822689581
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: enemy_venom_shaman
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: enemy_venom_shaman
-  displayName: "\u6BD2\u96FE\u796D\u53F8"
-  faction: 1
-  role: 4
-  maxHp: 36
-  attack: 7
-  attackInterval: 1.45
-  range: 3.6
-  moveSpeed: 0.45
-  commandCost: 0
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 68f216762e8bfba4289ecb67ac27378d, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &-6714781050189077413
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_vajra
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_vajra
-  displayName: "\u91D1\u521A\u6775"
-  rarity: 3
-  trigger: 0
-  description: "\u4E3B\u89D2\u751F\u547D\u4E0A\u9650 +35\uFF0C\u7EDF\u7387\u4E0A\u9650
-    +8\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &-6607903889127839168
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_heaven_general_order_lv2
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_heaven_general_order_lv2
-  displayName: "\u5929\u5C06\u4EE4+1"
-  type: 1
-  rarity: 1
-  level: 2
-  cost: 4
-  releaseRule: 1
-  description: "\u4E00\u6B21\u6027\u53EC\u6765\u6570\u540D\u91D1\u7532\u5929\u5C06\u3002"
-  art: {fileID: 21300000, guid: 71d0e8665a479ec41b66353236d38bbd, type: 3}
-  unitSpawns:
-  - unit: {fileID: 1874322892906706590}
-    count: 3
-    spacing: 0.35
-    yJitter: 0.25
-  effects: []
---- !u!114 &-6402051986284523349
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_cloud_boots
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_cloud_boots
-  displayName: "\u8E0F\u4E91\u5C65"
-  rarity: 0
-  trigger: 0
-  description: "\u5DF1\u65B9\u5355\u4F4D\u79FB\u52A8\u901F\u5EA6 +10%\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &-6235631215424244456
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_heaven_general_order_lv3
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_heaven_general_order_lv3
-  displayName: "\u5929\u5C06\u4EE4+2"
-  type: 1
-  rarity: 2
-  level: 3
-  cost: 5
-  releaseRule: 1
-  description: "\u4E00\u6B21\u6027\u53EC\u6765\u6570\u540D\u91D1\u7532\u5929\u5C06\u3002"
-  art: {fileID: 21300000, guid: 71d0e8665a479ec41b66353236d38bbd, type: 3}
-  unitSpawns:
-  - unit: {fileID: 1874322892906706590}
-    count: 3
-    spacing: 0.35
-    yJitter: 0.25
-  effects:
-  - effectType: 4
-    targetRule: 5
-    value: 18
-    duration: 0
-    radius: 99
-    statusId: 
---- !u!114 &-5509472801350035776
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_monkey_hero_lv2
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_monkey_hero_lv2
-  displayName: "\u9F50\u5929\u5148\u950B+1"
-  type: 2
-  rarity: 1
-  level: 2
-  cost: 6
-  releaseRule: 1
-  description: "\u53EC\u6765\u4E00\u540D\u9AD8\u7EDF\u7387\u82F1\u96C4\u58EB\u5175\u3002"
-  art: {fileID: 21300000, guid: 71d0e8665a479ec41b66353236d38bbd, type: 3}
-  unitSpawns:
-  - unit: {fileID: 6761378987431038314}
-    count: 1
-    spacing: 0.35
-    yJitter: 0.25
-  effects:
-  - effectType: 5
-    targetRule: 5
-    value: 0.28
-    duration: 6
-    radius: 99
-    statusId: 
---- !u!114 &-5474525847051831921
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: enemy_bone_elite
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: enemy_bone_elite
-  displayName: "\u767D\u9AA8\u7763\u519B"
-  faction: 1
-  role: 5
-  maxHp: 230
-  attack: 13
-  attackInterval: 1.15
-  range: 1.1
-  moveSpeed: 0.46
-  commandCost: 0
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 7cf2c536c465e7d4a99a8aff68e2c03d, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &-5336477714024301096
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_golden_barrier_lv3
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_golden_barrier_lv3
-  displayName: "\u62A4\u9635\u91D1\u5149+2"
-  type: 4
-  rarity: 2
-  level: 3
-  cost: 3
-  releaseRule: 0
-  description: "\u4E3A\u5DF1\u65B9\u5355\u4F4D\u9644\u52A0\u62A4\u76FE\u3002"
-  art: {fileID: 21300000, guid: 49057f8b1ee1cce42b328642edc372d4, type: 3}
-  unitSpawns: []
-  effects:
-  - effectType: 4
-    targetRule: 5
-    value: 48
-    duration: 0
-    radius: 99
-    statusId: 
---- !u!114 &-5188530977890053378
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_fire_pearl
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_fire_pearl
-  displayName: "\u79BB\u706B\u73E0"
-  rarity: 1
-  trigger: 0
-  description: "\u6CD5\u672F\u4F24\u5BB3 +25%\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &-5140725619609882149
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: enemy_wolf_elite
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: enemy_wolf_elite
-  displayName: "\u5996\u72FC\u5148\u950B"
-  faction: 1
-  role: 5
-  maxHp: 180
-  attack: 11
-  attackInterval: 0.95
-  range: 1.05
-  moveSpeed: 0.62
-  commandCost: 0
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 68f216762e8bfba4289ecb67ac27378d, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &-4604451470079341530
+--- !u!114 &-9180907955645852721
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -697,468 +22,12 @@ MonoBehaviour:
   description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u7075\u5F29\u5C04\u624B\u3002"
   art: {fileID: 21300000, guid: db8971086f04ad34cacf0fb1fd4a1fb4, type: 3}
   unitSpawns:
-  - unit: {fileID: -8495442962085276183}
+  - unit: {fileID: -6489187858641470256}
     count: 1
     spacing: 0.35
     yJitter: 0.25
   effects: []
---- !u!114 &-4582853303869980065
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
-  m_Name: encounter_black_wind
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
-  id: encounter_black_wind
-  displayName: "\u9ED1\u98CE\u5C0F\u5723"
-  nodeType: 7
-  playerBaseMaxHp: 110
-  enemyBaseMaxHp: 320
-  enemySpawnInterval: 1.75
-  rewardGold: 110
-  enemySpawns:
-  - unit: {fileID: -7703281138408042429}
-    count: 2
-    interval: 1.2
-  - unit: {fileID: 8843015809331196444}
-    count: 1
-    interval: 1.2
-  - unit: {fileID: -8492401376764403717}
-    count: 1
-    interval: 1.2
-  coreEnemy: {fileID: 7468329003333730452}
---- !u!114 &-4502085600494889931
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_market_token
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_market_token
-  displayName: "\u901A\u5B9D\u4EE4"
-  rarity: 0
-  trigger: 0
-  description: "\u5546\u5E97\u8D2D\u4E70\u4EF7\u683C -20%\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &-4219376041915850787
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: unit_thunder_drum_tower
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: unit_thunder_drum_tower
-  displayName: "\u96F7\u9F13\u53F0"
-  faction: 0
-  role: 3
-  maxHp: 70
-  attack: 0
-  attackInterval: 99
-  range: 0
-  moveSpeed: 0
-  commandCost: 5
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 787c7a5ab451af5459a269970f41f235, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: -2073175833685387505}
-  productionInterval: 4.2
-  productionCount: 1
-  productionSpread: 0.4
---- !u!114 &-4032678086118024349
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_thunder_talisman_lv3
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_thunder_talisman_lv3
-  displayName: "\u638C\u5FC3\u96F7\u7B26+2"
-  type: 3
-  rarity: 2
-  level: 3
-  cost: 3
-  releaseRule: 2
-  description: "\u5BF9\u76EE\u6807\u70B9\u9644\u8FD1\u654C\u4EBA\u9020\u6210\u96F7\u51FB\u4F24\u5BB3\u3002"
-  art: {fileID: 21300000, guid: 0a05d67501431a94b86f611c4a97f617, type: 3}
-  unitSpawns: []
-  effects:
-  - effectType: 1
-    targetRule: 3
-    value: 66
-    duration: 0
-    radius: 1.35
-    statusId: 
---- !u!114 &-4031653353201340902
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
-  m_Name: encounter_mystery_punishment
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
-  id: encounter_mystery_punishment
-  displayName: "\u8BEF\u5165\u51F6\u9635"
-  nodeType: 5
-  playerBaseMaxHp: 105
-  enemyBaseMaxHp: 300
-  enemySpawnInterval: 1.55
-  rewardGold: 0
-  enemySpawns:
-  - unit: {fileID: 8843015809331196444}
-    count: 2
-    interval: 1.2
-  - unit: {fileID: -7011601440822689581}
-    count: 1
-    interval: 1.2
-  coreEnemy: {fileID: -202910994805523303}
---- !u!114 &-3654724210278625260
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: unit_roadblock
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: unit_roadblock
-  displayName: "\u516B\u5366\u77F3\u5792"
-  faction: 0
-  role: 3
-  maxHp: 90
-  attack: 0
-  attackInterval: 99
-  range: 0
-  moveSpeed: 0
-  commandCost: 3
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 55a41df4c998eff4c9e94cb745e909d7, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &-3479435108058756043
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_incense_barracks
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_incense_barracks
-  displayName: "\u9999\u706B\u5175\u8425"
-  type: 6
-  rarity: 0
-  level: 1
-  cost: 3
-  releaseRule: 1
-  description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u9999\u706B\u6C11\u5175\u3002"
-  art: {fileID: 21300000, guid: f53ecea5d9f1c6c48a48c6d7edf3d140, type: 3}
-  unitSpawns:
-  - unit: {fileID: 5538354183817941540}
-    count: 1
-    spacing: 0.35
-    yJitter: 0.25
-  effects: []
---- !u!114 &-3159021405426624793
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_rally_lv3
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_rally_lv3
-  displayName: "\u6218\u9F13\u6CD5\u4EE4+2"
-  type: 4
-  rarity: 2
-  level: 3
-  cost: 3
-  releaseRule: 0
-  description: "\u77ED\u65F6\u95F4\u63D0\u5347\u5DF1\u65B9\u5355\u4F4D\u653B\u51FB\u3002"
-  art: {fileID: 21300000, guid: 359b86c017949cf49ba4027ebf9a0869, type: 3}
-  unitSpawns: []
-  effects:
-  - effectType: 5
-    targetRule: 5
-    value: 0.65999997
-    duration: 7
-    radius: 99
-    statusId: 
---- !u!114 &-3024488398671889641
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
-  m_Name: encounter_training_camp
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
-  id: encounter_training_camp
-  displayName: "\u5996\u7269\u8425\u5730"
-  nodeType: 0
-  playerBaseMaxHp: 100
-  enemyBaseMaxHp: 140
-  enemySpawnInterval: 2.2
-  rewardGold: 25
-  enemySpawns:
-  - unit: {fileID: -7703281138408042429}
-    count: 1
-    interval: 1.2
-  - unit: {fileID: 8843015809331196444}
-    count: 1
-    interval: 1.2
-  coreEnemy: {fileID: 0}
---- !u!114 &-2639076448650284837
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_thunder_talisman_lv2
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_thunder_talisman_lv2
-  displayName: "\u638C\u5FC3\u96F7\u7B26+1"
-  type: 3
-  rarity: 1
-  level: 2
-  cost: 2
-  releaseRule: 2
-  description: "\u5BF9\u76EE\u6807\u70B9\u9644\u8FD1\u654C\u4EBA\u9020\u6210\u96F7\u51FB\u4F24\u5BB3\u3002"
-  art: {fileID: 21300000, guid: 0a05d67501431a94b86f611c4a97f617, type: 3}
-  unitSpawns: []
-  effects:
-  - effectType: 1
-    targetRule: 3
-    value: 52
-    duration: 0
-    radius: 1.2
-    statusId: 
---- !u!114 &-2562970689130292799
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_artifact_eye
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_artifact_eye
-  displayName: "\u89C2\u661F\u955C"
-  rarity: 2
-  trigger: 0
-  description: "\u795E\u5668\u5C42\u53EF\u9009\u795E\u5668 +1\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &-2453209889372747984
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_heaven_soldier_talisman_lv3
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_heaven_soldier_talisman_lv3
-  displayName: "\u5929\u5175\u7B26+2"
-  type: 0
-  rarity: 2
-  level: 3
-  cost: 3
-  releaseRule: 1
-  description: "\u4E00\u6B21\u6027\u53EC\u6765\u4E00\u961F\u5F31\u5C0F\u5929\u5175\u3002"
-  art: {fileID: 21300000, guid: b0f81b63586afea498650034faaf8f93, type: 3}
-  unitSpawns:
-  - unit: {fileID: 1140625118215442637}
-    count: 10
-    spacing: 0.35
-    yJitter: 0.25
-  effects: []
---- !u!114 &-2341570893654233413
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_thunder_drum_tower_lv3
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_thunder_drum_tower_lv3
-  displayName: "\u96F7\u9F13\u53F0+2"
-  type: 6
-  rarity: 2
-  level: 3
-  cost: 5
-  releaseRule: 1
-  description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u8FD1\u6218\u96F7\u9F13\u536B\u3002"
-  art: {fileID: 21300000, guid: 359b86c017949cf49ba4027ebf9a0869, type: 3}
-  unitSpawns:
-  - unit: {fileID: -4219376041915850787}
-    count: 1
-    spacing: 0.35
-    yJitter: 0.25
-  effects:
-  - effectType: 13
-    targetRule: 8
-    value: 3
-    duration: 0
-    radius: 0
-    statusId: 
---- !u!114 &-2073175833685387505
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: unit_thunder_guard
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: unit_thunder_guard
-  displayName: "\u96F7\u9F13\u536B"
-  faction: 0
-  role: 0
-  maxHp: 24
-  attack: 5
-  attackInterval: 1
-  range: 1.05
-  moveSpeed: 0.95
-  commandCost: 2
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 0d9ff155dc933ef488e2d50693e7be5d, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &-1379532558429918836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_golden_barrier_lv2
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_golden_barrier_lv2
-  displayName: "\u62A4\u9635\u91D1\u5149+1"
-  type: 4
-  rarity: 1
-  level: 2
-  cost: 2
-  releaseRule: 0
-  description: "\u4E3A\u5DF1\u65B9\u5355\u4F4D\u9644\u52A0\u62A4\u76FE\u3002"
-  art: {fileID: 21300000, guid: 49057f8b1ee1cce42b328642edc372d4, type: 3}
-  unitSpawns: []
-  effects:
-  - effectType: 4
-    targetRule: 5
-    value: 36
-    duration: 0
-    radius: 99
-    statusId: 
---- !u!114 &-1092299649073708368
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_dragon_bone
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_dragon_bone
-  displayName: "\u9F99\u9AA8"
-  rarity: 1
-  trigger: 0
-  description: "\u5DF1\u65B9\u58EB\u5175\u653B\u51FB +12%\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &-834017944031825733
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_black_tortoise
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_black_tortoise
-  displayName: "\u7384\u6B66\u7532"
-  rarity: 1
-  trigger: 0
-  description: "\u4E3B\u89D2\u751F\u547D\u4E0A\u9650 +20\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &-830164111464246412
+--- !u!114 &-9160317279929240447
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1180,7 +49,7 @@ MonoBehaviour:
   description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u7075\u5F29\u5C04\u624B\u3002"
   art: {fileID: 21300000, guid: db8971086f04ad34cacf0fb1fd4a1fb4, type: 3}
   unitSpawns:
-  - unit: {fileID: -8495442962085276183}
+  - unit: {fileID: -6489187858641470256}
     count: 1
     spacing: 0.35
     yJitter: 0.25
@@ -1191,515 +60,7 @@ MonoBehaviour:
     duration: 5
     radius: 99
     statusId: 
---- !u!114 &-685466841085114077
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
-  m_Name: encounter_chaos_lord
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
-  id: encounter_chaos_lord
-  displayName: "\u6DF7\u6C8C\u9B54\u541B"
-  nodeType: 8
-  playerBaseMaxHp: 120
-  enemyBaseMaxHp: 520
-  enemySpawnInterval: 1.45
-  rewardGold: 220
-  enemySpawns:
-  - unit: {fileID: -7703281138408042429}
-    count: 3
-    interval: 1.2
-  - unit: {fileID: 8843015809331196444}
-    count: 1
-    interval: 1.2
-  - unit: {fileID: -8492401376764403717}
-    count: 2
-    interval: 1.2
-  - unit: {fileID: -7011601440822689581}
-    count: 1
-    interval: 1.2
-  coreEnemy: {fileID: 1354516470584034619}
---- !u!114 &-555225850049908892
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_thunder_drum_tower
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_thunder_drum_tower
-  displayName: "\u96F7\u9F13\u53F0"
-  type: 6
-  rarity: 0
-  level: 1
-  cost: 4
-  releaseRule: 1
-  description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u8FD1\u6218\u96F7\u9F13\u536B\u3002"
-  art: {fileID: 21300000, guid: 359b86c017949cf49ba4027ebf9a0869, type: 3}
-  unitSpawns:
-  - unit: {fileID: -4219376041915850787}
-    count: 1
-    spacing: 0.35
-    yJitter: 0.25
-  effects: []
---- !u!114 &-202910994805523303
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: enemy_ox_elite
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: enemy_ox_elite
-  displayName: "\u725B\u9B54\u6821\u5C09"
-  faction: 1
-  role: 5
-  maxHp: 270
-  attack: 16
-  attackInterval: 1.35
-  range: 1.25
-  moveSpeed: 0.4
-  commandCost: 0
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 68f216762e8bfba4289ecb67ac27378d, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &-94814844006881680
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: boss_bone_queen
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: boss_bone_queen
-  displayName: "\u767D\u9AA8\u519B\u4E3B"
-  faction: 1
-  role: 5
-  maxHp: 430
-  attack: 21
-  attackInterval: 1.2
-  range: 2.8
-  moveSpeed: 0.34
-  commandCost: 0
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 68f216762e8bfba4289ecb67ac27378d, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b92e12d597180de45b2124a1bb660c5e, type: 3}
-  m_Name: DemoContentCatalog
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ContentCatalog
-  cards:
-  - {fileID: -3479435108058756043}
-  - {fileID: -8896178121605052808}
-  - {fileID: 665607798270418894}
-  - {fileID: -7400422708545768902}
-  - {fileID: -4604451470079341530}
-  - {fileID: -830164111464246412}
-  - {fileID: 8415784456360085673}
-  - {fileID: -8975390834879579105}
-  - {fileID: 4271994744868500708}
-  - {fileID: -555225850049908892}
-  - {fileID: 8642073491845417527}
-  - {fileID: -2341570893654233413}
-  - {fileID: 485564321863271191}
-  - {fileID: 2485673381087308599}
-  - {fileID: -2453209889372747984}
-  - {fileID: -7149126232107592296}
-  - {fileID: -6607903889127839168}
-  - {fileID: -6235631215424244456}
-  - {fileID: -7460862354766317722}
-  - {fileID: -5509472801350035776}
-  - {fileID: 275208954449574293}
-  - {fileID: 6098645144047945449}
-  - {fileID: 8183131555084999593}
-  - {fileID: 8726001475398078060}
-  - {fileID: -8311397536562294016}
-  - {fileID: -2639076448650284837}
-  - {fileID: -4032678086118024349}
-  - {fileID: 5353286143817185026}
-  - {fileID: 7609764895474998674}
-  - {fileID: -3159021405426624793}
-  - {fileID: -8271073921784889426}
-  - {fileID: -1379532558429918836}
-  - {fileID: -5336477714024301096}
-  units:
-  - {fileID: 1140625118215442637}
-  - {fileID: 4272403505961078123}
-  - {fileID: 1874322892906706590}
-  - {fileID: 6761378987431038314}
-  - {fileID: -2073175833685387505}
-  - {fileID: 5538354183817941540}
-  - {fileID: -8495442962085276183}
-  - {fileID: -3654724210278625260}
-  - {fileID: -4219376041915850787}
-  - {fileID: -7703281138408042429}
-  - {fileID: 8843015809331196444}
-  - {fileID: -8492401376764403717}
-  - {fileID: -7011601440822689581}
-  - {fileID: -5140725619609882149}
-  - {fileID: -5474525847051831921}
-  - {fileID: -202910994805523303}
-  - {fileID: 7468329003333730452}
-  - {fileID: -94814844006881680}
-  - {fileID: 1354516470584034619}
-  artifacts:
-  - {fileID: -7149470964562052567}
-  - {fileID: -8126306139051607312}
-  - {fileID: -7328212897965003581}
-  - {fileID: 8655845937173692861}
-  - {fileID: 3536457293833138054}
-  - {fileID: -5188530977890053378}
-  - {fileID: -6402051986284523349}
-  - {fileID: -834017944031825733}
-  - {fileID: -4502085600494889931}
-  - {fileID: -2562970689130292799}
-  - {fileID: -1092299649073708368}
-  - {fileID: 4901902133478065567}
-  - {fileID: 5183258413765045651}
-  - {fileID: -7294332647960866807}
-  - {fileID: 9169288066165240691}
-  - {fileID: 8978474048597305120}
-  - {fileID: -6714781050189077413}
-  - {fileID: 464261671711332844}
-  encounters:
-  - {fileID: -3024488398671889641}
-  - {fileID: 2348315314852941420}
-  - {fileID: 5684300651387996793}
-  - {fileID: -9116635590093556401}
-  - {fileID: 8437696057170209943}
-  - {fileID: 2289051800843353313}
-  - {fileID: -4582853303869980065}
-  - {fileID: 625456373641291430}
-  - {fileID: -685466841085114077}
-  - {fileID: -4031653353201340902}
-  nodes: []
---- !u!114 &275208954449574293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_monkey_hero_lv3
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_monkey_hero_lv3
-  displayName: "\u9F50\u5929\u5148\u950B+2"
-  type: 2
-  rarity: 2
-  level: 3
-  cost: 7
-  releaseRule: 1
-  description: "\u53EC\u6765\u4E00\u540D\u9AD8\u7EDF\u7387\u82F1\u96C4\u58EB\u5175\u3002"
-  art: {fileID: 21300000, guid: 71d0e8665a479ec41b66353236d38bbd, type: 3}
-  unitSpawns:
-  - unit: {fileID: 6761378987431038314}
-    count: 1
-    spacing: 0.35
-    yJitter: 0.25
-  effects:
-  - effectType: 5
-    targetRule: 5
-    value: 0.35999998
-    duration: 7
-    radius: 99
-    statusId: 
---- !u!114 &464261671711332844
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_permanent_relic
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_permanent_relic
-  displayName: "\u901A\u5173\u9057\u73CD"
-  rarity: 3
-  trigger: 0
-  description: "\u6700\u7EC8\u9996\u9886\u6389\u843D\u7684\u6C38\u4E45\u795E\u5668\u5360\u4F4D\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &485564321863271191
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_heaven_soldier_talisman
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_heaven_soldier_talisman
-  displayName: "\u5929\u5175\u7B26"
-  type: 0
-  rarity: 0
-  level: 1
-  cost: 2
-  releaseRule: 1
-  description: "\u4E00\u6B21\u6027\u53EC\u6765\u4E00\u961F\u5F31\u5C0F\u5929\u5175\u3002"
-  art: {fileID: 21300000, guid: b0f81b63586afea498650034faaf8f93, type: 3}
-  unitSpawns:
-  - unit: {fileID: 1140625118215442637}
-    count: 6
-    spacing: 0.35
-    yJitter: 0.25
-  effects: []
---- !u!114 &625456373641291430
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
-  m_Name: encounter_bone_queen
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
-  id: encounter_bone_queen
-  displayName: "\u767D\u9AA8\u519B\u4E3B"
-  nodeType: 7
-  playerBaseMaxHp: 110
-  enemyBaseMaxHp: 360
-  enemySpawnInterval: 1.65
-  rewardGold: 125
-  enemySpawns:
-  - unit: {fileID: -7703281138408042429}
-    count: 2
-    interval: 1.2
-  - unit: {fileID: -7011601440822689581}
-    count: 1
-    interval: 1.2
-  - unit: {fileID: 8843015809331196444}
-    count: 1
-    interval: 1.2
-  coreEnemy: {fileID: -94814844006881680}
---- !u!114 &665607798270418894
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_incense_barracks_lv3
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_incense_barracks_lv3
-  displayName: "\u9999\u706B\u5175\u8425+2"
-  type: 6
-  rarity: 2
-  level: 3
-  cost: 4
-  releaseRule: 1
-  description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u9999\u706B\u6C11\u5175\u3002"
-  art: {fileID: 21300000, guid: f53ecea5d9f1c6c48a48c6d7edf3d140, type: 3}
-  unitSpawns:
-  - unit: {fileID: 5538354183817941540}
-    count: 1
-    spacing: 0.35
-    yJitter: 0.25
-  effects:
-  - effectType: 4
-    targetRule: 5
-    value: 20
-    duration: 0
-    radius: 99
-    statusId: 
---- !u!114 &1140625118215442637
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: unit_militia
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: unit_militia
-  displayName: "\u9999\u706B\u6C11\u5175"
-  faction: 0
-  role: 0
-  maxHp: 16
-  attack: 4
-  attackInterval: 1.1
-  range: 0.75
-  moveSpeed: 1.2
-  commandCost: 1
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 9f62df7fea079f24194c306213b13a12, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &1354516470584034619
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: boss_chaos_lord
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: boss_chaos_lord
-  displayName: "\u6DF7\u6C8C\u9B54\u541B"
-  faction: 1
-  role: 5
-  maxHp: 620
-  attack: 26
-  attackInterval: 0.95
-  range: 2
-  moveSpeed: 0.32
-  commandCost: 0
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 68f216762e8bfba4289ecb67ac27378d, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &1874322892906706590
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: unit_shield_guard
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: unit_shield_guard
-  displayName: "\u91D1\u7532\u5929\u5C06"
-  faction: 0
-  role: 1
-  maxHp: 58
-  attack: 6
-  attackInterval: 1.2
-  range: 0.85
-  moveSpeed: 0.72
-  commandCost: 4
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 0d9ff155dc933ef488e2d50693e7be5d, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &2289051800843353313
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
-  m_Name: encounter_elite_ox
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
-  id: encounter_elite_ox
-  displayName: "\u725B\u9B54\u6821\u5C09"
-  nodeType: 1
-  playerBaseMaxHp: 105
-  enemyBaseMaxHp: 270
-  enemySpawnInterval: 1.85
-  rewardGold: 75
-  enemySpawns:
-  - unit: {fileID: 8843015809331196444}
-    count: 1
-    interval: 1.2
-  - unit: {fileID: -7011601440822689581}
-    count: 1
-    interval: 1.2
-  coreEnemy: {fileID: -202910994805523303}
---- !u!114 &2348315314852941420
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
-  m_Name: encounter_bone_ford
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
-  id: encounter_bone_ford
-  displayName: "\u767D\u9AA8\u6E21\u53E3"
-  nodeType: 0
-  playerBaseMaxHp: 100
-  enemyBaseMaxHp: 160
-  enemySpawnInterval: 2
-  rewardGold: 30
-  enemySpawns:
-  - unit: {fileID: -7703281138408042429}
-    count: 2
-    interval: 1.2
-  - unit: {fileID: -8492401376764403717}
-    count: 1
-    interval: 1.2
-  coreEnemy: {fileID: 0}
---- !u!114 &2485673381087308599
+--- !u!114 &-9027612508846350916
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1721,12 +82,41 @@ MonoBehaviour:
   description: "\u4E00\u6B21\u6027\u53EC\u6765\u4E00\u961F\u5F31\u5C0F\u5929\u5175\u3002"
   art: {fileID: 21300000, guid: b0f81b63586afea498650034faaf8f93, type: 3}
   unitSpawns:
-  - unit: {fileID: 1140625118215442637}
+  - unit: {fileID: 9144161301996695504}
     count: 8
     spacing: 0.35
     yJitter: 0.25
   effects: []
---- !u!114 &3536457293833138054
+--- !u!114 &-8980447033416989740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_golden_barrier
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_golden_barrier
+  displayName: "\u62A4\u9635\u91D1\u5149"
+  type: 4
+  rarity: 0
+  level: 1
+  cost: 2
+  releaseRule: 0
+  description: "\u4E3A\u5DF1\u65B9\u5355\u4F4D\u9644\u52A0\u62A4\u76FE\u3002"
+  art: {fileID: 21300000, guid: 4b19b15d6b714b1690c56e2ec2669033, type: 3}
+  unitSpawns: []
+  effects:
+  - effectType: 4
+    targetRule: 5
+    value: 24
+    duration: 0
+    radius: 99
+    statusId: 
+--- !u!114 &-8886020726523686714
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1736,17 +126,36 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_jade_bottle
+  m_Name: artifact_heaven_seal
   m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_jade_bottle
-  displayName: "\u7389\u51C0\u74F6"
+  id: artifact_heaven_seal
+  displayName: "\u5929\u5EAD\u7B26\u5370"
   rarity: 1
   trigger: 0
-  description: "\u6BCF\u573A\u6218\u6597\u5F00\u59CB\u65F6\u4E3B\u89D2\u751F\u547D
-    +12\u3002"
-  icon: {fileID: 0}
+  description: "\u8D39\u7528\u4E0A\u9650 +2\uFF0C\u5F00\u5C40\u8D39\u7528 +1\u3002"
+  icon: {fileID: 21300000, guid: bb703b476aca4e53a6a0f3fee7bb1b89, type: 3}
   effects: []
---- !u!114 &4271994744868500708
+--- !u!114 &-8702450942123694493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_command_seal
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_command_seal
+  displayName: "\u5175\u7B26"
+  rarity: 0
+  trigger: 0
+  description: "\u7EDF\u7387\u4E0A\u9650 +3\uFF0C\u6218\u6597\u5F00\u59CB\u62BD\u724C
+    +1\u3002"
+  icon: {fileID: 21300000, guid: 2194eee3a88c4a8683bfe450aaf16e32, type: 3}
+  effects: []
+--- !u!114 &-8437475378932589652
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1768,372 +177,12 @@ MonoBehaviour:
   description: "\u653E\u7F6E\u4E00\u9053\u4E34\u65F6\u9632\u7EBF\uFF0C\u963B\u6321\u654C\u4EBA\u63A8\u8FDB\u3002"
   art: {fileID: 21300000, guid: 49057f8b1ee1cce42b328642edc372d4, type: 3}
   unitSpawns:
-  - unit: {fileID: -3654724210278625260}
+  - unit: {fileID: 9170919719481284748}
     count: 3
     spacing: 0.35
     yJitter: 0.25
   effects: []
---- !u!114 &4272403505961078123
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: unit_archer
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: unit_archer
-  displayName: "\u7075\u5F29\u5C04\u624B"
-  faction: 0
-  role: 0
-  maxHp: 12
-  attack: 3
-  attackInterval: 1.2
-  range: 3.6
-  moveSpeed: 0.85
-  commandCost: 1
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 38cbd100f62610c41b702bf19b256058, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &4901902133478065567
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_command_seal
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_command_seal
-  displayName: "\u5175\u7B26"
-  rarity: 0
-  trigger: 0
-  description: "\u7EDF\u7387\u4E0A\u9650 +3\uFF0C\u6218\u6597\u5F00\u59CB\u62BD\u724C
-    +1\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &5183258413765045651
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_fox_coin
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_fox_coin
-  displayName: "\u72D0\u4ED9\u94B1"
-  rarity: 1
-  trigger: 0
-  description: "\u673A\u9047\u548C\u795E\u79D8\u5956\u52B1\u989D\u5916 +15 \u91D1\u5E01\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &5353286143817185026
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_rally
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_rally
-  displayName: "\u6218\u9F13\u6CD5\u4EE4"
-  type: 4
-  rarity: 0
-  level: 1
-  cost: 2
-  releaseRule: 0
-  description: "\u77ED\u65F6\u95F4\u63D0\u5347\u5DF1\u65B9\u5355\u4F4D\u653B\u51FB\u3002"
-  art: {fileID: 21300000, guid: 359b86c017949cf49ba4027ebf9a0869, type: 3}
-  unitSpawns: []
-  effects:
-  - effectType: 5
-    targetRule: 5
-    value: 0.34
-    duration: 5
-    radius: 99
-    statusId: 
---- !u!114 &5538354183817941540
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: unit_incense_barracks
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: unit_incense_barracks
-  displayName: "\u9999\u706B\u5175\u8425"
-  faction: 0
-  role: 3
-  maxHp: 75
-  attack: 0
-  attackInterval: 99
-  range: 0
-  moveSpeed: 0
-  commandCost: 4
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: eff1dfb0912997d4093fdd812326137c, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 1140625118215442637}
-  productionInterval: 2.6
-  productionCount: 1
-  productionSpread: 0.4
---- !u!114 &5684300651387996793
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
-  m_Name: encounter_poison_copse
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
-  id: encounter_poison_copse
-  displayName: "\u6BD2\u96FE\u6797"
-  nodeType: 0
-  playerBaseMaxHp: 100
-  enemyBaseMaxHp: 175
-  enemySpawnInterval: 2.15
-  rewardGold: 34
-  enemySpawns:
-  - unit: {fileID: -7703281138408042429}
-    count: 1
-    interval: 1.2
-  - unit: {fileID: -7011601440822689581}
-    count: 1
-    interval: 1.2
-  coreEnemy: {fileID: 0}
---- !u!114 &6098645144047945449
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_fireball
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_fireball
-  displayName: "\u4E09\u6627\u771F\u706B"
-  type: 3
-  rarity: 0
-  level: 1
-  cost: 3
-  releaseRule: 2
-  description: "\u5728\u76EE\u6807\u70B9\u71C3\u8D77\u8303\u56F4\u771F\u706B\u3002"
-  art: {fileID: 21300000, guid: 0a05d67501431a94b86f611c4a97f617, type: 3}
-  unitSpawns: []
-  effects:
-  - effectType: 2
-    targetRule: 3
-    value: 30
-    duration: 0
-    radius: 1.5
-    statusId: 
---- !u!114 &6761378987431038314
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: unit_monkey_vanguard
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: unit_monkey_vanguard
-  displayName: "\u9F50\u5929\u5148\u950B"
-  faction: 0
-  role: 2
-  maxHp: 145
-  attack: 15
-  attackInterval: 0.85
-  range: 1.05
-  moveSpeed: 0.92
-  commandCost: 8
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 0d9ff155dc933ef488e2d50693e7be5d, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &7468329003333730452
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
-  m_Name: boss_black_wind
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
-  id: boss_black_wind
-  displayName: "\u9ED1\u98CE\u5C0F\u5723"
-  faction: 1
-  role: 5
-  maxHp: 360
-  attack: 18
-  attackInterval: 1.05
-  range: 1.4
-  moveSpeed: 0.42
-  commandCost: 0
-  projectileSpeed: 8
-  blocksMovement: 1
-  art: {fileID: 21300000, guid: 68f216762e8bfba4289ecb67ac27378d, type: 3}
-  tint: {r: 1, g: 1, b: 1, a: 1}
-  prefab: {fileID: 0}
-  producedUnit: {fileID: 0}
-  productionInterval: 0
-  productionCount: 0
-  productionSpread: 0.4
---- !u!114 &7609764895474998674
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_rally_lv2
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_rally_lv2
-  displayName: "\u6218\u9F13\u6CD5\u4EE4+1"
-  type: 4
-  rarity: 1
-  level: 2
-  cost: 2
-  releaseRule: 0
-  description: "\u77ED\u65F6\u95F4\u63D0\u5347\u5DF1\u65B9\u5355\u4F4D\u653B\u51FB\u3002"
-  art: {fileID: 21300000, guid: 359b86c017949cf49ba4027ebf9a0869, type: 3}
-  unitSpawns: []
-  effects:
-  - effectType: 5
-    targetRule: 5
-    value: 0.5
-    duration: 6
-    radius: 99
-    statusId: 
---- !u!114 &8183131555084999593
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_fireball_lv2
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_fireball_lv2
-  displayName: "\u4E09\u6627\u771F\u706B+1"
-  type: 3
-  rarity: 1
-  level: 2
-  cost: 3
-  releaseRule: 2
-  description: "\u5728\u76EE\u6807\u70B9\u71C3\u8D77\u8303\u56F4\u771F\u706B\u3002"
-  art: {fileID: 21300000, guid: 0a05d67501431a94b86f611c4a97f617, type: 3}
-  unitSpawns: []
-  effects:
-  - effectType: 2
-    targetRule: 3
-    value: 42
-    duration: 0
-    radius: 1.75
-    statusId: 
---- !u!114 &8415784456360085673
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_roadblock
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_roadblock
-  displayName: "\u516B\u5366\u77F3\u5792"
-  type: 6
-  rarity: 0
-  level: 1
-  cost: 2
-  releaseRule: 1
-  description: "\u653E\u7F6E\u4E00\u9053\u4E34\u65F6\u9632\u7EBF\uFF0C\u963B\u6321\u654C\u4EBA\u63A8\u8FDB\u3002"
-  art: {fileID: 21300000, guid: 49057f8b1ee1cce42b328642edc372d4, type: 3}
-  unitSpawns:
-  - unit: {fileID: -3654724210278625260}
-    count: 1
-    spacing: 0.35
-    yJitter: 0.25
-  effects: []
---- !u!114 &8437696057170209943
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
-  m_Name: encounter_elite_bone
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
-  id: encounter_elite_bone
-  displayName: "\u767D\u9AA8\u7763\u519B"
-  nodeType: 1
-  playerBaseMaxHp: 105
-  enemyBaseMaxHp: 245
-  enemySpawnInterval: 1.95
-  rewardGold: 66
-  enemySpawns:
-  - unit: {fileID: -7703281138408042429}
-    count: 2
-    interval: 1.2
-  - unit: {fileID: 8843015809331196444}
-    count: 1
-    interval: 1.2
-  coreEnemy: {fileID: -5474525847051831921}
---- !u!114 &8642073491845417527
+--- !u!114 &-8236896276920311377
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2153,9 +202,9 @@ MonoBehaviour:
   cost: 4
   releaseRule: 1
   description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u8FD1\u6218\u96F7\u9F13\u536B\u3002"
-  art: {fileID: 21300000, guid: 359b86c017949cf49ba4027ebf9a0869, type: 3}
+  art: {fileID: 21300000, guid: ac68da30f38b4476a1898765f2164497, type: 3}
   unitSpawns:
-  - unit: {fileID: -4219376041915850787}
+  - unit: {fileID: 8257348171524882485}
     count: 1
     spacing: 0.35
     yJitter: 0.25
@@ -2166,7 +215,7 @@ MonoBehaviour:
     duration: 0
     radius: 0
     statusId: 
---- !u!114 &8655845937173692861
+--- !u!114 &-8102462331305128416
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2175,17 +224,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_heaven_seal
-  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_heaven_seal
-  displayName: "\u5929\u5EAD\u7B26\u5370"
-  rarity: 1
-  trigger: 0
-  description: "\u8D39\u7528\u4E0A\u9650 +2\uFF0C\u5F00\u5C40\u8D39\u7528 +1\u3002"
-  icon: {fileID: 0}
-  effects: []
---- !u!114 &8726001475398078060
+  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
+  m_Name: encounter_mystery_punishment
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
+  id: encounter_mystery_punishment
+  displayName: "\u8BEF\u5165\u51F6\u9635"
+  nodeType: 5
+  playerBaseMaxHp: 105
+  enemyBaseMaxHp: 300
+  enemySpawnInterval: 1.55
+  rewardGold: 0
+  enemySpawns:
+  - unit: {fileID: -6925059456647097247}
+    count: 2
+    interval: 1.2
+  - unit: {fileID: 6976282090842975849}
+    count: 1
+    interval: 1.2
+  coreEnemy: {fileID: 7787996102414537546}
+--- !u!114 &-7946602413407175132
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2195,26 +252,104 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
-  m_Name: card_fireball_lv3
+  m_Name: card_incense_barracks
   m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
-  id: card_fireball_lv3
-  displayName: "\u4E09\u6627\u771F\u706B+2"
-  type: 3
+  id: card_incense_barracks
+  displayName: "\u9999\u706B\u5175\u8425"
+  type: 6
+  rarity: 0
+  level: 1
+  cost: 3
+  releaseRule: 1
+  description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u9999\u706B\u6C11\u5175\u3002"
+  art: {fileID: 21300000, guid: f53ecea5d9f1c6c48a48c6d7edf3d140, type: 3}
+  unitSpawns:
+  - unit: {fileID: -1857529694154206149}
+    count: 1
+    spacing: 0.35
+    yJitter: 0.25
+  effects: []
+--- !u!114 &-7848472335507917624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
+  m_Name: encounter_chaos_lord
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
+  id: encounter_chaos_lord
+  displayName: "\u6DF7\u6C8C\u9B54\u541B"
+  nodeType: 8
+  playerBaseMaxHp: 120
+  enemyBaseMaxHp: 520
+  enemySpawnInterval: 1.45
+  rewardGold: 220
+  enemySpawns:
+  - unit: {fileID: 3849117026645536564}
+    count: 3
+    interval: 1.2
+  - unit: {fileID: -6925059456647097247}
+    count: 1
+    interval: 1.2
+  - unit: {fileID: 9039557354062219311}
+    count: 2
+    interval: 1.2
+  - unit: {fileID: 6976282090842975849}
+    count: 1
+    interval: 1.2
+  coreEnemy: {fileID: 5067906461903608263}
+--- !u!114 &-7351398246571982456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_taiji_map
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_taiji_map
+  displayName: "\u592A\u6781\u56FE\u6B8B\u5377"
   rarity: 2
-  level: 3
-  cost: 4
-  releaseRule: 2
-  description: "\u5728\u76EE\u6807\u70B9\u71C3\u8D77\u8303\u56F4\u771F\u706B\u3002"
-  art: {fileID: 21300000, guid: 0a05d67501431a94b86f611c4a97f617, type: 3}
-  unitSpawns: []
-  effects:
-  - effectType: 2
-    targetRule: 3
-    value: 54
-    duration: 0
-    radius: 2
-    statusId: 
---- !u!114 &8843015809331196444
+  trigger: 0
+  description: "\u4F11\u606F\u56DE\u8840\u63D0\u5347\uFF0C\u4E09\u5408\u4E00\u540E\u989D\u5916\u83B7\u5F97
+    20 \u91D1\u5E01\u3002"
+  icon: {fileID: 21300000, guid: bb6b6c96d37340d4a4d40e55dcff4e76, type: 3}
+  effects: []
+--- !u!114 &-7274212366852222202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
+  m_Name: encounter_elite_bone
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
+  id: encounter_elite_bone
+  displayName: "\u767D\u9AA8\u7763\u519B"
+  nodeType: 1
+  playerBaseMaxHp: 105
+  enemyBaseMaxHp: 245
+  enemySpawnInterval: 1.95
+  rewardGold: 66
+  enemySpawns:
+  - unit: {fileID: 3849117026645536564}
+    count: 2
+    interval: 1.2
+  - unit: {fileID: -6925059456647097247}
+    count: 1
+    interval: 1.2
+  coreEnemy: {fileID: -3281956703825349927}
+--- !u!114 &-6925059456647097247
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2245,7 +380,7 @@ MonoBehaviour:
   productionInterval: 0
   productionCount: 0
   productionSpread: 0.4
---- !u!114 &8978474048597305120
+--- !u!114 &-6750071900042107314
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2255,16 +390,767 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
-  m_Name: artifact_battle_scripture
+  m_Name: artifact_market_token
   m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
-  id: artifact_battle_scripture
-  displayName: "\u6597\u6218\u7ECF"
-  rarity: 2
+  id: artifact_market_token
+  displayName: "\u901A\u5B9D\u4EE4"
+  rarity: 0
   trigger: 0
-  description: "\u82F1\u96C4\u548C\u7CBE\u5175\u653B\u51FB +20%\u3002"
-  icon: {fileID: 0}
+  description: "\u5546\u5E97\u8D2D\u4E70\u4EF7\u683C -20%\u3002"
+  icon: {fileID: 21300000, guid: 65d7570f316643d69b1f1e56ee5a6e24, type: 3}
   effects: []
---- !u!114 &9169288066165240691
+--- !u!114 &-6523051193723829012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_black_tortoise
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_black_tortoise
+  displayName: "\u7384\u6B66\u7532"
+  rarity: 1
+  trigger: 0
+  description: "\u4E3B\u89D2\u751F\u547D\u4E0A\u9650 +20\u3002"
+  icon: {fileID: 21300000, guid: f7180955d8984799890b9055efcedd01, type: 3}
+  effects: []
+--- !u!114 &-6489187858641470256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: unit_spirit_arrow_altar
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: unit_spirit_arrow_altar
+  displayName: "\u7075\u5F29\u575B"
+  faction: 0
+  role: 3
+  maxHp: 58
+  attack: 0
+  attackInterval: 99
+  range: 0
+  moveSpeed: 0
+  commandCost: 4
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: 787c7a5ab451af5459a269970f41f235, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 1995817299648045097}
+  productionInterval: 3.2
+  productionCount: 1
+  productionSpread: 0.4
+--- !u!114 &-5924926236734659263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_thunder_talisman_lv3
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_thunder_talisman_lv3
+  displayName: "\u638C\u5FC3\u96F7\u7B26+2"
+  type: 3
+  rarity: 2
+  level: 3
+  cost: 3
+  releaseRule: 2
+  description: "\u5BF9\u76EE\u6807\u70B9\u9644\u8FD1\u654C\u4EBA\u9020\u6210\u96F7\u51FB\u4F24\u5BB3\u3002"
+  art: {fileID: 21300000, guid: 070fc7965f374775953102564f19eb55, type: 3}
+  unitSpawns: []
+  effects:
+  - effectType: 1
+    targetRule: 3
+    value: 66
+    duration: 0
+    radius: 1.35
+    statusId: 
+--- !u!114 &-4647513068741366567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_war_drum
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_war_drum
+  displayName: "\u6218\u9F13"
+  rarity: 1
+  trigger: 0
+  description: "\u6BCF 4 \u4E2A\u5DF1\u65B9\u58EB\u5175\u89E6\u53D1 1 \u70B9\u58EB\u6C14\u3002"
+  icon: {fileID: 21300000, guid: e52e4850b2f9481a9ef1a63816951bc4, type: 3}
+  effects: []
+--- !u!114 &-4110557534048315433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_roadblock
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_roadblock
+  displayName: "\u516B\u5366\u77F3\u5792"
+  type: 6
+  rarity: 0
+  level: 1
+  cost: 2
+  releaseRule: 1
+  description: "\u653E\u7F6E\u4E00\u9053\u4E34\u65F6\u9632\u7EBF\uFF0C\u963B\u6321\u654C\u4EBA\u63A8\u8FDB\u3002"
+  art: {fileID: 21300000, guid: 49057f8b1ee1cce42b328642edc372d4, type: 3}
+  unitSpawns:
+  - unit: {fileID: 9170919719481284748}
+    count: 1
+    spacing: 0.35
+    yJitter: 0.25
+  effects: []
+--- !u!114 &-3960801667219518221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_fireball_lv2
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_fireball_lv2
+  displayName: "\u4E09\u6627\u771F\u706B+1"
+  type: 3
+  rarity: 1
+  level: 2
+  cost: 3
+  releaseRule: 2
+  description: "\u5728\u76EE\u6807\u70B9\u71C3\u8D77\u8303\u56F4\u771F\u706B\u3002"
+  art: {fileID: 21300000, guid: 0a05d67501431a94b86f611c4a97f617, type: 3}
+  unitSpawns: []
+  effects:
+  - effectType: 2
+    targetRule: 3
+    value: 42
+    duration: 0
+    radius: 1.75
+    statusId: 
+--- !u!114 &-3857985974046415028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
+  m_Name: encounter_bone_queen
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
+  id: encounter_bone_queen
+  displayName: "\u767D\u9AA8\u519B\u4E3B"
+  nodeType: 7
+  playerBaseMaxHp: 110
+  enemyBaseMaxHp: 360
+  enemySpawnInterval: 1.65
+  rewardGold: 125
+  enemySpawns:
+  - unit: {fileID: 3849117026645536564}
+    count: 2
+    interval: 1.2
+  - unit: {fileID: 6976282090842975849}
+    count: 1
+    interval: 1.2
+  - unit: {fileID: -6925059456647097247}
+    count: 1
+    interval: 1.2
+  coreEnemy: {fileID: 1376596417085215128}
+--- !u!114 &-3682395680660241323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_thunder_drum_tower
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_thunder_drum_tower
+  displayName: "\u96F7\u9F13\u53F0"
+  type: 6
+  rarity: 0
+  level: 1
+  cost: 4
+  releaseRule: 1
+  description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u8FD1\u6218\u96F7\u9F13\u536B\u3002"
+  art: {fileID: 21300000, guid: ac68da30f38b4476a1898765f2164497, type: 3}
+  unitSpawns:
+  - unit: {fileID: 8257348171524882485}
+    count: 1
+    spacing: 0.35
+    yJitter: 0.25
+  effects: []
+--- !u!114 &-3489145833927761273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_spirit_arrow_altar
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_spirit_arrow_altar
+  displayName: "\u7075\u5F29\u575B"
+  type: 6
+  rarity: 0
+  level: 1
+  cost: 3
+  releaseRule: 1
+  description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u7075\u5F29\u5C04\u624B\u3002"
+  art: {fileID: 21300000, guid: db8971086f04ad34cacf0fb1fd4a1fb4, type: 3}
+  unitSpawns:
+  - unit: {fileID: -6489187858641470256}
+    count: 1
+    spacing: 0.35
+    yJitter: 0.25
+  effects: []
+--- !u!114 &-3281956703825349927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: enemy_bone_elite
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: enemy_bone_elite
+  displayName: "\u767D\u9AA8\u7763\u519B"
+  faction: 1
+  role: 5
+  maxHp: 230
+  attack: 13
+  attackInterval: 1.15
+  range: 5.2
+  moveSpeed: 0
+  commandCost: 0
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: 8cbbff4010d4452e84130a9245aa16ee, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &-3119710116225846820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_thunder_drum_tower_lv3
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_thunder_drum_tower_lv3
+  displayName: "\u96F7\u9F13\u53F0+2"
+  type: 6
+  rarity: 2
+  level: 3
+  cost: 5
+  releaseRule: 1
+  description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u8FD1\u6218\u96F7\u9F13\u536B\u3002"
+  art: {fileID: 21300000, guid: ac68da30f38b4476a1898765f2164497, type: 3}
+  unitSpawns:
+  - unit: {fileID: 8257348171524882485}
+    count: 1
+    spacing: 0.35
+    yJitter: 0.25
+  effects:
+  - effectType: 13
+    targetRule: 8
+    value: 3
+    duration: 0
+    radius: 0
+    statusId: 
+--- !u!114 &-2873819166758956100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_golden_barrier_lv3
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_golden_barrier_lv3
+  displayName: "\u62A4\u9635\u91D1\u5149+2"
+  type: 4
+  rarity: 2
+  level: 3
+  cost: 3
+  releaseRule: 0
+  description: "\u4E3A\u5DF1\u65B9\u5355\u4F4D\u9644\u52A0\u62A4\u76FE\u3002"
+  art: {fileID: 21300000, guid: 4b19b15d6b714b1690c56e2ec2669033, type: 3}
+  unitSpawns: []
+  effects:
+  - effectType: 4
+    targetRule: 5
+    value: 48
+    duration: 0
+    radius: 99
+    statusId: 
+--- !u!114 &-2809531859109411958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: unit_shield_guard
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: unit_shield_guard
+  displayName: "\u91D1\u7532\u5929\u5C06"
+  faction: 0
+  role: 1
+  maxHp: 58
+  attack: 6
+  attackInterval: 1.2
+  range: 0.85
+  moveSpeed: 0.72
+  commandCost: 4
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: 0d9ff155dc933ef488e2d50693e7be5d, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &-2547137021237316212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_fireball
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_fireball
+  displayName: "\u4E09\u6627\u771F\u706B"
+  type: 3
+  rarity: 0
+  level: 1
+  cost: 3
+  releaseRule: 2
+  description: "\u5728\u76EE\u6807\u70B9\u71C3\u8D77\u8303\u56F4\u771F\u706B\u3002"
+  art: {fileID: 21300000, guid: 0a05d67501431a94b86f611c4a97f617, type: 3}
+  unitSpawns: []
+  effects:
+  - effectType: 2
+    targetRule: 3
+    value: 30
+    duration: 0
+    radius: 1.5
+    statusId: 
+--- !u!114 &-2463587217503365640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_monkey_hero_lv2
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_monkey_hero_lv2
+  displayName: "\u9F50\u5929\u5148\u950B+1"
+  type: 2
+  rarity: 1
+  level: 2
+  cost: 6
+  releaseRule: 1
+  description: "\u53EC\u6765\u4E00\u540D\u9AD8\u7EDF\u7387\u82F1\u96C4\u58EB\u5175\u3002"
+  art: {fileID: 21300000, guid: f25087f4e94b406ea540e34d029cf602, type: 3}
+  unitSpawns:
+  - unit: {fileID: 1227196091283015838}
+    count: 1
+    spacing: 0.35
+    yJitter: 0.25
+  effects:
+  - effectType: 5
+    targetRule: 5
+    value: 0.28
+    duration: 6
+    radius: 99
+    statusId: 
+--- !u!114 &-2391554575055637223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_heaven_general_order_lv3
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_heaven_general_order_lv3
+  displayName: "\u5929\u5C06\u4EE4+2"
+  type: 1
+  rarity: 2
+  level: 3
+  cost: 5
+  releaseRule: 1
+  description: "\u4E00\u6B21\u6027\u53EC\u6765\u6570\u540D\u91D1\u7532\u5929\u5C06\u3002"
+  art: {fileID: 21300000, guid: 71d0e8665a479ec41b66353236d38bbd, type: 3}
+  unitSpawns:
+  - unit: {fileID: -2809531859109411958}
+    count: 3
+    spacing: 0.35
+    yJitter: 0.25
+  effects:
+  - effectType: 4
+    targetRule: 5
+    value: 18
+    duration: 0
+    radius: 99
+    statusId: 
+--- !u!114 &-2369615810981241199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_monkey_hero
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_monkey_hero
+  displayName: "\u9F50\u5929\u5148\u950B"
+  type: 2
+  rarity: 0
+  level: 1
+  cost: 6
+  releaseRule: 1
+  description: "\u53EC\u6765\u4E00\u540D\u9AD8\u7EDF\u7387\u82F1\u96C4\u58EB\u5175\u3002"
+  art: {fileID: 21300000, guid: f25087f4e94b406ea540e34d029cf602, type: 3}
+  unitSpawns:
+  - unit: {fileID: 1227196091283015838}
+    count: 1
+    spacing: 0.35
+    yJitter: 0.25
+  effects:
+  - effectType: 5
+    targetRule: 5
+    value: 0.19999999
+    duration: 5
+    radius: 99
+    statusId: 
+--- !u!114 &-1932109368399756536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: boss_black_wind
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: boss_black_wind
+  displayName: "\u9ED1\u98CE\u5C0F\u5723"
+  faction: 1
+  role: 5
+  maxHp: 360
+  attack: 18
+  attackInterval: 1.05
+  range: 5.2
+  moveSpeed: 0
+  commandCost: 0
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: b9b808a896444dcdae56f3b304ebbb70, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &-1857529694154206149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: unit_incense_barracks
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: unit_incense_barracks
+  displayName: "\u9999\u706B\u5175\u8425"
+  faction: 0
+  role: 3
+  maxHp: 75
+  attack: 0
+  attackInterval: 99
+  range: 0
+  moveSpeed: 0
+  commandCost: 4
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: eff1dfb0912997d4093fdd812326137c, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 9144161301996695504}
+  productionInterval: 2.6
+  productionCount: 1
+  productionSpread: 0.4
+--- !u!114 &-1278511396832129601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_heaven_soldier_talisman
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_heaven_soldier_talisman
+  displayName: "\u5929\u5175\u7B26"
+  type: 0
+  rarity: 0
+  level: 1
+  cost: 2
+  releaseRule: 1
+  description: "\u4E00\u6B21\u6027\u53EC\u6765\u4E00\u961F\u5F31\u5C0F\u5929\u5175\u3002"
+  art: {fileID: 21300000, guid: b0f81b63586afea498650034faaf8f93, type: 3}
+  unitSpawns:
+  - unit: {fileID: 9144161301996695504}
+    count: 6
+    spacing: 0.35
+    yJitter: 0.25
+  effects: []
+--- !u!114 &-857291473845242625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_dragon_bone
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_dragon_bone
+  displayName: "\u9F99\u9AA8"
+  rarity: 1
+  trigger: 0
+  description: "\u5DF1\u65B9\u58EB\u5175\u653B\u51FB +12%\u3002"
+  icon: {fileID: 21300000, guid: 6c4b73d37eb74127b474e8c892e5bf81, type: 3}
+  effects: []
+--- !u!114 &-311067938256880870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_thunder_talisman
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_thunder_talisman
+  displayName: "\u638C\u5FC3\u96F7\u7B26"
+  type: 3
+  rarity: 0
+  level: 1
+  cost: 2
+  releaseRule: 2
+  description: "\u5BF9\u76EE\u6807\u70B9\u9644\u8FD1\u654C\u4EBA\u9020\u6210\u96F7\u51FB\u4F24\u5BB3\u3002"
+  art: {fileID: 21300000, guid: 070fc7965f374775953102564f19eb55, type: 3}
+  unitSpawns: []
+  effects:
+  - effectType: 1
+    targetRule: 3
+    value: 38
+    duration: 0
+    radius: 1.05
+    statusId: 
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b92e12d597180de45b2124a1bb660c5e, type: 3}
+  m_Name: DemoContentCatalog
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ContentCatalog
+  cards:
+  - {fileID: -7946602413407175132}
+  - {fileID: 4217647347889541554}
+  - {fileID: 5087192529418162265}
+  - {fileID: -3489145833927761273}
+  - {fileID: -9180907955645852721}
+  - {fileID: -9160317279929240447}
+  - {fileID: -4110557534048315433}
+  - {fileID: 7912593773260869253}
+  - {fileID: -8437475378932589652}
+  - {fileID: -3682395680660241323}
+  - {fileID: -8236896276920311377}
+  - {fileID: -3119710116225846820}
+  - {fileID: -1278511396832129601}
+  - {fileID: -9027612508846350916}
+  - {fileID: 70565371581553721}
+  - {fileID: 8365227987631546174}
+  - {fileID: 972954809631269674}
+  - {fileID: -2391554575055637223}
+  - {fileID: -2369615810981241199}
+  - {fileID: -2463587217503365640}
+  - {fileID: 4161302053374397719}
+  - {fileID: -2547137021237316212}
+  - {fileID: -3960801667219518221}
+  - {fileID: 4144565721125225879}
+  - {fileID: -311067938256880870}
+  - {fileID: 5615669661932916731}
+  - {fileID: -5924926236734659263}
+  - {fileID: 6033773345860346280}
+  - {fileID: 7105336586014745917}
+  - {fileID: 8641491726200136563}
+  - {fileID: -8980447033416989740}
+  - {fileID: 2461308882996310573}
+  - {fileID: -2873819166758956100}
+  units:
+  - {fileID: 9144161301996695504}
+  - {fileID: 1995817299648045097}
+  - {fileID: -2809531859109411958}
+  - {fileID: 1227196091283015838}
+  - {fileID: 7876401013992483775}
+  - {fileID: -1857529694154206149}
+  - {fileID: -6489187858641470256}
+  - {fileID: 9170919719481284748}
+  - {fileID: 8257348171524882485}
+  - {fileID: 3849117026645536564}
+  - {fileID: -6925059456647097247}
+  - {fileID: 9039557354062219311}
+  - {fileID: 6976282090842975849}
+  - {fileID: 8731631691608925211}
+  - {fileID: -3281956703825349927}
+  - {fileID: 7787996102414537546}
+  - {fileID: -1932109368399756536}
+  - {fileID: 1376596417085215128}
+  - {fileID: 5067906461903608263}
+  artifacts:
+  - {fileID: 2704428416483176906}
+  - {fileID: 7209748259754470064}
+  - {fileID: -4647513068741366567}
+  - {fileID: -8886020726523686714}
+  - {fileID: 1317448680336760797}
+  - {fileID: 7622192736076143602}
+  - {fileID: 2384438056110448469}
+  - {fileID: -6523051193723829012}
+  - {fileID: -6750071900042107314}
+  - {fileID: 4101325342143009811}
+  - {fileID: -857291473845242625}
+  - {fileID: -8702450942123694493}
+  - {fileID: 6085802157756280001}
+  - {fileID: -7351398246571982456}
+  - {fileID: 731959020464745170}
+  - {fileID: 4391018909762451655}
+  - {fileID: 4954383607375911410}
+  - {fileID: 3645146878426660938}
+  encounters:
+  - {fileID: 2067962665277967801}
+  - {fileID: 9100187369026636728}
+  - {fileID: 891992439685995724}
+  - {fileID: 3940409086807647771}
+  - {fileID: -7274212366852222202}
+  - {fileID: 3254025021993101484}
+  - {fileID: 2825986966739920197}
+  - {fileID: -3857985974046415028}
+  - {fileID: -7848472335507917624}
+  - {fileID: -8102462331305128416}
+  nodes: []
+--- !u!114 &70565371581553721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_heaven_soldier_talisman_lv3
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_heaven_soldier_talisman_lv3
+  displayName: "\u5929\u5175\u7B26+2"
+  type: 0
+  rarity: 2
+  level: 3
+  cost: 3
+  releaseRule: 1
+  description: "\u4E00\u6B21\u6027\u53EC\u6765\u4E00\u961F\u5F31\u5C0F\u5929\u5175\u3002"
+  art: {fileID: 21300000, guid: b0f81b63586afea498650034faaf8f93, type: 3}
+  unitSpawns:
+  - unit: {fileID: 9144161301996695504}
+    count: 10
+    spacing: 0.35
+    yJitter: 0.25
+  effects: []
+--- !u!114 &731959020464745170
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2281,5 +1167,1137 @@ MonoBehaviour:
   rarity: 0
   trigger: 0
   description: "\u6218\u6597\u5F00\u59CB\u83B7\u5F97 1 \u70B9\u8D39\u7528\u3002"
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 59dbd74afe17432897b346347d0c3fbb, type: 3}
   effects: []
+--- !u!114 &891992439685995724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
+  m_Name: encounter_poison_copse
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
+  id: encounter_poison_copse
+  displayName: "\u6BD2\u96FE\u6797"
+  nodeType: 0
+  playerBaseMaxHp: 100
+  enemyBaseMaxHp: 175
+  enemySpawnInterval: 2.15
+  rewardGold: 34
+  enemySpawns:
+  - unit: {fileID: 3849117026645536564}
+    count: 1
+    interval: 1.2
+  - unit: {fileID: 6976282090842975849}
+    count: 1
+    interval: 1.2
+  coreEnemy: {fileID: 0}
+--- !u!114 &972954809631269674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_heaven_general_order_lv2
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_heaven_general_order_lv2
+  displayName: "\u5929\u5C06\u4EE4+1"
+  type: 1
+  rarity: 1
+  level: 2
+  cost: 4
+  releaseRule: 1
+  description: "\u4E00\u6B21\u6027\u53EC\u6765\u6570\u540D\u91D1\u7532\u5929\u5C06\u3002"
+  art: {fileID: 21300000, guid: 71d0e8665a479ec41b66353236d38bbd, type: 3}
+  unitSpawns:
+  - unit: {fileID: -2809531859109411958}
+    count: 3
+    spacing: 0.35
+    yJitter: 0.25
+  effects: []
+--- !u!114 &1227196091283015838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: unit_monkey_vanguard
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: unit_monkey_vanguard
+  displayName: "\u9F50\u5929\u5148\u950B"
+  faction: 0
+  role: 2
+  maxHp: 145
+  attack: 15
+  attackInterval: 0.85
+  range: 1.05
+  moveSpeed: 0.92
+  commandCost: 8
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: e5bd63f08dc14ff6a7dc318222b570e2, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &1317448680336760797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_jade_bottle
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_jade_bottle
+  displayName: "\u7389\u51C0\u74F6"
+  rarity: 1
+  trigger: 0
+  description: "\u6BCF\u573A\u6218\u6597\u5F00\u59CB\u65F6\u4E3B\u89D2\u751F\u547D
+    +12\u3002"
+  icon: {fileID: 21300000, guid: 4ece09e9712c424e84859b496ec71970, type: 3}
+  effects: []
+--- !u!114 &1376596417085215128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: boss_bone_queen
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: boss_bone_queen
+  displayName: "\u767D\u9AA8\u519B\u4E3B"
+  faction: 1
+  role: 5
+  maxHp: 430
+  attack: 21
+  attackInterval: 1.2
+  range: 5.2
+  moveSpeed: 0
+  commandCost: 0
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: 5a429c8b148249e591881c4567c0eb1f, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &1995817299648045097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: unit_archer
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: unit_archer
+  displayName: "\u7075\u5F29\u5C04\u624B"
+  faction: 0
+  role: 0
+  maxHp: 12
+  attack: 3
+  attackInterval: 1.2
+  range: 2.15
+  moveSpeed: 0.85
+  commandCost: 1
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: 38cbd100f62610c41b702bf19b256058, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &2067962665277967801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
+  m_Name: encounter_training_camp
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
+  id: encounter_training_camp
+  displayName: "\u5996\u7269\u8425\u5730"
+  nodeType: 0
+  playerBaseMaxHp: 100
+  enemyBaseMaxHp: 140
+  enemySpawnInterval: 2.2
+  rewardGold: 25
+  enemySpawns:
+  - unit: {fileID: 3849117026645536564}
+    count: 1
+    interval: 1.2
+  - unit: {fileID: -6925059456647097247}
+    count: 1
+    interval: 1.2
+  coreEnemy: {fileID: 0}
+--- !u!114 &2384438056110448469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_cloud_boots
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_cloud_boots
+  displayName: "\u8E0F\u4E91\u5C65"
+  rarity: 0
+  trigger: 0
+  description: "\u5DF1\u65B9\u5355\u4F4D\u79FB\u52A8\u901F\u5EA6 +10%\u3002"
+  icon: {fileID: 21300000, guid: 48b6041aa7c44f0ea088430adb0a8e5a, type: 3}
+  effects: []
+--- !u!114 &2461308882996310573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_golden_barrier_lv2
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_golden_barrier_lv2
+  displayName: "\u62A4\u9635\u91D1\u5149+1"
+  type: 4
+  rarity: 1
+  level: 2
+  cost: 2
+  releaseRule: 0
+  description: "\u4E3A\u5DF1\u65B9\u5355\u4F4D\u9644\u52A0\u62A4\u76FE\u3002"
+  art: {fileID: 21300000, guid: 4b19b15d6b714b1690c56e2ec2669033, type: 3}
+  unitSpawns: []
+  effects:
+  - effectType: 4
+    targetRule: 5
+    value: 36
+    duration: 0
+    radius: 99
+    statusId: 
+--- !u!114 &2704428416483176906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_long_banner
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_long_banner
+  displayName: "\u957F\u65D7"
+  rarity: 0
+  trigger: 0
+  description: "\u7EDF\u7387\u4E0A\u9650 +5\u3002"
+  icon: {fileID: 21300000, guid: 1006c2aa515540bc912625f3075dac7e, type: 3}
+  effects: []
+--- !u!114 &2825986966739920197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
+  m_Name: encounter_black_wind
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
+  id: encounter_black_wind
+  displayName: "\u9ED1\u98CE\u5C0F\u5723"
+  nodeType: 7
+  playerBaseMaxHp: 110
+  enemyBaseMaxHp: 320
+  enemySpawnInterval: 1.75
+  rewardGold: 110
+  enemySpawns:
+  - unit: {fileID: 3849117026645536564}
+    count: 2
+    interval: 1.2
+  - unit: {fileID: -6925059456647097247}
+    count: 1
+    interval: 1.2
+  - unit: {fileID: 9039557354062219311}
+    count: 1
+    interval: 1.2
+  coreEnemy: {fileID: -1932109368399756536}
+--- !u!114 &3254025021993101484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
+  m_Name: encounter_elite_ox
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
+  id: encounter_elite_ox
+  displayName: "\u725B\u9B54\u6821\u5C09"
+  nodeType: 1
+  playerBaseMaxHp: 105
+  enemyBaseMaxHp: 270
+  enemySpawnInterval: 1.85
+  rewardGold: 75
+  enemySpawns:
+  - unit: {fileID: -6925059456647097247}
+    count: 1
+    interval: 1.2
+  - unit: {fileID: 6976282090842975849}
+    count: 1
+    interval: 1.2
+  coreEnemy: {fileID: 7787996102414537546}
+--- !u!114 &3645146878426660938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_permanent_relic
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_permanent_relic
+  displayName: "\u901A\u5173\u9057\u73CD"
+  rarity: 3
+  trigger: 0
+  description: "\u6700\u7EC8\u9996\u9886\u6389\u843D\u7684\u6C38\u4E45\u795E\u5668\u5360\u4F4D\u3002"
+  icon: {fileID: 21300000, guid: 74c905edfcc54c028abf1519c7542d6e, type: 3}
+  effects: []
+--- !u!114 &3849117026645536564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: enemy_grunt
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: enemy_grunt
+  displayName: "\u5C71\u9B48\u722A\u7259"
+  faction: 1
+  role: 4
+  maxHp: 16
+  attack: 4
+  attackInterval: 1.2
+  range: 0.75
+  moveSpeed: 0.95
+  commandCost: 0
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: 1800770e923472b41a982a95d57d6538, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &3940409086807647771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
+  m_Name: encounter_elite_wolf
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
+  id: encounter_elite_wolf
+  displayName: "\u5996\u72FC\u5148\u950B"
+  nodeType: 1
+  playerBaseMaxHp: 105
+  enemyBaseMaxHp: 220
+  enemySpawnInterval: 2
+  rewardGold: 58
+  enemySpawns:
+  - unit: {fileID: 3849117026645536564}
+    count: 2
+    interval: 1.2
+  - unit: {fileID: 9039557354062219311}
+    count: 1
+    interval: 1.2
+  coreEnemy: {fileID: 8731631691608925211}
+--- !u!114 &4101325342143009811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_artifact_eye
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_artifact_eye
+  displayName: "\u89C2\u661F\u955C"
+  rarity: 2
+  trigger: 0
+  description: "\u795E\u5668\u5C42\u53EF\u9009\u795E\u5668 +1\u3002"
+  icon: {fileID: 21300000, guid: d07a9642e12a4091ba49a4be881c7c81, type: 3}
+  effects: []
+--- !u!114 &4144565721125225879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_fireball_lv3
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_fireball_lv3
+  displayName: "\u4E09\u6627\u771F\u706B+2"
+  type: 3
+  rarity: 2
+  level: 3
+  cost: 4
+  releaseRule: 2
+  description: "\u5728\u76EE\u6807\u70B9\u71C3\u8D77\u8303\u56F4\u771F\u706B\u3002"
+  art: {fileID: 21300000, guid: 0a05d67501431a94b86f611c4a97f617, type: 3}
+  unitSpawns: []
+  effects:
+  - effectType: 2
+    targetRule: 3
+    value: 54
+    duration: 0
+    radius: 2
+    statusId: 
+--- !u!114 &4161302053374397719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_monkey_hero_lv3
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_monkey_hero_lv3
+  displayName: "\u9F50\u5929\u5148\u950B+2"
+  type: 2
+  rarity: 2
+  level: 3
+  cost: 7
+  releaseRule: 1
+  description: "\u53EC\u6765\u4E00\u540D\u9AD8\u7EDF\u7387\u82F1\u96C4\u58EB\u5175\u3002"
+  art: {fileID: 21300000, guid: f25087f4e94b406ea540e34d029cf602, type: 3}
+  unitSpawns:
+  - unit: {fileID: 1227196091283015838}
+    count: 1
+    spacing: 0.35
+    yJitter: 0.25
+  effects:
+  - effectType: 5
+    targetRule: 5
+    value: 0.35999998
+    duration: 7
+    radius: 99
+    statusId: 
+--- !u!114 &4217647347889541554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_incense_barracks_lv2
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_incense_barracks_lv2
+  displayName: "\u9999\u706B\u5175\u8425+1"
+  type: 6
+  rarity: 1
+  level: 2
+  cost: 3
+  releaseRule: 1
+  description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u9999\u706B\u6C11\u5175\u3002"
+  art: {fileID: 21300000, guid: f53ecea5d9f1c6c48a48c6d7edf3d140, type: 3}
+  unitSpawns:
+  - unit: {fileID: -1857529694154206149}
+    count: 1
+    spacing: 0.35
+    yJitter: 0.25
+  effects:
+  - effectType: 4
+    targetRule: 5
+    value: 16
+    duration: 0
+    radius: 99
+    statusId: 
+--- !u!114 &4391018909762451655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_battle_scripture
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_battle_scripture
+  displayName: "\u6597\u6218\u7ECF"
+  rarity: 2
+  trigger: 0
+  description: "\u82F1\u96C4\u548C\u7CBE\u5175\u653B\u51FB +20%\u3002"
+  icon: {fileID: 21300000, guid: 6dcd52e2196a458e8a230069b6e9c21b, type: 3}
+  effects: []
+--- !u!114 &4954383607375911410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_vajra
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_vajra
+  displayName: "\u91D1\u521A\u6775"
+  rarity: 3
+  trigger: 0
+  description: "\u4E3B\u89D2\u751F\u547D\u4E0A\u9650 +35\uFF0C\u7EDF\u7387\u4E0A\u9650
+    +8\u3002"
+  icon: {fileID: 21300000, guid: 394c6f2062f1421ca4029f2950eb06ad, type: 3}
+  effects: []
+--- !u!114 &5067906461903608263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: boss_chaos_lord
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: boss_chaos_lord
+  displayName: "\u6DF7\u6C8C\u9B54\u541B"
+  faction: 1
+  role: 5
+  maxHp: 620
+  attack: 26
+  attackInterval: 0.95
+  range: 5.2
+  moveSpeed: 0
+  commandCost: 0
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: d4d2549aa029447d8aa2c6bd17083162, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &5087192529418162265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_incense_barracks_lv3
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_incense_barracks_lv3
+  displayName: "\u9999\u706B\u5175\u8425+2"
+  type: 6
+  rarity: 2
+  level: 3
+  cost: 4
+  releaseRule: 1
+  description: "\u653E\u7F6E\u540E\u6301\u7EED\u751F\u4EA7\u9999\u706B\u6C11\u5175\u3002"
+  art: {fileID: 21300000, guid: f53ecea5d9f1c6c48a48c6d7edf3d140, type: 3}
+  unitSpawns:
+  - unit: {fileID: -1857529694154206149}
+    count: 1
+    spacing: 0.35
+    yJitter: 0.25
+  effects:
+  - effectType: 4
+    targetRule: 5
+    value: 20
+    duration: 0
+    radius: 99
+    statusId: 
+--- !u!114 &5615669661932916731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_thunder_talisman_lv2
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_thunder_talisman_lv2
+  displayName: "\u638C\u5FC3\u96F7\u7B26+1"
+  type: 3
+  rarity: 1
+  level: 2
+  cost: 2
+  releaseRule: 2
+  description: "\u5BF9\u76EE\u6807\u70B9\u9644\u8FD1\u654C\u4EBA\u9020\u6210\u96F7\u51FB\u4F24\u5BB3\u3002"
+  art: {fileID: 21300000, guid: 070fc7965f374775953102564f19eb55, type: 3}
+  unitSpawns: []
+  effects:
+  - effectType: 1
+    targetRule: 3
+    value: 52
+    duration: 0
+    radius: 1.2
+    statusId: 
+--- !u!114 &6033773345860346280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_rally
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_rally
+  displayName: "\u6218\u9F13\u6CD5\u4EE4"
+  type: 4
+  rarity: 0
+  level: 1
+  cost: 2
+  releaseRule: 0
+  description: "\u77ED\u65F6\u95F4\u63D0\u5347\u5DF1\u65B9\u5355\u4F4D\u653B\u51FB\uFF0C\u5E76\u83B7\u5F97\u58EB\u6C14\u5F3A\u5316\u4E0B\u4E00\u5F20\u51FA\u5175\u724C\u3002"
+  art: {fileID: 21300000, guid: 359b86c017949cf49ba4027ebf9a0869, type: 3}
+  unitSpawns: []
+  effects:
+  - effectType: 5
+    targetRule: 5
+    value: 0.34
+    duration: 5
+    radius: 99
+    statusId: 
+  - effectType: 14
+    targetRule: 8
+    value: 1
+    duration: 0
+    radius: 0
+    statusId: 
+--- !u!114 &6085802157756280001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_fox_coin
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_fox_coin
+  displayName: "\u72D0\u4ED9\u94B1"
+  rarity: 1
+  trigger: 0
+  description: "\u673A\u9047\u548C\u795E\u79D8\u5956\u52B1\u989D\u5916 +15 \u91D1\u5E01\u3002"
+  icon: {fileID: 21300000, guid: d18c89ddce78443aa1a726040e1c6e8d, type: 3}
+  effects: []
+--- !u!114 &6976282090842975849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: enemy_venom_shaman
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: enemy_venom_shaman
+  displayName: "\u6BD2\u96FE\u796D\u53F8"
+  faction: 1
+  role: 4
+  maxHp: 36
+  attack: 7
+  attackInterval: 1.45
+  range: 2.65
+  moveSpeed: 0.45
+  commandCost: 0
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: 81ca118b4fd04228bdf5ec1eba5464f1, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &7105336586014745917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_rally_lv2
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_rally_lv2
+  displayName: "\u6218\u9F13\u6CD5\u4EE4+1"
+  type: 4
+  rarity: 1
+  level: 2
+  cost: 2
+  releaseRule: 0
+  description: "\u77ED\u65F6\u95F4\u63D0\u5347\u5DF1\u65B9\u5355\u4F4D\u653B\u51FB\uFF0C\u5E76\u83B7\u5F97\u58EB\u6C14\u5F3A\u5316\u4E0B\u4E00\u5F20\u51FA\u5175\u724C\u3002"
+  art: {fileID: 21300000, guid: 359b86c017949cf49ba4027ebf9a0869, type: 3}
+  unitSpawns: []
+  effects:
+  - effectType: 5
+    targetRule: 5
+    value: 0.5
+    duration: 6
+    radius: 99
+    statusId: 
+  - effectType: 14
+    targetRule: 8
+    value: 1
+    duration: 0
+    radius: 0
+    statusId: 
+--- !u!114 &7209748259754470064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_field_purse
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_field_purse
+  displayName: "\u6218\u5730\u94B1\u888B"
+  rarity: 0
+  trigger: 0
+  description: "\u91D1\u5E01\u6536\u76CA +20%\u3002"
+  icon: {fileID: 21300000, guid: 0205750996ef448282bea902a5859891, type: 3}
+  effects: []
+--- !u!114 &7622192736076143602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 831d2f800cdfcf148aeaea198fc2dbbc, type: 3}
+  m_Name: artifact_fire_pearl
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.ArtifactDefinition
+  id: artifact_fire_pearl
+  displayName: "\u79BB\u706B\u73E0"
+  rarity: 1
+  trigger: 0
+  description: "\u6CD5\u672F\u4F24\u5BB3 +25%\u3002"
+  icon: {fileID: 21300000, guid: c2289fbe499c463189ded86a79605a3d, type: 3}
+  effects: []
+--- !u!114 &7787996102414537546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: enemy_ox_elite
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: enemy_ox_elite
+  displayName: "\u725B\u9B54\u6821\u5C09"
+  faction: 1
+  role: 5
+  maxHp: 270
+  attack: 16
+  attackInterval: 1.35
+  range: 5.2
+  moveSpeed: 0
+  commandCost: 0
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: 87745962e63841e28fd8a15f281b98bb, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &7876401013992483775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: unit_thunder_guard
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: unit_thunder_guard
+  displayName: "\u96F7\u9F13\u536B"
+  faction: 0
+  role: 0
+  maxHp: 24
+  attack: 5
+  attackInterval: 1
+  range: 1.05
+  moveSpeed: 0.95
+  commandCost: 2
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: 0770d3061c484f05b8818e13efce4f2e, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &7912593773260869253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_roadblock_lv2
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_roadblock_lv2
+  displayName: "\u516B\u5366\u77F3\u5792+1"
+  type: 6
+  rarity: 1
+  level: 2
+  cost: 2
+  releaseRule: 1
+  description: "\u653E\u7F6E\u4E00\u9053\u4E34\u65F6\u9632\u7EBF\uFF0C\u963B\u6321\u654C\u4EBA\u63A8\u8FDB\u3002"
+  art: {fileID: 21300000, guid: 49057f8b1ee1cce42b328642edc372d4, type: 3}
+  unitSpawns:
+  - unit: {fileID: 9170919719481284748}
+    count: 2
+    spacing: 0.35
+    yJitter: 0.25
+  effects: []
+--- !u!114 &8257348171524882485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: unit_thunder_drum_tower
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: unit_thunder_drum_tower
+  displayName: "\u96F7\u9F13\u53F0"
+  faction: 0
+  role: 3
+  maxHp: 70
+  attack: 0
+  attackInterval: 99
+  range: 0
+  moveSpeed: 0
+  commandCost: 5
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: e36c41299d5b4ca59e8f227d7aa8bfa3, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 7876401013992483775}
+  productionInterval: 4.2
+  productionCount: 1
+  productionSpread: 0.4
+--- !u!114 &8365227987631546174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_heaven_general_order
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_heaven_general_order
+  displayName: "\u5929\u5C06\u4EE4"
+  type: 1
+  rarity: 0
+  level: 1
+  cost: 4
+  releaseRule: 1
+  description: "\u4E00\u6B21\u6027\u53EC\u6765\u6570\u540D\u91D1\u7532\u5929\u5C06\u3002"
+  art: {fileID: 21300000, guid: 71d0e8665a479ec41b66353236d38bbd, type: 3}
+  unitSpawns:
+  - unit: {fileID: -2809531859109411958}
+    count: 2
+    spacing: 0.35
+    yJitter: 0.25
+  effects: []
+--- !u!114 &8641491726200136563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b844b69a7d57844793cd5970f833fc3, type: 3}
+  m_Name: card_rally_lv3
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.CardDefinition
+  id: card_rally_lv3
+  displayName: "\u6218\u9F13\u6CD5\u4EE4+2"
+  type: 4
+  rarity: 2
+  level: 3
+  cost: 3
+  releaseRule: 0
+  description: "\u77ED\u65F6\u95F4\u63D0\u5347\u5DF1\u65B9\u5355\u4F4D\u653B\u51FB\uFF0C\u5E76\u83B7\u5F97\u58EB\u6C14\u5F3A\u5316\u4E0B\u4E00\u5F20\u51FA\u5175\u724C\u3002"
+  art: {fileID: 21300000, guid: 359b86c017949cf49ba4027ebf9a0869, type: 3}
+  unitSpawns: []
+  effects:
+  - effectType: 5
+    targetRule: 5
+    value: 0.65999997
+    duration: 7
+    radius: 99
+    statusId: 
+  - effectType: 14
+    targetRule: 8
+    value: 2
+    duration: 0
+    radius: 0
+    statusId: 
+--- !u!114 &8731631691608925211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: enemy_wolf_elite
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: enemy_wolf_elite
+  displayName: "\u5996\u72FC\u5148\u950B"
+  faction: 1
+  role: 5
+  maxHp: 180
+  attack: 11
+  attackInterval: 0.95
+  range: 5.2
+  moveSpeed: 0
+  commandCost: 0
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: c816b9e93bdc4fd690ad18c71c5e9032, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &9039557354062219311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: enemy_imp_archer
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: enemy_imp_archer
+  displayName: "\u9AA8\u5F29\u5C0F\u5996"
+  faction: 1
+  role: 4
+  maxHp: 18
+  attack: 4
+  attackInterval: 1.25
+  range: 2.05
+  moveSpeed: 0.72
+  commandCost: 0
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: 24b2bae5c0364732b8fa496ca369de79, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &9100187369026636728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 594ed41a79e539445a1110e4c07c1b8b, type: 3}
+  m_Name: encounter_bone_ford
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.EncounterDefinition
+  id: encounter_bone_ford
+  displayName: "\u767D\u9AA8\u6E21\u53E3"
+  nodeType: 0
+  playerBaseMaxHp: 100
+  enemyBaseMaxHp: 160
+  enemySpawnInterval: 2
+  rewardGold: 30
+  enemySpawns:
+  - unit: {fileID: 3849117026645536564}
+    count: 2
+    interval: 1.2
+  - unit: {fileID: 9039557354062219311}
+    count: 1
+    interval: 1.2
+  coreEnemy: {fileID: 0}
+--- !u!114 &9144161301996695504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: unit_militia
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: unit_militia
+  displayName: "\u9999\u706B\u6C11\u5175"
+  faction: 0
+  role: 0
+  maxHp: 16
+  attack: 4
+  attackInterval: 1.1
+  range: 0.75
+  moveSpeed: 1.2
+  commandCost: 1
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: 9f62df7fea079f24194c306213b13a12, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4
+--- !u!114 &9170919719481284748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42732912a7f9e9c4fa8fe68e05ea76bc, type: 3}
+  m_Name: unit_roadblock
+  m_EditorClassIdentifier: XTD.Runtime::XTD.Content.UnitDefinition
+  id: unit_roadblock
+  displayName: "\u516B\u5366\u77F3\u5792"
+  faction: 0
+  role: 3
+  maxHp: 90
+  attack: 0
+  attackInterval: 99
+  range: 0
+  moveSpeed: 0
+  commandCost: 3
+  projectileSpeed: 8
+  blocksMovement: 1
+  art: {fileID: 21300000, guid: 55a41df4c998eff4c9e94cb745e909d7, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  prefab: {fileID: 0}
+  producedUnit: {fileID: 0}
+  productionInterval: 0
+  productionCount: 0
+  productionSpread: 0.4

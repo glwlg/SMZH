@@ -24,6 +24,10 @@ namespace XTD.Editor
         private const string AiFxRoot = AiArtRoot + "/FX";
         private const string AiBackgroundRoot = AiArtRoot + "/Backgrounds";
         private const string AiSourceRoot = AiArtRoot + "/SourceSheets";
+        private const string AiUiRoot = AiArtRoot + "/UI";
+        private const string AiNodeIconRoot = AiUiRoot + "/Nodes";
+        private const string AiArtifactIconRoot = AiUiRoot + "/Artifacts";
+        private const string BattleMusicAssetPath = "Assets/Resources/Audio/BGM/hyoshi_action_track_2.ogg";
         private const string CatalogPath = ContentRoot + "/DemoContentCatalog.asset";
 
         [MenuItem("X-TD/初始化/重建 MVP 原型内容")]
@@ -96,6 +100,9 @@ namespace XTD.Editor
             Directory.CreateDirectory(AiFxRoot);
             Directory.CreateDirectory(AiBackgroundRoot);
             Directory.CreateDirectory(AiSourceRoot);
+            Directory.CreateDirectory(AiUiRoot);
+            Directory.CreateDirectory(AiNodeIconRoot);
+            Directory.CreateDirectory(AiArtifactIconRoot);
         }
 
         private static ContentCatalog CreateCatalogAsset()
@@ -143,23 +150,23 @@ namespace XTD.Editor
             SetUnitArt(catalog, "unit_militia", LoadAiBattleSprite("unit_militia_battle"));
             SetUnitArt(catalog, "unit_archer", LoadAiBattleSprite("unit_archer_battle"));
             SetUnitArt(catalog, "unit_shield_guard", LoadAiBattleSprite("unit_heaven_general_battle"));
-            SetUnitArt(catalog, "unit_monkey_vanguard", LoadAiBattleSprite("unit_heaven_general_battle"));
-            SetUnitArt(catalog, "unit_thunder_guard", LoadAiBattleSprite("unit_heaven_general_battle"));
+            SetUnitArt(catalog, "unit_monkey_vanguard", LoadAiBattleSprite("unit_monkey_vanguard_battle"));
+            SetUnitArt(catalog, "unit_thunder_guard", LoadAiBattleSprite("unit_thunder_guard_battle"));
             SetUnitArt(catalog, "unit_incense_barracks", LoadAiBattleSprite("unit_incense_barracks_battle"));
             SetUnitArt(catalog, "unit_spirit_arrow_altar", LoadAiBattleSprite("unit_spirit_arrow_altar_battle"));
             SetUnitArt(catalog, "unit_roadblock", LoadAiBattleSprite("unit_bagua_wall_battle"));
-            SetUnitArt(catalog, "unit_thunder_drum_tower", LoadAiBattleSprite("unit_spirit_arrow_altar_battle"));
+            SetUnitArt(catalog, "unit_thunder_drum_tower", LoadAiBattleSprite("unit_thunder_drum_tower_battle"));
             SetUnitArt(catalog, "enemy_grunt", LoadAiBattleSprite("enemy_grunt_battle"));
             SetUnitArt(catalog, "enemy_brute", LoadAiBattleSprite("enemy_brute_battle"));
-            SetUnitArt(catalog, "enemy_alpha", LoadAiBattleSprite("enemy_alpha_battle"));
-            SetUnitArt(catalog, "enemy_imp_archer", LoadAiBattleSprite("enemy_grunt_battle"));
-            SetUnitArt(catalog, "enemy_venom_shaman", LoadAiBattleSprite("enemy_alpha_battle"));
-            SetUnitArt(catalog, "enemy_wolf_elite", LoadAiBattleSprite("enemy_alpha_battle"));
-            SetUnitArt(catalog, "enemy_bone_elite", LoadAiBattleSprite("enemy_brute_battle"));
-            SetUnitArt(catalog, "enemy_ox_elite", LoadAiBattleSprite("enemy_alpha_battle"));
-            SetUnitArt(catalog, "boss_black_wind", LoadAiBattleSprite("enemy_alpha_battle"));
-            SetUnitArt(catalog, "boss_bone_queen", LoadAiBattleSprite("enemy_alpha_battle"));
-            SetUnitArt(catalog, "boss_chaos_lord", LoadAiBattleSprite("enemy_alpha_battle"));
+            SetUnitArt(catalog, "enemy_alpha", LoadAiBattleSprite("enemy_wolf_elite_battle"));
+            SetUnitArt(catalog, "enemy_imp_archer", LoadAiBattleSprite("enemy_imp_archer_battle"));
+            SetUnitArt(catalog, "enemy_venom_shaman", LoadAiBattleSprite("enemy_venom_shaman_battle"));
+            SetUnitArt(catalog, "enemy_wolf_elite", LoadAiBattleSprite("enemy_wolf_elite_battle"));
+            SetUnitArt(catalog, "enemy_bone_elite", LoadAiBattleSprite("enemy_bone_elite_battle"));
+            SetUnitArt(catalog, "enemy_ox_elite", LoadAiBattleSprite("enemy_ox_elite_battle"));
+            SetUnitArt(catalog, "boss_black_wind", LoadAiBattleSprite("boss_black_wind_battle"));
+            SetUnitArt(catalog, "boss_bone_queen", LoadAiBattleSprite("boss_bone_queen_battle"));
+            SetUnitArt(catalog, "boss_chaos_lord", LoadAiBattleSprite("boss_chaos_lord_battle"));
 
             SetLeveledCardArt(catalog, "card_incense_barracks", LoadAiCardSprite("card_incense_barracks"));
             SetLeveledCardArt(catalog, "card_spirit_arrow_altar", LoadAiCardSprite("card_spirit_arrow_altar"));
@@ -168,10 +175,29 @@ namespace XTD.Editor
             SetLeveledCardArt(catalog, "card_heaven_general_order", LoadAiCardSprite("card_heaven_general_order"));
             SetLeveledCardArt(catalog, "card_fireball", LoadAiCardSprite("card_fireball"));
             SetLeveledCardArt(catalog, "card_rally", LoadAiCardSprite("card_rally"));
-            SetLeveledCardArt(catalog, "card_thunder_drum_tower", LoadAiCardSprite("card_rally"));
-            SetLeveledCardArt(catalog, "card_monkey_hero", LoadAiCardSprite("card_heaven_general_order"));
-            SetLeveledCardArt(catalog, "card_thunder_talisman", LoadAiCardSprite("card_fireball"));
-            SetLeveledCardArt(catalog, "card_golden_barrier", LoadAiCardSprite("card_roadblock"));
+            SetLeveledCardArt(catalog, "card_thunder_drum_tower", LoadAiCardSprite("card_thunder_drum_tower"));
+            SetLeveledCardArt(catalog, "card_monkey_hero", LoadAiCardSprite("card_monkey_hero"));
+            SetLeveledCardArt(catalog, "card_thunder_talisman", LoadAiCardSprite("card_thunder_talisman"));
+            SetLeveledCardArt(catalog, "card_golden_barrier", LoadAiCardSprite("card_golden_barrier"));
+
+            SetArtifactIcon(catalog, "artifact_long_banner", LoadAiArtifactSprite("artifact_long_banner"));
+            SetArtifactIcon(catalog, "artifact_field_purse", LoadAiArtifactSprite("artifact_field_purse"));
+            SetArtifactIcon(catalog, "artifact_war_drum", LoadAiArtifactSprite("artifact_war_drum"));
+            SetArtifactIcon(catalog, "artifact_heaven_seal", LoadAiArtifactSprite("artifact_heaven_seal"));
+            SetArtifactIcon(catalog, "artifact_jade_bottle", LoadAiArtifactSprite("artifact_jade_bottle"));
+            SetArtifactIcon(catalog, "artifact_fire_pearl", LoadAiArtifactSprite("artifact_fire_pearl"));
+            SetArtifactIcon(catalog, "artifact_cloud_boots", LoadAiArtifactSprite("artifact_cloud_boots"));
+            SetArtifactIcon(catalog, "artifact_black_tortoise", LoadAiArtifactSprite("artifact_black_tortoise"));
+            SetArtifactIcon(catalog, "artifact_market_token", LoadAiArtifactSprite("artifact_market_token"));
+            SetArtifactIcon(catalog, "artifact_artifact_eye", LoadAiArtifactSprite("artifact_artifact_eye"));
+            SetArtifactIcon(catalog, "artifact_dragon_bone", LoadAiArtifactSprite("artifact_dragon_bone"));
+            SetArtifactIcon(catalog, "artifact_command_seal", LoadAiArtifactSprite("artifact_command_seal"));
+            SetArtifactIcon(catalog, "artifact_fox_coin", LoadAiArtifactSprite("artifact_fox_coin"));
+            SetArtifactIcon(catalog, "artifact_taiji_map", LoadAiArtifactSprite("artifact_taiji_map"));
+            SetArtifactIcon(catalog, "artifact_star_sand", LoadAiArtifactSprite("artifact_star_sand"));
+            SetArtifactIcon(catalog, "artifact_battle_scripture", LoadAiArtifactSprite("artifact_battle_scripture"));
+            SetArtifactIcon(catalog, "artifact_vajra", LoadAiArtifactSprite("artifact_vajra"));
+            SetArtifactIcon(catalog, "artifact_permanent_relic", LoadAiArtifactSprite("artifact_permanent_relic"));
         }
 
         private static void PrepareAiSprites()
@@ -246,6 +272,21 @@ namespace XTD.Editor
             SetCardArt(catalog, baseCardId + "_lv3", sprite);
         }
 
+        private static void SetArtifactIcon(ContentCatalog catalog, string artifactId, Sprite sprite)
+        {
+            var artifact = catalog.FindArtifact(artifactId);
+            if (artifact == null)
+            {
+                return;
+            }
+
+            artifact.icon = sprite;
+            if (sprite == null)
+            {
+                Debug.LogWarning($"未找到神器图标：{artifactId}");
+            }
+        }
+
         private static Sprite LoadAiBattleSprite(string spriteName)
         {
             return AssetDatabase.LoadAssetAtPath<Sprite>($"{AiBattleRoot}/{spriteName}.png");
@@ -264,6 +305,17 @@ namespace XTD.Editor
         private static Sprite LoadAiBackgroundSprite(string spriteName)
         {
             return AssetDatabase.LoadAssetAtPath<Sprite>($"{AiBackgroundRoot}/{spriteName}.png");
+        }
+
+        private static Sprite LoadAiArtifactSprite(string spriteName)
+        {
+            return AssetDatabase.LoadAssetAtPath<Sprite>($"{AiArtifactIconRoot}/{spriteName}.png");
+        }
+
+        private static AudioClip LoadBattleMusicClip()
+        {
+            AssetDatabase.ImportAsset(BattleMusicAssetPath, ImportAssetOptions.ForceUpdate);
+            return AssetDatabase.LoadAssetAtPath<AudioClip>(BattleMusicAssetPath);
         }
 
         private static void CreateBootScene()
@@ -303,6 +355,7 @@ namespace XTD.Editor
             SetSerializedObject(serialized, "enemyProjectileSprite", LoadAiFxSprite("projectile_spirit_arrow"));
             SetSerializedObject(serialized, "hitEffectSprite", LoadAiFxSprite("fx_hit_jade_spark"));
             SetSerializedObject(serialized, "spellImpactSprite", LoadAiFxSprite("fx_samadhi_fire_impact"));
+            SetSerializedObject(serialized, "battleMusicClip", LoadBattleMusicClip());
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
             CreateBattlefield();
@@ -324,6 +377,7 @@ namespace XTD.Editor
         {
             var cameraObject = new GameObject("Main Camera");
             var camera = cameraObject.AddComponent<Camera>();
+            cameraObject.AddComponent<AudioListener>();
             camera.tag = "MainCamera";
             camera.orthographic = true;
             camera.orthographicSize = 5f;
@@ -387,7 +441,12 @@ namespace XTD.Editor
                     inputModule.enabled = inputModule.GetType() == inputSystemModule;
                 }
 
-                var module = eventSystem.GetComponent(inputSystemModule) ?? eventSystem.AddComponent(inputSystemModule);
+                var module = eventSystem.GetComponent(inputSystemModule);
+                if (module == null)
+                {
+                    module = eventSystem.AddComponent(inputSystemModule);
+                }
+
                 module.GetType().GetMethod("AssignDefaultActions")?.Invoke(module, null);
                 return;
             }

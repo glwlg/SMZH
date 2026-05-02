@@ -15,6 +15,7 @@ namespace XTD.Presentation
     {
         [SerializeField] private ContentCatalog catalog;
         private static Font cachedFont;
+        private static readonly Dictionary<string, Sprite> cachedResourceSprites = new();
         private GameFlowController flow;
         private GameObject uiRoot;
 
@@ -63,6 +64,12 @@ namespace XTD.Presentation
             if (!flow.HasActiveRun)
             {
                 BuildTitleMenu();
+                return;
+            }
+
+            if (flow.HasPendingCardReward)
+            {
+                BuildCardRewardPanel();
                 return;
             }
 
@@ -127,6 +134,9 @@ namespace XTD.Presentation
 
             var mapPanel = CreatePanel("层路线图", uiRoot.transform, new Vector2(0.5f, 0.47f), new Vector2(0.5f, 0.47f), Vector2.zero, new Vector2(1180f, 620f), new Color(0.02f, 0.03f, 0.035f, 0.28f));
             var mapRoot = mapPanel.rectTransform;
+            var previewText = CreateText("房间预览", uiRoot.transform, new Vector2(0.82f, 0.80f), new Vector2(430f, 112f), 18, TextAnchor.MiddleLeft);
+            previewText.text = "把鼠标移到房间上，可以预览类型、奖励和风险。";
+            previewText.color = new Color(0.92f, 0.94f, 0.88f, 0.94f);
             var positions = new Dictionary<string, Vector2>();
             foreach (var row in floorRows)
             {
@@ -180,6 +190,7 @@ namespace XTD.Presentation
                     var position = positions[node.Key];
                     var button = CreateMapRoomButton(node, mapRoot, position, isAvailable, isSelected);
                     button.interactable = isAvailable;
+                    AddNodePreview(button, node, previewText, isAvailable || isSelected);
                     if (!isAvailable)
                     {
                         continue;
@@ -220,6 +231,17 @@ namespace XTD.Presentation
                     ? NodeColor(node.NodeType)
                     : new Color(0.10f, 0.12f, 0.13f, 0.72f);
 
+            var label = button.GetComponentInChildren<Text>();
+            if (label != null)
+            {
+                var labelRect = label.rectTransform;
+                labelRect.sizeDelta = new Vector2(72f, 42f);
+                labelRect.anchoredPosition = new Vector2(24f, 0f);
+                label.fontSize = 18;
+            }
+
+            AddSpriteIcon(button.transform, LoadNodeSprite(node.NodeType), new Vector2(-42f, 0f), new Vector2(42f, 42f));
+
             if (selected || available)
             {
                 var outline = button.gameObject.AddComponent<Outline>();
@@ -228,6 +250,38 @@ namespace XTD.Presentation
             }
 
             return button;
+        }
+
+        private void AddNodePreview(Button button, MapNodeRuntime node, Text previewText, bool reachable)
+        {
+            var trigger = button.gameObject.AddComponent<EventTrigger>();
+            AddTrigger(trigger, EventTriggerType.PointerEnter, () => previewText.text = BuildNodePreview(node, reachable));
+            AddTrigger(trigger, EventTriggerType.PointerClick, () => previewText.text = BuildNodePreview(node, reachable));
+        }
+
+        private static void AddTrigger(EventTrigger trigger, EventTriggerType type, Action callback)
+        {
+            var entry = new EventTrigger.Entry { eventID = type };
+            entry.callback.AddListener(_ => callback());
+            trigger.triggers.Add(entry);
+        }
+
+        private static string BuildNodePreview(MapNodeRuntime node, bool reachable)
+        {
+            var state = reachable ? "当前路线可达" : "暂未连通";
+            return node.NodeType switch
+            {
+                MapNodeType.NormalMonster => $"普通怪物\n{state}\n奖励：金币\n目标：摧毁敌方基地。",
+                MapNodeType.EliteMonster => $"精英怪物\n{state}\n奖励：金币，从 3 张卡中选 1 张\n提示：敌方核心站桩输出并派兵。",
+                MapNodeType.Shop => $"商店\n{state}\n奖励：构筑调整\n提示：购买新牌，或半价出售已有牌。",
+                MapNodeType.Rest => $"休息\n{state}\n奖励：回血或三合一合成\n提示：合成最多升到 3 级。",
+                MapNodeType.Opportunity => $"机遇\n{state}\n奖励：事件收益\n提示：可能获得金币、卡牌、升级或承担小风险。",
+                MapNodeType.Mystery => $"神秘\n{state}\n奖励/风险：高收益或凶阵战斗\n提示：凶阵打赢也没有额外奖励。",
+                MapNodeType.Artifact => $"神器层\n{state}\n奖励：3 个神器选 1 个\n提示：观星镜可提高可选数量。",
+                MapNodeType.SmallBoss => $"小首领\n{state}\n奖励：金币、经验，从 4 张卡中选 2 张\n提示：核心生命低时技能节奏会加快。",
+                MapNodeType.FinalBoss => $"最终首领\n{state}\n奖励：大量金币、经验、永久神器，从 5 张卡中选 3 张\n提示：击败后结束本次探索。",
+                _ => $"房间\n{state}\n奖励：未知"
+            };
         }
 
         private static Image CreateMapLine(Transform parent, Vector2 from, Vector2 to, Color color, float thickness)
@@ -265,6 +319,23 @@ namespace XTD.Presentation
             };
         }
 
+        private static string NodeIconName(MapNodeType nodeType)
+        {
+            return nodeType switch
+            {
+                MapNodeType.NormalMonster => "node_normal_monster",
+                MapNodeType.EliteMonster => "node_elite_monster",
+                MapNodeType.Shop => "node_shop",
+                MapNodeType.Rest => "node_rest",
+                MapNodeType.Opportunity => "node_opportunity",
+                MapNodeType.Mystery => "node_mystery",
+                MapNodeType.Artifact => "node_artifact",
+                MapNodeType.SmallBoss => "node_small_boss",
+                MapNodeType.FinalBoss => "node_final_boss",
+                _ => "icon_route_path"
+            };
+        }
+
         private static Color NodeColor(MapNodeType nodeType)
         {
             return nodeType switch
@@ -278,6 +349,32 @@ namespace XTD.Presentation
                 MapNodeType.Artifact => new Color(0.31f, 0.20f, 0.08f, 0.96f),
                 MapNodeType.SmallBoss or MapNodeType.FinalBoss => new Color(0.42f, 0.08f, 0.08f, 0.96f),
                 _ => new Color(0.15f, 0.2f, 0.28f, 0.95f)
+            };
+        }
+
+        private static string CardTypeName(CardType type)
+        {
+            return type switch
+            {
+                CardType.Structure => "建筑",
+                CardType.Soldier => "士兵",
+                CardType.EliteSoldier => "精兵",
+                CardType.Hero => "英雄",
+                CardType.Spell => "法术",
+                CardType.Tactic => "战术",
+                _ => "卡牌"
+            };
+        }
+
+        private static Color CardPanelColor(CardType type)
+        {
+            return type switch
+            {
+                CardType.Structure => new Color(0.33f, 0.18f, 0.10f, 0.96f),
+                CardType.Spell => new Color(0.34f, 0.09f, 0.08f, 0.96f),
+                CardType.Tactic => new Color(0.14f, 0.22f, 0.14f, 0.96f),
+                CardType.EliteSoldier or CardType.Hero => new Color(0.30f, 0.22f, 0.08f, 0.96f),
+                _ => new Color(0.13f, 0.20f, 0.23f, 0.96f)
             };
         }
 
@@ -327,16 +424,46 @@ namespace XTD.Presentation
             }
         }
 
+        private void BuildCardRewardPanel()
+        {
+            BuildHeader();
+
+            var title = CreateText("奖励标题", uiRoot.transform, new Vector2(0.5f, 0.74f), new Vector2(920f, 72f), 36, TextAnchor.MiddleCenter);
+            title.text = $"卡牌奖励：还可选择 {flow.PendingCardRewardPickCount} 张";
+
+            var choices = flow.PendingCardRewardChoices();
+            var startX = -((choices.Count - 1) * 230f) * 0.5f;
+            for (var i = 0; i < choices.Count; i++)
+            {
+                var card = choices[i];
+                var label = $"{card.displayName}\n{CardTypeName(card.type)}  费用 {card.cost}  Lv.{card.level}\n{card.description}";
+                var button = CreateButton(label, uiRoot.transform, new Vector2(0.5f, 0.50f), new Vector2(220f, 190f), new Vector2(startX + i * 230f, 0f));
+                button.GetComponent<Image>().color = CardPanelColor(card.type);
+                button.onClick.AddListener(() =>
+                {
+                    flow.ChooseCardReward(card);
+                    BuildUi();
+                });
+            }
+
+            var skip = CreateButton("放弃剩余奖励", uiRoot.transform, new Vector2(0.5f, 0.24f), new Vector2(260f, 62f));
+            skip.onClick.AddListener(() =>
+            {
+                flow.SkipCardReward();
+                BuildUi();
+            });
+        }
+
         private void BuildShopPanel()
         {
             var info = CreateText("商店说明", uiRoot.transform, new Vector2(0.5f, 0.69f), new Vector2(1000f, 52f), 22, TextAnchor.MiddleCenter);
-            info.text = "购买新卡牌，或半价出售已有卡牌。离开后进入下一行。";
+            info.text = $"当前金币 {flow.CurrentRun.gold}。上方购买新卡牌，下方半价出售已有卡牌；离开后进入下一行。";
 
             var shopCards = flow.GenerateShopCards();
             for (var i = 0; i < shopCards.Count; i++)
             {
                 var card = shopCards[i];
-                var button = CreateButton($"{card.displayName}\n{flow.CardBuyPrice(card)} 金币", uiRoot.transform, new Vector2(0.5f, 0.56f), new Vector2(190f, 92f), new Vector2(-390f + i * 195f, 0f));
+                var button = CreateButton($"{card.displayName}\n{CardTypeName(card.type)} Lv.{card.level}\n买 {flow.CardBuyPrice(card)} 金币", uiRoot.transform, new Vector2(0.5f, 0.56f), new Vector2(190f, 108f), new Vector2(-390f + i * 195f, 0f));
                 button.onClick.AddListener(() =>
                 {
                     flow.BuyCard(card);
@@ -403,7 +530,8 @@ namespace XTD.Presentation
         private void BuildOpportunityPanel()
         {
             var body = CreateText("机遇说明", uiRoot.transform, new Vector2(0.5f, 0.58f), new Vector2(980f, 120f), 24, TextAnchor.MiddleCenter);
-            body.text = "此处可能获得金币、新卡牌，或让已有卡牌升级。";
+            var preview = flow.GenerateOpportunityPreview();
+            body.text = $"{preview.title}\n{preview.story}\n收益：{preview.reward}    风险：{preview.risk}";
 
             var button = CreateButton("揭开机遇", uiRoot.transform, new Vector2(0.5f, 0.42f), new Vector2(280f, 72f));
             button.onClick.AddListener(() =>
@@ -424,6 +552,15 @@ namespace XTD.Presentation
             {
                 var artifact = choices[i];
                 var button = CreateButton($"{artifact.displayName}\n{artifact.description}", uiRoot.transform, new Vector2(0.5f, 0.50f), new Vector2(245f, 130f), new Vector2(startX + i * 260f, 0f));
+                var label = button.GetComponentInChildren<Text>();
+                if (label != null)
+                {
+                    label.rectTransform.sizeDelta = new Vector2(210f, 72f);
+                    label.rectTransform.anchoredPosition = new Vector2(0f, -26f);
+                    label.fontSize = 18;
+                }
+
+                AddSpriteIcon(button.transform, artifact.icon, new Vector2(0f, 28f), new Vector2(50f, 50f));
                 button.onClick.AddListener(() =>
                 {
                     flow.ChooseArtifact(artifact);
@@ -471,6 +608,15 @@ namespace XTD.Presentation
                 MapNodeType.SmallBoss or MapNodeType.FinalBoss => new Color(0.42f, 0.08f, 0.08f, 0.96f),
                 _ => image.color
             };
+            var label = button.GetComponentInChildren<Text>();
+            if (label != null)
+            {
+                label.rectTransform.sizeDelta = new Vector2(160f, 48f);
+                label.rectTransform.anchoredPosition = new Vector2(0f, -34f);
+                label.fontSize = 20;
+            }
+
+            AddSpriteIcon(button.transform, LoadNodeSprite(node.NodeType), new Vector2(0f, 22f), new Vector2(52f, 52f));
             return button;
         }
 
@@ -487,6 +633,56 @@ namespace XTD.Presentation
             var image = go.GetComponent<Image>();
             image.color = color;
             return image;
+        }
+
+        private static void AddSpriteIcon(Transform parent, Sprite sprite, Vector2 position, Vector2 size)
+        {
+            if (sprite == null)
+            {
+                return;
+            }
+
+            var go = new GameObject("AI Icon", typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(parent, false);
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = size;
+            rect.anchoredPosition = position;
+
+            var image = go.GetComponent<Image>();
+            image.sprite = sprite;
+            image.preserveAspect = true;
+            image.raycastTarget = false;
+            image.color = Color.white;
+        }
+
+        private static Sprite LoadNodeSprite(MapNodeType nodeType)
+        {
+            var path = $"UI/Nodes/{NodeIconName(nodeType)}";
+            return LoadResourceSprite(path);
+        }
+
+        private static Sprite LoadResourceSprite(string path)
+        {
+            if (cachedResourceSprites.TryGetValue(path, out var cached))
+            {
+                return cached;
+            }
+
+            var sprite = Resources.Load<Sprite>(path);
+            if (sprite == null)
+            {
+                var texture = Resources.Load<Texture2D>(path);
+                if (texture != null)
+                {
+                    sprite = Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100f);
+                }
+            }
+
+            cachedResourceSprites[path] = sprite;
+            return sprite;
         }
 
         private static Text CreateText(string name, Transform parent, Vector2 anchor, Vector2 size, int fontSize, TextAnchor alignment)
@@ -581,7 +777,12 @@ namespace XTD.Presentation
                     module.enabled = module.GetType() == inputSystemModule;
                 }
 
-                var inputModule = eventSystem.GetComponent(inputSystemModule) ?? eventSystem.AddComponent(inputSystemModule);
+                var inputModule = eventSystem.GetComponent(inputSystemModule);
+                if (inputModule == null)
+                {
+                    inputModule = eventSystem.AddComponent(inputSystemModule);
+                }
+
                 inputSystemModule.GetMethod("AssignDefaultActions")?.Invoke(inputModule, null);
                 return;
             }
@@ -595,7 +796,12 @@ namespace XTD.Presentation
                 }
             }
 
-            var standalone = eventSystem.GetComponent<StandaloneInputModule>() ?? eventSystem.AddComponent<StandaloneInputModule>();
+            var standalone = eventSystem.GetComponent<StandaloneInputModule>();
+            if (standalone == null)
+            {
+                standalone = eventSystem.AddComponent<StandaloneInputModule>();
+            }
+
             standalone.enabled = true;
         }
 

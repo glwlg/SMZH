@@ -20,6 +20,8 @@ namespace XTD.Content
         public List<string> permanentArtifactIds = new();
         public List<int> availableNodeIndices = new();
         public List<string> selectedNodeKeys = new();
+        public List<string> pendingCardRewardIds = new();
+        public int pendingCardRewardPickCount;
 
         public RunState Clone()
         {
@@ -38,7 +40,9 @@ namespace XTD.Content
                 artifactIds = new List<string>(artifactIds),
                 permanentArtifactIds = new List<string>(permanentArtifactIds),
                 availableNodeIndices = new List<int>(availableNodeIndices),
-                selectedNodeKeys = new List<string>(selectedNodeKeys)
+                selectedNodeKeys = new List<string>(selectedNodeKeys),
+                pendingCardRewardIds = new List<string>(pendingCardRewardIds),
+                pendingCardRewardPickCount = pendingCardRewardPickCount
             };
         }
     }

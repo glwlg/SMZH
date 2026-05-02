@@ -2,33 +2,49 @@
 
 这份文件用于记录 X-TD 中使用的 AI 生成或 AI 辅助素材。后续如果准备上 Steam，需要根据平台要求如实披露 AI 内容来源和二次处理方式。
 
-## 当前素材清单
+## 当前素材批次
 
-| 素材路径 | 用途 | 来源工具 | 生成提示词或简述 | 是否二次处理 | 备注 |
-| --- | --- | --- | --- | --- | --- |
-| `Assets/_Project/Art/AI/SourceSheets/ai_card_sheet_raw.png` | 卡牌正面展示源素材表 | ChatGPT 图像生成 | 4 列 3 行，中式神话题材，包含建筑、士兵、敌人、法术、战术图标；卡牌视角正向玩家 | 是 | 原始图保留，便于后续重新裁切 |
-| `Assets/_Project/Art/AI/SourceSheets/ai_battle_sheet_raw.png` | 战场单位源素材表 | ChatGPT 图像生成 | 3 列 3 行，上敌下我的战场视角；我方建筑和士兵朝上，敌人朝下 | 是 | 原始图保留，便于后续重新裁切 |
-| `Assets/_Project/Art/AI/Cards/*.png` | 手牌和奖励界面的卡牌图 | ChatGPT 图像生成 + 本地裁切 | 从卡牌源素材表裁切，去除品红背景并居中到透明画布 | 是 | 卡牌图使用正面展示视角，不等同于战场落地图 |
-| `Assets/_Project/Art/AI/Battle/*.png` | 战场建筑、士兵、敌人精灵 | ChatGPT 图像生成 + 本地裁切 | 从战场源素材表裁切，去除品红背景并居中到透明画布 | 是 | 我方单位和炮塔朝上，敌方单位朝下 |
-| `Assets/_Project/Art/AI/FX/projectile_spirit_arrow.png` | 远程弹道 | AI 素材风格参考 + 本地绘制 | 依据灵弩坛、弓手和青玉灵光配色制作的上行灵箭弹道 | 是 | 同目录保留 `projectile_spirit_arrow_sheet.png` 作为后续动画帧 |
-| `Assets/_Project/Art/AI/FX/fx_hit_jade_spark.png` | 命中特效 | AI 素材风格参考 + 本地绘制 | 青玉火花、金色冲击线，适合普通命中特效 | 是 | 同目录保留 `fx_hit_jade_spark_sheet.png` |
-| `Assets/_Project/Art/AI/FX/fx_samadhi_fire_impact.png` | 三昧真火落点特效 | ChatGPT 图像生成 + 本地帧处理 | 基于 `card_fireball.png` 生成冲击帧和发光层 | 是 | 同目录保留 `fx_samadhi_fire_impact_sheet.png` |
-| `Assets/_Project/Art/AI/Backgrounds/battlefield_honghuang_ai.png` | 战斗场景全屏背景 | imagegen CLI / OpenAI 兼容接口 | 中式神话洪荒风格开放战场，上方妖雾赤土、下方仙灵青玉气息；无单位、无建筑、无怪物虚影、无中路 | 否 | 已用 imagegen 重新生成；保留原 `.meta`，Unity 刷新后会沿用同一个资源引用 |
-| `Assets/_Project/Art/AI/UI/card_frame_honghuang_raw.png` | 卡牌边框原始生成图 | imagegen CLI / OpenAI 兼容接口 | 中式神话洪荒风格竖版卡牌边框，朱红漆、鎏金纹、青玉嵌饰、云纹与符箓结构；外部和内部留纯品红抠图区域 | 否 | 原始图保留，便于后续重新抠图或重绘 |
-| `Assets/_Project/Art/AI/UI/card_frame_honghuang.png` | 手牌 UI 的透明卡牌边框 | imagegen CLI + 本地抠图 | 从 `card_frame_honghuang_raw.png` 移除纯品红背景，保留透明内窗和透明外部区域 | 是 | 同步复制到 `Assets/Resources/UI/card_frame_honghuang.png`，供运行时 `Resources.Load` 加载 |
+| 批次 | 资源范围 | 来源工具 | 生成说明 | 二次处理 |
+| --- | --- | --- | --- | --- |
+| v0.2 | 战斗单位、敌人、首领、卡牌图、迷宫节点图标、神器图标、战斗特效、战场背景 | imagegen CLI / OpenAI 兼容接口 | 中式神话、洪荒西游方向；战斗视角为敌方在上、我方在下；战斗落地图和卡牌正面图分开生成 | 是 |
+
+## v0.2 源图
+
+| 源图路径 | 用途 | 说明 |
+| --- | --- | --- |
+| `Assets/_Project/Art/AI/SourceSheets/v02_player_units_sheet.png` | 我方单位和建筑源图 | 3x3 表，我方建筑与士兵朝上，用于战场落地 Sprite。 |
+| `Assets/_Project/Art/AI/SourceSheets/v02_enemy_units_sheet.png` | 敌方怪物、精英、小首领源图 | 3x3 表，敌方单位朝下，精英和首领作为敌方核心。 |
+| `Assets/_Project/Art/AI/SourceSheets/v02_final_boss_sheet.png` | 最终首领源图 | 单张混沌魔君核心图。 |
+| `Assets/_Project/Art/AI/SourceSheets/v02_card_art_sheet.png` | 卡牌正面源图 | 4x3 表，正向玩家展示，不等同于战场落地图。 |
+| `Assets/_Project/Art/AI/SourceSheets/v02_node_icon_sheet.png` | 迷宫节点和奖励图标源图 | 4x4 表，包含普通、精英、商店、休息、机遇、神秘、神器、Boss 等图标。 |
+| `Assets/_Project/Art/AI/SourceSheets/v02_artifact_icon_sheet.png` | 神器图标源图 | 5x4 表，覆盖当前 MVP 神器和预留图标。 |
+| `Assets/_Project/Art/AI/SourceSheets/v02_fx_sheet.png` | 战斗特效源图 | 4x2 表，包含弹道、命中、火焰、雷击、Boss 预警、士气、死亡烟雾等。 |
+| `Assets/_Project/Art/AI/SourceSheets/v02_battlefield_background.png` | 战场背景源图 | 16:9 全屏背景，上方妖雾赤土，下方仙灵青玉阵地。 |
+
+## v0.2 输出资源
+
+| 输出路径 | 用途 | 说明 |
+| --- | --- | --- |
+| `Assets/_Project/Art/AI/Battle/*.png` | 战斗单位、建筑、怪物、精英和首领 | 从源图裁切、去品红底、居中或底部对齐到透明 PNG。 |
+| `Assets/_Project/Art/AI/Cards/*.png` | 手牌、奖励和卡牌详情图 | 从卡牌源图裁切，保持正向玩家视角。 |
+| `Assets/_Project/Art/AI/FX/*.png` | 弹道、命中、法术和反馈特效 | 从特效源图裁切，保留透明背景。 |
+| `Assets/_Project/Art/AI/UI/Nodes/*.png` | 迷宫路线节点图标 | 同步复制到 `Assets/Resources/UI/Nodes/`，运行时可直接加载。 |
+| `Assets/_Project/Art/AI/UI/Artifacts/*.png` | 神器图标 | 已写入当前 `DemoContentCatalog.asset` 的神器 icon 引用。 |
+| `Assets/_Project/Art/AI/Backgrounds/battlefield_honghuang_ai.png` | 战斗场景背景 | 同步复制到 `Assets/Resources/UI/battlefield_honghuang_ai.png`。 |
 
 ## 处理脚本
 
-当前批量裁切和透明化脚本位于：
+当前 v0.2 批量处理脚本：
 
-`W:\glwlg\game\X-TD\.codex-tmp\asset-generation\process_ai_assets.py`
+`W:\glwlg\game\X-TD\.codex-tmp\asset-generation\process_v02_generated_assets.py`
 
 脚本用途：
 
-- 从源素材表裁切卡牌图和战场图。
-- 移除品红背景并导出透明 PNG。
-- 生成基础弹道、命中特效和三昧真火冲击帧。
-- 不再生成战场背景，避免覆盖已经用 imagegen 单独生成的正式背景图。
+- 从 `v02-generated` 源图按固定网格裁切素材。
+- 去除纯品红背景并导出透明 PNG。
+- 为新素材生成 Unity 可识别的 `.meta`。
+- 同步更新 `DemoContentCatalog.asset` 中已有单位、卡牌和神器图标引用。
+- 将迷宫节点图标和战场背景复制到 `Assets/Resources/UI/`，方便运行时加载。
 
 ## 记录规则
 

@@ -41,12 +41,12 @@ namespace XTD.Content
                     continue;
                 }
 
-                if (spawn.unit.role == UnitRole.Structure)
+                if (spawn.unit.role != UnitRole.Structure)
                 {
                     continue;
                 }
 
-                total += spawn.unit.commandCost * Mathf.Max(0, spawn.count);
+                total += Mathf.Max(0, spawn.count);
             }
 
             return total;

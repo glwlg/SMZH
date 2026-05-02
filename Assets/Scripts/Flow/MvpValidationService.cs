@@ -87,9 +87,24 @@ namespace XTD.Flow
             RequireEncounterCount(catalog, MapNodeType.SmallBoss, 2, "小首领", report);
             RequireEncounterCount(catalog, MapNodeType.FinalBoss, 1, "最终首领", report);
 
+            if (playableCards.Count == 0)
+            {
+                report.issues.Add("卡牌奖励池不能为空。");
+            }
+
+            if (artifacts.Count(artifact => artifact.id != "artifact_permanent_relic") < 3)
+            {
+                report.issues.Add("神器奖励池至少需要 3 个非永久神器。");
+            }
+
             if (catalog.encounters.Any(encounter => encounter != null && encounter.nodeType == MapNodeType.NormalMonster && encounter.coreEnemy != null))
             {
                 report.issues.Add("普通怪物节点应以摧毁敌方基地为目标，不应配置核心敌人。");
+            }
+
+            if (catalog.encounters.Any(encounter => encounter != null && encounter.nodeType == MapNodeType.NormalMonster && encounter.enemyBaseMaxHp <= 0f))
+            {
+                report.issues.Add("普通怪物节点必须有可摧毁的敌方基地血量。");
             }
 
             foreach (var nodeType in new[] { MapNodeType.EliteMonster, MapNodeType.SmallBoss, MapNodeType.FinalBoss })
@@ -98,6 +113,11 @@ namespace XTD.Flow
                 {
                     report.issues.Add($"{GameFlowController.NodeTypeName(nodeType)}节点应配置核心敌人作为胜利目标。");
                 }
+            }
+
+            if (catalog.encounters.Any(encounter => encounter != null && encounter.enemySpawns.Count == 0))
+            {
+                report.issues.Add("所有遭遇至少需要一组敌方派兵配置。");
             }
         }
 
@@ -159,6 +179,63 @@ namespace XTD.Flow
                     report.issues.Add($"第 5 行之后缺少 {GameFlowController.NodeTypeName(required)}。");
                 }
             }
+
+            ValidateEveryRoomCanReachFloorEnd(rows, report);
+        }
+
+        private static void ValidateEveryRoomCanReachFloorEnd(IReadOnlyList<List<MapNodeRuntime>> rows, MvpValidationReport report)
+        {
+            foreach (var floorRows in rows.GroupBy(row => row[0].Floor))
+            {
+                var orderedRows = floorRows.OrderBy(row => row[0].Row).ToList();
+                foreach (var row in orderedRows)
+                {
+                    foreach (var node in row)
+                    {
+                        if (!CanReachFloorEnd(node, orderedRows))
+                        {
+                            report.issues.Add($"迷宫第 {node.Floor} 层房间 {node.Row}-{node.NodeIndex} 无法到达本层终点。");
+                        }
+                    }
+                }
+            }
+        }
+
+        private static bool CanReachFloorEnd(MapNodeRuntime start, IReadOnlyList<List<MapNodeRuntime>> floorRows)
+        {
+            var queue = new Queue<MapNodeRuntime>();
+            var visited = new HashSet<string>();
+            queue.Enqueue(start);
+            visited.Add(start.Key);
+
+            while (queue.Count > 0)
+            {
+                var node = queue.Dequeue();
+                if (node.Row == 10)
+                {
+                    return true;
+                }
+
+                var nextRow = floorRows.FirstOrDefault(row => row.Count > 0 && row[0].Row == node.Row + 1);
+                if (nextRow == null)
+                {
+                    continue;
+                }
+
+                foreach (var nextIndex in node.NextNodeIndices)
+                {
+                    var next = nextRow.FirstOrDefault(candidate => candidate.NodeIndex == nextIndex);
+                    if (next == null || visited.Contains(next.Key))
+                    {
+                        continue;
+                    }
+
+                    visited.Add(next.Key);
+                    queue.Enqueue(next);
+                }
+            }
+
+            return false;
         }
 
         private static void ValidateRunCanReachFinalBoss(ContentCatalog catalog, int seed, MvpValidationReport report)

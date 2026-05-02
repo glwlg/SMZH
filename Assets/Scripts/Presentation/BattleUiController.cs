@@ -24,6 +24,11 @@ namespace XTD.Presentation
         private Text resultText;
         private Button restartButton;
         private Button debugWinButton;
+        private Button debugLoseButton;
+        private Button debugGoldButton;
+        private Button debugRewardButton;
+        private Button debugMoraleButton;
+        private Button debugSkipButton;
         private float noticeTimer;
         private static Font cachedFont;
 
@@ -70,10 +75,10 @@ namespace XTD.Presentation
             var cardPoolCount = deck != null ? deck.CardPool.Count : 0;
             var usedCount = deck != null ? deck.UsedPile.Count : 0;
             var moraleHint = battle.NextCardWillUseMorale
-                ? "下张出兵+1"
+                ? "下张士兵+1 / 精兵护盾 / 英雄增伤"
                 : $"{battle.MoralePendingSoldiers}/{battle.MoraleSoldiersPerCharge}";
             statusText.text =
-                $"费用 {battle.Mana:0.0}/{battle.MaxMana}    统率 {battle.CurrentCommand}/{battle.MaxCommand}    士气 {battle.MoraleCharges}（{moraleHint}）    卡池 {cardPoolCount} / 已用 {usedCount}\n" +
+                $"费用 {battle.Mana:0.0}/{battle.MaxMana}    阵位 {battle.CurrentCommand}/{battle.MaxCommand}    士气 {battle.MoraleCharges}（{moraleHint}）    卡池 {cardPoolCount} / 已用 {usedCount}\n" +
                 $"我方基地 {battle.PlayerBaseHp:0}    {battle.EnemyObjectiveLabel} {battle.EnemyObjectiveHp:0}";
 
             TickNotice();
@@ -167,9 +172,30 @@ namespace XTD.Presentation
             restartButton = CreateButton("重新开始", root, new Vector2(0.5f, 0.46f), new Vector2(220f, 64f));
             restartButton.gameObject.SetActive(false);
 
-            debugWinButton = CreateButton("测试胜利", root, new Vector2(1f, 1f), new Vector2(132f, 42f));
-            debugWinButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(-92f, -34f);
+            var debugPanel = CreatePanel(
+                "调试区",
+                root,
+                new Vector2(1f, 1f),
+                new Vector2(1f, 1f),
+                new Vector2(-170f, -96f),
+                new Vector2(300f, 138f),
+                new Color(0.025f, 0.035f, 0.045f, 0.58f));
+            var debugTitle = CreateText("调试标题", debugPanel.transform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -17f), 15);
+            debugTitle.text = "调试";
+            debugTitle.rectTransform.sizeDelta = new Vector2(280f, 24f);
+
+            debugWinButton = CreateDebugButton("胜利", debugPanel.transform, -92f, -48f);
             debugWinButton.onClick.AddListener(() => battle?.DebugWinNow());
+            debugLoseButton = CreateDebugButton("失败", debugPanel.transform, 0f, -48f);
+            debugLoseButton.onClick.AddListener(() => battle?.DebugLoseNow());
+            debugGoldButton = CreateDebugButton("+金币", debugPanel.transform, 92f, -48f);
+            debugGoldButton.onClick.AddListener(() => battle?.DebugAddGold());
+            debugRewardButton = CreateDebugButton("抽奖励", debugPanel.transform, -92f, -92f);
+            debugRewardButton.onClick.AddListener(() => battle?.DebugOpenCardReward());
+            debugMoraleButton = CreateDebugButton("+士气", debugPanel.transform, 0f, -92f);
+            debugMoraleButton.onClick.AddListener(() => battle?.DebugAddMorale());
+            debugSkipButton = CreateDebugButton("跳节点", debugPanel.transform, 92f, -92f);
+            debugSkipButton.onClick.AddListener(() => battle?.DebugSkipNode());
 
             var hand = new GameObject("手牌区", typeof(RectTransform));
             hand.transform.SetParent(root, false);
@@ -284,6 +310,20 @@ namespace XTD.Presentation
             return go.GetComponent<Button>();
         }
 
+        private static Button CreateDebugButton(string label, Transform parent, float x, float y)
+        {
+            var button = CreateButton(label, parent, new Vector2(0.5f, 1f), new Vector2(82f, 34f));
+            button.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);
+            var text = button.GetComponentInChildren<Text>();
+            if (text != null)
+            {
+                text.fontSize = 16;
+                text.resizeTextMaxSize = 16;
+            }
+
+            return button;
+        }
+
         private static void EnsureEventSystem()
         {
             var eventSystem = UnityEngine.Object.FindFirstObjectByType<EventSystem>();
@@ -306,7 +346,12 @@ namespace XTD.Presentation
                     inputModule.enabled = inputModule.GetType() == inputSystemModule;
                 }
 
-                var module = eventSystem.GetComponent(inputSystemModule) ?? eventSystem.AddComponent(inputSystemModule);
+                var module = eventSystem.GetComponent(inputSystemModule);
+                if (module == null)
+                {
+                    module = eventSystem.AddComponent(inputSystemModule);
+                }
+
                 module.GetType().GetMethod("AssignDefaultActions")?.Invoke(module, null);
                 return;
             }
@@ -320,7 +365,12 @@ namespace XTD.Presentation
                 }
             }
 
-            var standalone = eventSystem.GetComponent<StandaloneInputModule>() ?? eventSystem.AddComponent<StandaloneInputModule>();
+            var standalone = eventSystem.GetComponent<StandaloneInputModule>();
+            if (standalone == null)
+            {
+                standalone = eventSystem.AddComponent<StandaloneInputModule>();
+            }
+
             standalone.enabled = true;
         }
 
@@ -405,7 +455,9 @@ namespace XTD.Presentation
 
                 title.text = definition.displayName;
                 cost.text = definition.cost.ToString();
-                description.text = CardTypeLabel(definition);
+                description.text = definition.CanReceiveMorale && battleController.NextCardWillUseMorale
+                    ? $"{CardTypeLabel(definition)}\n士气待发"
+                    : CardTypeLabel(definition);
                 icon.sprite = definition.art;
                 icon.enabled = definition.art != null;
                 icon.preserveAspect = true;
@@ -455,7 +507,7 @@ namespace XTD.Presentation
             {
                 if (card == null || battle == null || !canPlay)
                 {
-                    owner.ShowNotice("费用或统率不足");
+                    owner.ShowNotice("费用或阵位不足");
                     return;
                 }
 

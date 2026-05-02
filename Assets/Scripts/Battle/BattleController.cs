@@ -8,8 +8,20 @@ using XTD.Presentation;
 
 namespace XTD.Battle
 {
+    [RequireComponent(typeof(AudioSource))]
     public sealed class BattleController : MonoBehaviour
     {
+        private const string BattleMusicResourcePath = "Audio/BGM/hyoshi_action_track_2";
+        private const string BattleMusicAssetPath = "Assets/Resources/Audio/BGM/hyoshi_action_track_2.ogg";
+        private static readonly string[] HitSfxResourcePaths =
+        {
+            "Audio/SFX/attack_hit",
+            "Audio/SFX/attack_hit_1",
+            "Audio/SFX/hit01",
+            "Audio/SFX/thud2",
+            "Audio/SFX/clink1"
+        };
+
         [Header("Content")]
         [SerializeField] private ContentCatalog defaultCatalog;
         [SerializeField] private string encounterId = "encounter_training_camp";
@@ -31,6 +43,12 @@ namespace XTD.Battle
         [SerializeField] private Sprite hitEffectSprite;
         [SerializeField] private Sprite spellImpactSprite;
 
+        [Header("Audio")]
+        [SerializeField] private AudioClip battleMusicClip;
+        [SerializeField, Range(0f, 1f)] private float battleMusicVolume = 0.22f;
+        [SerializeField] private AudioClip[] hitSfxClips;
+        [SerializeField, Range(0f, 1f)] private float hitSfxVolume = 0.12f;
+
         private readonly List<BattleUnit> activeUnits = new();
         private readonly MoraleTracker morale = new();
         private ComponentPool<BattleUnit> unitPool;
@@ -45,11 +63,25 @@ namespace XTD.Battle
         private BattleBaseView enemyBaseView;
         private float tickAccumulator;
         private float enemySpawnTimer;
+        private float coreAreaSkillTimer;
+        private float coreBuffSkillTimer;
+        private float coreWarningTimer;
+        private Vector3 pendingCoreBlastPosition;
+        private float pendingCoreBlastRadius;
+        private float pendingCoreBlastDamage;
         private float mana;
         private int baseMaxMana;
         private int baseMaxCommand;
         private float baseManaRegenPerSecond;
         private GameFlowController flow;
+        private AudioSource audioSource;
+        private AudioSource musicSource;
+        private AudioClip playCardClip;
+        private AudioClip summonClip;
+        private AudioClip hitClip;
+        private AudioClip victoryClip;
+        private AudioClip defeatClip;
+        private float hitSfxCooldown;
 
         public BattleOutcome Outcome { get; private set; } = BattleOutcome.Running;
         public float PlayerBaseHp { get; private set; }
@@ -57,8 +89,7 @@ namespace XTD.Battle
         public float Mana => mana;
         public int MaxMana => maxMana;
         public int CurrentCommand => activeUnits
-            .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player && unit.Definition.role != UnitRole.Structure)
-            .Sum(unit => unit.Definition.commandCost);
+            .Count(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player && unit.Definition.role == UnitRole.Structure);
         public int MaxCommand => maxCommand;
         public int MoraleCharges => morale.Charges;
         public int MoralePendingSoldiers => morale.PendingSoldiers;
@@ -100,6 +131,7 @@ namespace XTD.Battle
             }
 
             ui.Bind(this);
+            ConfigureAudio();
         }
 
         private void Start()
@@ -141,6 +173,11 @@ namespace XTD.Battle
             ApplyRunBattleModifiers();
             mana = Mathf.Min(maxMana, 4f + (flow != null && flow.HasActiveRun ? flow.ExtraStartingMana() : 0f));
             enemySpawnTimer = 0.5f;
+            coreAreaSkillTimer = 3.2f;
+            coreBuffSkillTimer = 5.5f;
+            coreWarningTimer = 0f;
+            hitSfxCooldown = 0f;
+            StartBattleMusic();
             var playerMaxHp = CurrentPlayerBattleMaxHp();
             PlayerBaseHp = flow != null && flow.HasActiveRun
                 ? Mathf.Clamp(flow.CurrentRun.playerHp + flow.BattleStartHpBonus(), 1f, playerMaxHp)
@@ -199,9 +236,11 @@ namespace XTD.Battle
             mana -= card.cost;
             deck.Play(card);
             ResolveCard(card, strengthened, targetPosition);
+            PlayOneShot(ref playCardClip, 540f, 0.06f);
             if (strengthened)
             {
-                ui.ShowNotice($"士气强化：{card.displayName} 额外召唤 1 个单位");
+                SpawnMoraleEffect(targetPosition);
+                ui.ShowNotice(MoraleNotice(card));
             }
 
             deck.RefillHandIfEmpty();
@@ -230,7 +269,7 @@ namespace XTD.Battle
             reason = string.Empty;
             if (!CanPlayCard(card))
             {
-                reason = "费用或统率不足";
+                reason = "费用或阵位不足";
                 return false;
             }
 
@@ -336,6 +375,11 @@ namespace XTD.Battle
         {
             var effect = effectPool.Get();
             effect.Initialize(position, faction, hitEffectSprite, 0.25f, () => effectPool.Release(effect));
+            if (hitSfxCooldown <= 0f)
+            {
+                PlayHitSfx(faction);
+                hitSfxCooldown = 0.08f;
+            }
         }
 
         public void SpawnSpellImpact(Vector3 position)
@@ -344,14 +388,27 @@ namespace XTD.Battle
             effect.Initialize(position, Faction.Player, spellImpactSprite != null ? spellImpactSprite : hitEffectSprite, 0.55f, () => effectPool.Release(effect));
         }
 
+        public void SpawnDeathEffect(Vector3 position, Faction faction)
+        {
+            var effect = effectPool.Get();
+            effect.InitializeCustom(position, faction == Faction.Player ? new Color(0.58f, 0.88f, 1f, 0.9f) : new Color(1f, 0.36f, 0.25f, 0.9f), hitEffectSprite, 0.28f, 1.15f, 0.42f, 28, () => effectPool.Release(effect));
+        }
+
+        public void SpawnMoraleEffect(Vector3 position)
+        {
+            var effect = effectPool.Get();
+            effect.InitializeCustom(position, new Color(1f, 0.86f, 0.22f, 0.92f), hitEffectSprite, 0.45f, 1.75f, 0.55f, 32, () => effectPool.Release(effect));
+        }
+
+        public void SpawnWarningCircle(Vector3 position, float radius)
+        {
+            var effect = effectPool.Get();
+            effect.InitializeCustom(position, new Color(1f, 0.12f, 0.08f, 0.42f), RuntimeSpriteFactory.EffectSprite, Mathf.Max(0.3f, radius * 0.55f), Mathf.Max(0.4f, radius * 0.72f), 0.72f, 18, () => effectPool.Release(effect));
+        }
+
         public bool TrySpawnProducedUnit(UnitDefinition unitDefinition, Faction faction, Vector3 position)
         {
             if (unitDefinition == null || Outcome != BattleOutcome.Running)
-            {
-                return false;
-            }
-
-            if (faction == Faction.Player && unitDefinition.role != UnitRole.Structure && CurrentCommand + unitDefinition.commandCost > maxCommand)
             {
                 return false;
             }
@@ -368,8 +425,10 @@ namespace XTD.Battle
         private void Tick(float deltaTime)
         {
             mana = Mathf.Min(maxMana, mana + manaRegenPerSecond * deltaTime);
+            hitSfxCooldown = Mathf.Max(0f, hitSfxCooldown - deltaTime);
 
             TickEnemyBase(deltaTime);
+            TickEnemyCoreSkills(deltaTime);
 
             for (var i = activeUnits.Count - 1; i >= 0; i--)
             {
@@ -395,7 +454,7 @@ namespace XTD.Battle
                 return;
             }
 
-            enemySpawnTimer = Mathf.Max(0.2f, encounter.enemySpawnInterval);
+            enemySpawnTimer = Mathf.Max(0.2f, encounter.enemySpawnInterval * CoreSpawnIntervalMultiplier());
             var entry = encounter.enemySpawns[Random.Range(0, encounter.enemySpawns.Count)];
             for (var i = 0; i < entry.count; i++)
             {
@@ -403,20 +462,114 @@ namespace XTD.Battle
             }
         }
 
-        private int CalculateCommandCost(CardDefinition card, bool strengthened)
+        private void TickEnemyCoreSkills(float deltaTime)
         {
-            var total = card.CommandCost();
-            if (strengthened && card.unitSpawns.Count > 0 && card.unitSpawns[0].unit != null && card.unitSpawns[0].unit.role != UnitRole.Structure)
+            var core = EnemyCoreUnit();
+            if (core == null)
             {
-                total += card.unitSpawns[0].unit.commandCost;
+                coreWarningTimer = 0f;
+                return;
             }
 
-            return total;
+            if (coreWarningTimer > 0f)
+            {
+                coreWarningTimer -= deltaTime;
+                if (coreWarningTimer <= 0f)
+                {
+                    ResolveCoreAreaBlast();
+                }
+            }
+
+            var enrage = IsCoreEnraged(core);
+            coreAreaSkillTimer -= deltaTime;
+            if (coreAreaSkillTimer <= 0f && coreWarningTimer <= 0f)
+            {
+                PrepareCoreAreaBlast(core, enrage);
+                coreAreaSkillTimer = enrage ? 4.1f : 6.4f;
+            }
+
+            coreBuffSkillTimer -= deltaTime;
+            if (coreBuffSkillTimer <= 0f)
+            {
+                BuffEnemyWave(enrage);
+                coreBuffSkillTimer = enrage ? 5.2f : 8.0f;
+            }
+        }
+
+        private void PrepareCoreAreaBlast(BattleUnit core, bool enrage)
+        {
+            var target = activeUnits
+                .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player && unit.Definition.role != UnitRole.Structure)
+                .OrderByDescending(unit => unit.transform.position.y)
+                .FirstOrDefault();
+            if (target == null)
+            {
+                return;
+            }
+
+            pendingCoreBlastPosition = target.transform.position;
+            pendingCoreBlastRadius = enrage ? 2.15f : 1.65f;
+            pendingCoreBlastDamage = Mathf.Max(8f, core.EffectiveAttack() * (enrage ? 1.15f : 0.85f));
+            coreWarningTimer = enrage ? 0.48f : 0.72f;
+            SpawnWarningCircle(pendingCoreBlastPosition, pendingCoreBlastRadius);
+            ui.ShowNotice(enrage ? "敌方核心狂暴：范围技能即将落下" : "敌方核心正在蓄力");
+        }
+
+        private void ResolveCoreAreaBlast()
+        {
+            SpawnSpellImpact(pendingCoreBlastPosition);
+            var targets = activeUnits
+                .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player && unit.Definition.role != UnitRole.Structure)
+                .Where(unit => Vector2.Distance(unit.transform.position, pendingCoreBlastPosition) <= pendingCoreBlastRadius)
+                .ToList();
+
+            foreach (var target in targets)
+            {
+                target.TakeDamage(pendingCoreBlastDamage);
+            }
+        }
+
+        private void BuffEnemyWave(bool enrage)
+        {
+            var enemies = activeUnits
+                .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Enemy && unit.Definition.role != UnitRole.Boss)
+                .OrderByDescending(unit => unit.transform.position.y)
+                .Take(enrage ? 6 : 4)
+                .ToList();
+            if (enemies.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var enemy in enemies)
+            {
+                enemy.AddModifier(EffectType.BuffAttack, enrage ? 0.28f : 0.16f, enrage ? 4.5f : 3.5f);
+                SpawnMoraleEffect(enemy.transform.position);
+            }
+
+            ui.ShowNotice(enrage ? "敌方核心狂暴：妖兵攻击提升" : "敌方核心号令妖兵");
+        }
+
+        private bool IsCoreEnraged(BattleUnit core)
+        {
+            return core != null && core.Definition.maxHp > 0f && core.CurrentHp / core.Definition.maxHp <= 0.5f;
+        }
+
+        private float CoreSpawnIntervalMultiplier()
+        {
+            var core = EnemyCoreUnit();
+            return core != null && IsCoreEnraged(core) ? 0.62f : 1f;
+        }
+
+        private int CalculateCommandCost(CardDefinition card, bool strengthened)
+        {
+            return card.CommandCost();
         }
 
         private void ResolveCard(CardDefinition card, bool strengthened, Vector3 targetPosition)
         {
             var spawnedSoldiers = 0;
+            var moraleUnits = new List<BattleUnit>();
             foreach (var spawn in card.unitSpawns)
             {
                 if (spawn?.unit == null)
@@ -425,7 +578,7 @@ namespace XTD.Battle
                 }
 
                 var count = spawn.count;
-                if (strengthened && spawnedSoldiers == 0)
+                if (strengthened && card.type == CardType.Soldier && spawnedSoldiers == 0)
                 {
                     count += 1;
                 }
@@ -443,8 +596,15 @@ namespace XTD.Battle
                     {
                         spawnedSoldiers++;
                     }
+
+                    if (strengthened && unit.Definition.role != UnitRole.Structure)
+                    {
+                        moraleUnits.Add(unit);
+                    }
                 }
             }
+
+            ApplyMoraleUnitBonus(card, moraleUnits);
 
             if (spawnedSoldiers > 0)
             {
@@ -455,6 +615,43 @@ namespace XTD.Battle
             {
                 ResolveEffect(effect, strengthened, targetPosition, card.releaseRule == CardReleaseRule.Anywhere);
             }
+        }
+
+        private void ApplyMoraleUnitBonus(CardDefinition card, IReadOnlyList<BattleUnit> units)
+        {
+            if (card == null || units.Count == 0)
+            {
+                return;
+            }
+
+            switch (card.type)
+            {
+                case CardType.EliteSoldier:
+                    foreach (var unit in units)
+                    {
+                        unit.AddShield(Mathf.Max(12f, unit.Definition.maxHp * 0.35f));
+                        SpawnMoraleEffect(unit.transform.position);
+                    }
+                    break;
+                case CardType.Hero:
+                    foreach (var unit in units)
+                    {
+                        unit.AddModifier(EffectType.BuffAttack, 0.65f, 6f);
+                        SpawnMoraleEffect(unit.transform.position);
+                    }
+                    break;
+            }
+        }
+
+        private static string MoraleNotice(CardDefinition card)
+        {
+            return card.type switch
+            {
+                CardType.Soldier => $"士气强化：{card.displayName} 额外召唤 1 个单位",
+                CardType.EliteSoldier => $"士气强化：{card.displayName} 登场获得护盾",
+                CardType.Hero => $"士气强化：{card.displayName} 登场短时增伤",
+                _ => $"士气强化：{card.displayName}"
+            };
         }
 
         private Vector3 ResolveSpawnCenter(CardDefinition card, Vector3 targetPosition)
@@ -549,6 +746,11 @@ namespace XTD.Battle
             var unit = unitPool.Get();
             unit.Initialize(this, unitDefinition, faction, position);
             activeUnits.Add(unit);
+            if (countCommand && faction == Faction.Player)
+            {
+                PlayOneShot(ref summonClip, 720f, 0.045f);
+            }
+
             return unit;
         }
 
@@ -687,17 +889,23 @@ namespace XTD.Battle
             if (encounter != null && encounter.coreEnemy != null && !HasLivingEnemyCore())
             {
                 Outcome = BattleOutcome.Victory;
+                StopBattleMusic();
                 ui.ShowResult("胜利");
+                PlayOneShot(ref victoryClip, 880f, 0.11f);
             }
             else if ((encounter == null || encounter.coreEnemy == null) && EnemyBaseHp <= 0f)
             {
                 Outcome = BattleOutcome.Victory;
+                StopBattleMusic();
                 ui.ShowResult("胜利");
+                PlayOneShot(ref victoryClip, 880f, 0.11f);
             }
             else if (PlayerBaseHp <= 0f)
             {
                 Outcome = BattleOutcome.Defeat;
+                StopBattleMusic();
                 ui.ShowResult("失败");
+                PlayOneShot(ref defeatClip, 150f, 0.13f);
             }
         }
 
@@ -720,7 +928,65 @@ namespace XTD.Battle
             }
 
             Outcome = BattleOutcome.Victory;
+            StopBattleMusic();
             ui.ShowResult("胜利");
+            PlayOneShot(ref victoryClip, 880f, 0.11f);
+        }
+
+        public void DebugLoseNow()
+        {
+            if (Outcome != BattleOutcome.Running)
+            {
+                return;
+            }
+
+            PlayerBaseHp = 0f;
+            Outcome = BattleOutcome.Defeat;
+            StopBattleMusic();
+            playerBaseView?.UpdateHealth(PlayerBaseHp, CurrentPlayerBattleMaxHp());
+            ui.ShowResult("失败");
+            PlayOneShot(ref defeatClip, 150f, 0.13f);
+        }
+
+        public void DebugAddMorale()
+        {
+            morale.AddCharges(1);
+            ui.ShowNotice("调试：士气 +1，下一张出兵牌会强化");
+            ui.Refresh();
+        }
+
+        public void DebugAddGold()
+        {
+            if (flow != null && flow.HasActiveRun)
+            {
+                flow.DebugAddGold(100);
+                ui.ShowNotice("调试：金币 +100");
+                return;
+            }
+
+            ui.ShowNotice("调试加金币需要从迷宫探索进入战斗");
+        }
+
+        public void DebugOpenCardReward()
+        {
+            if (flow != null && flow.HasActiveRun)
+            {
+                flow.DebugOpenCardReward();
+                return;
+            }
+
+            ui.ShowNotice("调试卡牌奖励需要从迷宫探索进入战斗");
+        }
+
+        public void DebugSkipNode()
+        {
+            if (flow != null && flow.HasActiveRun)
+            {
+                flow.DebugSkipPendingNode();
+                return;
+            }
+
+            DebugWinNow();
         }
 
         public float AttackMultiplierFor(UnitDefinition unit)
@@ -781,6 +1047,285 @@ namespace XTD.Battle
                     unit.Faction == Faction.Enemy &&
                     unit.Definition == encounter.coreEnemy)
                 : null;
+        }
+
+        private void ConfigureAudio()
+        {
+            EnsureAudioListener();
+
+            audioSource = gameObject.GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                audioSource = gameObject.AddComponent<AudioSource>();
+            }
+
+            audioSource.playOnAwake = false;
+            audioSource.loop = false;
+            audioSource.spatialBlend = 0f;
+            audioSource.ignoreListenerPause = true;
+
+            var musicObject = new GameObject("Battle Music");
+            musicObject.transform.SetParent(transform, false);
+            musicSource = musicObject.AddComponent<AudioSource>();
+            musicSource.playOnAwake = false;
+            musicSource.loop = true;
+            musicSource.spatialBlend = 0f;
+            musicSource.volume = battleMusicVolume;
+            musicSource.ignoreListenerPause = true;
+
+            battleMusicClip ??= LoadBattleMusicClip();
+            if (hitSfxClips == null || hitSfxClips.Length == 0)
+            {
+                hitSfxClips = LoadHitSfxClips();
+            }
+        }
+
+        private void EnsureAudioListener()
+        {
+            var existingListener = FindAnyObjectByType<AudioListener>();
+            if (existingListener != null && existingListener.enabled && existingListener.gameObject.activeInHierarchy)
+            {
+                return;
+            }
+
+            var target = Camera.main != null ? Camera.main.gameObject : null;
+            if (target == null)
+            {
+                var camera = FindAnyObjectByType<Camera>();
+                target = camera != null ? camera.gameObject : gameObject;
+            }
+
+            var listener = target.GetComponent<AudioListener>();
+            if (listener == null)
+            {
+                listener = target.AddComponent<AudioListener>();
+            }
+
+            listener.enabled = true;
+        }
+
+        private void StartBattleMusic()
+        {
+            if (musicSource == null)
+            {
+                return;
+            }
+
+            var usingFallbackMusic = false;
+            battleMusicClip ??= LoadBattleMusicClip();
+            if (battleMusicClip == null)
+            {
+                battleMusicClip = CreateFallbackMusicClip();
+                usingFallbackMusic = true;
+                Debug.Log("X-TD 外部 BGM 暂未加载，使用程序生成的临时战斗 BGM。");
+            }
+
+            if (!EnsureAudioClipData(battleMusicClip, "战斗 BGM"))
+            {
+                return;
+            }
+
+            musicSource.clip = battleMusicClip;
+            musicSource.volume = usingFallbackMusic ? Mathf.Max(battleMusicVolume, 0.38f) : battleMusicVolume;
+            if (!musicSource.isPlaying)
+            {
+                musicSource.Play();
+            }
+        }
+
+        private void StopBattleMusic()
+        {
+            if (musicSource != null && musicSource.isPlaying)
+            {
+                musicSource.Stop();
+            }
+        }
+
+        private static AudioClip LoadBattleMusicClip()
+        {
+            var clip = Resources.Load<AudioClip>(BattleMusicResourcePath);
+            if (clip != null)
+            {
+                return clip;
+            }
+
+            var clips = Resources.LoadAll<AudioClip>("Audio/BGM");
+            clip = clips.FirstOrDefault(item => item != null && item.name == "hyoshi_action_track_2")
+                ?? clips.FirstOrDefault(item => item != null);
+            if (clip != null)
+            {
+                return clip;
+            }
+
+#if UNITY_EDITOR
+            UnityEditor.AssetDatabase.ImportAsset(BattleMusicAssetPath, UnityEditor.ImportAssetOptions.ForceUpdate);
+            clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(BattleMusicAssetPath);
+            if (clip != null)
+            {
+                Debug.Log("X-TD 使用编辑器资源路径加载战斗 BGM。");
+                return clip;
+            }
+
+            var guids = UnityEditor.AssetDatabase.FindAssets("hyoshi_action_track_2 t:AudioClip", new[] { "Assets" });
+            foreach (var guid in guids)
+            {
+                var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                clip = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>(path);
+                if (clip != null)
+                {
+                    Debug.Log($"X-TD 使用搜索到的音频资源加载战斗 BGM：{path}");
+                    return clip;
+                }
+            }
+#endif
+
+            return null;
+        }
+
+        private static AudioClip CreateFallbackMusicClip()
+        {
+            const int sampleRate = 44100;
+            const float duration = 12f;
+            var sampleCount = Mathf.RoundToInt(sampleRate * duration);
+            var samples = new float[sampleCount];
+            var scale = new[] { 220f, 261.63f, 293.66f, 329.63f, 392f, 440f, 523.25f, 587.33f };
+
+            for (var i = 0; i < samples.Length; i++)
+            {
+                var t = i / (float)sampleRate;
+                var beat = t * 2f;
+                var step = Mathf.FloorToInt(beat * 2f) % 16;
+                var note = scale[(step * 3 + (step >= 8 ? 2 : 0)) % scale.Length];
+                var phraseLift = step >= 8 ? 1.125f : 1f;
+
+                var melodyGate = SmoothPulse(beat * 2f, 0.18f);
+                var melody = Mathf.Sin(2f * Mathf.PI * note * phraseLift * t) * 0.055f * melodyGate;
+                melody += Mathf.Sin(2f * Mathf.PI * note * 2f * phraseLift * t) * 0.018f * melodyGate;
+
+                var bassNote = step < 8 ? 110f : 130.81f;
+                var bassGate = SmoothPulse(beat, 0.32f);
+                var bass = Mathf.Sin(2f * Mathf.PI * bassNote * t) * 0.08f * bassGate;
+
+                var drumPhase = beat - Mathf.Floor(beat);
+                var drum = Mathf.Exp(-drumPhase * 18f) * Mathf.Sin(2f * Mathf.PI * 64f * t) * 0.09f;
+                if (step % 4 == 2)
+                {
+                    drum += Mathf.Exp(-drumPhase * 30f) * Noise01(i) * 0.025f;
+                }
+
+                var pad = Mathf.Sin(2f * Mathf.PI * 55f * t) * 0.025f;
+                samples[i] = Mathf.Clamp((melody + bass + drum + pad) * 0.78f, -0.32f, 0.32f);
+            }
+
+            var clip = AudioClip.Create("XTD_Temporary_Battle_BGM", sampleCount, 1, sampleRate, false);
+            clip.SetData(samples, 0);
+            return clip;
+        }
+
+        private static float SmoothPulse(float value, float width)
+        {
+            var phase = value - Mathf.Floor(value);
+            if (phase > width)
+            {
+                return 0f;
+            }
+
+            var normalized = phase / Mathf.Max(0.001f, width);
+            return Mathf.Sin(normalized * Mathf.PI);
+        }
+
+        private static float Noise01(int seed)
+        {
+            var value = Mathf.Sin(seed * 12.9898f) * 43758.5453f;
+            return (value - Mathf.Floor(value)) * 2f - 1f;
+        }
+
+        private static AudioClip[] LoadHitSfxClips()
+        {
+            var clips = new List<AudioClip>();
+            foreach (var path in HitSfxResourcePaths)
+            {
+                var clip = Resources.Load<AudioClip>(path);
+                if (clip != null)
+                {
+                    clips.Add(clip);
+                }
+            }
+
+            return clips.ToArray();
+        }
+
+        private void PlayHitSfx(Faction faction)
+        {
+            if (audioSource == null)
+            {
+                return;
+            }
+
+            if (hitSfxClips != null && hitSfxClips.Length > 0)
+            {
+                var clip = hitSfxClips[Random.Range(0, hitSfxClips.Length)];
+                if (clip != null)
+                {
+                    EnsureAudioClipData(clip, $"打击音效 {clip.name}");
+                    var volume = faction == Faction.Player ? hitSfxVolume * 0.9f : hitSfxVolume;
+                    audioSource.PlayOneShot(clip, volume);
+                    return;
+                }
+            }
+
+            PlayOneShot(ref hitClip, faction == Faction.Player ? 240f : 310f, 0.035f);
+        }
+
+        private void PlayOneShot(ref AudioClip clip, float frequency, float volume)
+        {
+            if (audioSource == null)
+            {
+                return;
+            }
+
+            clip ??= CreateToneClip(frequency, 0.08f);
+            EnsureAudioClipData(clip, clip.name);
+            audioSource.PlayOneShot(clip, volume);
+        }
+
+        private static bool EnsureAudioClipData(AudioClip clip, string label)
+        {
+            if (clip == null)
+            {
+                return false;
+            }
+
+            if (clip.loadState == AudioDataLoadState.Failed)
+            {
+                Debug.LogWarning($"X-TD 音频加载失败：{label}");
+                return false;
+            }
+
+            if (clip.loadState == AudioDataLoadState.Unloaded && !clip.LoadAudioData())
+            {
+                Debug.LogWarning($"X-TD 音频数据未能载入：{label}");
+                return false;
+            }
+
+            return true;
+        }
+
+        private static AudioClip CreateToneClip(float frequency, float duration)
+        {
+            const int sampleRate = 22050;
+            var sampleCount = Mathf.Max(1, Mathf.RoundToInt(sampleRate * duration));
+            var samples = new float[sampleCount];
+            for (var i = 0; i < samples.Length; i++)
+            {
+                var t = i / (float)sampleRate;
+                var envelope = 1f - (i / (float)samples.Length);
+                samples[i] = Mathf.Sin(2f * Mathf.PI * frequency * t) * envelope * 0.24f;
+            }
+
+            var clip = AudioClip.Create($"XTD_Tone_{frequency:0}", sampleCount, 1, sampleRate, false);
+            clip.SetData(samples, 0);
+            return clip;
         }
 
         private BattleUnit CreateUnitInstance()

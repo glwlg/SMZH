@@ -292,6 +292,7 @@ namespace XTD.Battle
 
         private void Die()
         {
+            controller.SpawnDeathEffect(transform.position, Faction);
             controller.ReleaseUnit(this);
         }
 

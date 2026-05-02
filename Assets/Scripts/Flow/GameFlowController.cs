@@ -9,10 +9,20 @@ using XTD.Roguelike;
 
 namespace XTD.Flow
 {
+    public sealed class OpportunityEventPreview
+    {
+        public string title;
+        public string story;
+        public string reward;
+        public string risk;
+        public int templateIndex;
+    }
+
     public sealed class GameFlowController : MonoBehaviour
     {
         private const string MainMenuScene = "MainMenu";
         private const string BattleScene = "BattlePrototype";
+        private const int OpportunityTemplateCount = 6;
 
         private readonly MapGenerationService mapGeneration = new();
         private readonly List<List<MapNodeRuntime>> mapRows = new();
@@ -30,6 +40,8 @@ namespace XTD.Flow
         public IReadOnlyList<string> PermanentArtifactIds => PermanentProgress.permanentArtifactIds;
         public bool HasActiveRun => CurrentRun != null && !CurrentRun.isComplete && !CurrentRun.isDefeated;
         public bool HasPendingNode => hasPendingNode;
+        public bool HasPendingCardReward => CurrentRun != null && CurrentRun.pendingCardRewardPickCount > 0 && CurrentRun.pendingCardRewardIds.Count > 0;
+        public int PendingCardRewardPickCount => CurrentRun != null ? CurrentRun.pendingCardRewardPickCount : 0;
         public MapNodeRuntime PendingNode => pendingNode;
 
         private void Awake()
@@ -182,6 +194,14 @@ namespace XTD.Flow
             var rewardText = pendingBattleSuppressRewards
                 ? "凶阵被破，没有额外奖励。"
                 : GrantBattleRewards(pendingNode, encounter);
+
+            if (HasPendingCardReward)
+            {
+                CurrentRun.lastMessage = rewardText + " 请选择卡牌奖励。";
+                LoadMainMenu();
+                return;
+            }
+
             AdvanceAfterResolvedNode(pendingNode);
             ClearPendingNode();
             CurrentRun.lastMessage = rewardText;
@@ -278,32 +298,35 @@ namespace XTD.Flow
             }
 
             var random = RandomForCurrentNode(29);
-            var roll = random.NextDouble();
-            var message = string.Empty;
-            if (roll < 0.34)
+            var preview = GenerateOpportunityPreview();
+            var message = ResolveOpportunityTemplate(preview.templateIndex, random);
+
+            if (HasPendingCardReward)
             {
-                var gold = 35 + CurrentRun.floor * 8 + ArtifactBonusOpportunityGold();
-                GrantGold(gold);
-                message = $"机遇奖励：获得 {gold} 金币。";
-            }
-            else if (roll < 0.67)
-            {
-                var card = RandomRewardCard(random, true);
-                CurrentRun.deckCardIds.Add(card.id);
-                message = $"机遇奖励：获得卡牌 {card.displayName}。";
-            }
-            else if (TryUpgradeRandomCard(random, out var upgradedName))
-            {
-                message = $"机遇奖励：{upgradedName} 升级。";
-            }
-            else
-            {
-                var card = RandomRewardCard(random, true);
-                CurrentRun.deckCardIds.Add(card.id);
-                message = $"机遇奖励：获得卡牌 {card.displayName}。";
+                CurrentRun.lastMessage = message + " 请选择卡牌奖励。";
+                return;
             }
 
             ResolvePendingNonBattle(message);
+        }
+
+        public OpportunityEventPreview GenerateOpportunityPreview()
+        {
+            if (CurrentRun == null)
+            {
+                return new OpportunityEventPreview
+                {
+                    title = "未知机遇",
+                    story = "迷雾尚未散开。",
+                    reward = "未知",
+                    risk = "未知",
+                    templateIndex = 0
+                };
+            }
+
+            var random = RandomForCurrentNode(29);
+            var templateIndex = random.Next(OpportunityTemplateCount);
+            return OpportunityPreview(templateIndex);
         }
 
         public void ChooseArtifact(ArtifactDefinition artifact)
@@ -319,6 +342,49 @@ namespace XTD.Flow
             }
 
             ResolvePendingNonBattle($"获得神器：{artifact.displayName}。");
+        }
+
+        public IReadOnlyList<CardDefinition> PendingCardRewardChoices()
+        {
+            if (!HasPendingCardReward)
+            {
+                return Array.Empty<CardDefinition>();
+            }
+
+            return CurrentRun.pendingCardRewardIds
+                .Select(id => Catalog.FindCard(id))
+                .Where(card => card != null)
+                .ToList();
+        }
+
+        public void ChooseCardReward(CardDefinition card)
+        {
+            if (!HasPendingCardReward || card == null)
+            {
+                return;
+            }
+
+            CurrentRun.deckCardIds.Add(card.id);
+            CurrentRun.pendingCardRewardIds.Remove(card.id);
+            CurrentRun.pendingCardRewardPickCount--;
+
+            if (CurrentRun.pendingCardRewardPickCount > 0 && CurrentRun.pendingCardRewardIds.Count > 0)
+            {
+                CurrentRun.lastMessage = $"获得 {card.displayName}。还可以选择 {CurrentRun.pendingCardRewardPickCount} 张奖励卡。";
+                return;
+            }
+
+            FinishPendingCardReward($"获得卡牌奖励：{card.displayName}。");
+        }
+
+        public void SkipCardReward()
+        {
+            if (!HasPendingCardReward)
+            {
+                return;
+            }
+
+            FinishPendingCardReward("放弃剩余卡牌奖励。");
         }
 
         public IReadOnlyList<CardDefinition> GenerateShopCards()
@@ -429,6 +495,52 @@ namespace XTD.Flow
             return multiplier;
         }
 
+        public void DebugAddGold(int amount = 100)
+        {
+            if (CurrentRun == null)
+            {
+                return;
+            }
+
+            CurrentRun.gold += Mathf.Max(1, amount);
+            CurrentRun.lastMessage = $"调试：金币 +{amount}。";
+        }
+
+        public void DebugOpenCardReward()
+        {
+            if (CurrentRun == null)
+            {
+                return;
+            }
+
+            var random = RandomForCurrentNode(89);
+            QueueCardReward(RandomCards(random, 3, includeUpgraded: true), 1);
+            CurrentRun.lastMessage = "调试：打开三选一卡牌奖励。";
+            LoadMainMenu();
+        }
+
+        public void DebugSkipPendingNode()
+        {
+            if (CurrentRun == null)
+            {
+                return;
+            }
+
+            if (hasPendingNode)
+            {
+                AdvanceAfterResolvedNode(pendingNode);
+                ClearPendingNode();
+                CurrentRun.lastMessage = "调试：已跳过当前房间。";
+            }
+            else
+            {
+                SetAvailableNodesForCurrentRow();
+                CurrentRun.lastMessage = "调试：当前没有待处理房间。";
+            }
+
+            LoadMainMenu();
+        }
+
         public float PlayerMaxHpForRun()
         {
             var maxHp = 100f;
@@ -461,11 +573,9 @@ namespace XTD.Flow
 
             var gold = 70 + CurrentRun.floor * 18 + ArtifactBonusOpportunityGold();
             GrantGold(gold);
-            var card = RandomRewardCard(random, true);
-            CurrentRun.deckCardIds.Add(card.id);
-            AdvanceAfterResolvedNode(node);
-            ClearPendingNode();
-            CurrentRun.lastMessage = $"神秘奖励：获得 {gold} 金币和 {card.displayName}。";
+            var cards = RandomCards(random, 3, includeUpgraded: true, preferHighQuality: true);
+            QueueCardReward(cards, 1);
+            CurrentRun.lastMessage = $"神秘奖励：获得 {Mathf.CeilToInt(gold * GoldMultiplier())} 金币，并从 3 张高质量卡中选择 1 张。";
             LoadMainMenu();
         }
 
@@ -476,23 +586,26 @@ namespace XTD.Flow
             var messages = new List<string> { $"战斗胜利，获得 {Mathf.CeilToInt(gold * GoldMultiplier())} 金币" };
 
             var random = RandomForNode(node, 73);
-            var cardCount = node.NodeType switch
+            var cardChoiceCount = node.NodeType switch
             {
-                MapNodeType.EliteMonster => random.Next(1, 3),
-                MapNodeType.SmallBoss => random.Next(2, 4),
-                MapNodeType.FinalBoss => random.Next(3, 6),
+                MapNodeType.EliteMonster => 3,
+                MapNodeType.SmallBoss => 4,
+                MapNodeType.FinalBoss => 5,
+                _ => 0
+            };
+            var pickCount = node.NodeType switch
+            {
+                MapNodeType.SmallBoss => 2,
+                MapNodeType.FinalBoss => 3,
+                MapNodeType.EliteMonster => 1,
                 _ => 0
             };
 
-            if (cardCount > 0)
+            if (cardChoiceCount > 0)
             {
-                var cards = RandomCards(random, cardCount, includeUpgraded: node.NodeType != MapNodeType.NormalMonster);
-                foreach (var card in cards)
-                {
-                    CurrentRun.deckCardIds.Add(card.id);
-                }
-
-                messages.Add($"获得卡牌：{string.Join("、", cards.Select(card => card.displayName))}");
+                var cards = RandomCards(random, cardChoiceCount, includeUpgraded: true, preferHighQuality: node.NodeType is MapNodeType.SmallBoss or MapNodeType.FinalBoss);
+                QueueCardReward(cards, pickCount);
+                messages.Add($"卡牌奖励：从 {cards.Count} 张中选择 {pickCount} 张");
             }
 
             if (node.NodeType == MapNodeType.SmallBoss)
@@ -515,6 +628,27 @@ namespace XTD.Flow
             return string.Join("；", messages) + "。";
         }
 
+        private void QueueCardReward(IReadOnlyList<CardDefinition> cards, int pickCount)
+        {
+            CurrentRun.pendingCardRewardIds.Clear();
+            CurrentRun.pendingCardRewardIds.AddRange(cards.Where(card => card != null).Select(card => card.id));
+            CurrentRun.pendingCardRewardPickCount = Mathf.Min(Mathf.Max(1, pickCount), CurrentRun.pendingCardRewardIds.Count);
+        }
+
+        private void FinishPendingCardReward(string message)
+        {
+            CurrentRun.pendingCardRewardIds.Clear();
+            CurrentRun.pendingCardRewardPickCount = 0;
+
+            if (hasPendingNode)
+            {
+                AdvanceAfterResolvedNode(pendingNode);
+                ClearPendingNode();
+            }
+
+            CurrentRun.lastMessage = message;
+        }
+
         private void GrantGold(int amount)
         {
             CurrentRun.gold += Mathf.CeilToInt(amount * GoldMultiplier());
@@ -530,6 +664,115 @@ namespace XTD.Flow
         private int ArtifactBonusOpportunityGold()
         {
             return HasArtifact("artifact_fox_coin") ? 15 : 0;
+        }
+
+        private string ResolveOpportunityTemplate(int templateIndex, System.Random random)
+        {
+            switch (templateIndex)
+            {
+                case 0:
+                {
+                    var gold = 38 + CurrentRun.floor * 10 + ArtifactBonusOpportunityGold();
+                    GrantGold(gold);
+                    return $"机遇：香火商队赠礼，获得 {Mathf.CeilToInt(gold * GoldMultiplier())} 金币。";
+                }
+                case 1:
+                {
+                    QueueCardReward(RandomCards(random, 3, includeUpgraded: false), 1);
+                    return "机遇：天庭旧符苏醒，从 3 张等级 1 卡牌中选择 1 张。";
+                }
+                case 2:
+                {
+                    if (TryUpgradeRandomCard(random, out var upgradedName))
+                    {
+                        return $"机遇：炼器炉火正旺，{upgradedName} 升级。";
+                    }
+
+                    QueueCardReward(RandomCards(random, 3, includeUpgraded: true), 1);
+                    return "机遇：炼器炉中无可合成卡，改为从 3 张卡中选择 1 张。";
+                }
+                case 3:
+                {
+                    var heal = Mathf.CeilToInt(PlayerMaxHpForRun() * 0.16f);
+                    var gold = 18 + ArtifactBonusOpportunityGold();
+                    CurrentRun.playerHp = Mathf.Min(PlayerMaxHpForRun(), CurrentRun.playerHp + heal);
+                    GrantGold(gold);
+                    return $"机遇：青莲泉眼，恢复 {heal} 生命并获得 {Mathf.CeilToInt(gold * GoldMultiplier())} 金币。";
+                }
+                case 4:
+                {
+                    var hpCost = Mathf.CeilToInt(PlayerMaxHpForRun() * 0.08f);
+                    CurrentRun.playerHp = Mathf.Max(1f, CurrentRun.playerHp - hpCost);
+                    QueueCardReward(RandomCards(random, 3, includeUpgraded: true), 1);
+                    return $"机遇：妖市秘约，失去 {hpCost} 生命，从 3 张卡中选择 1 张。";
+                }
+                default:
+                {
+                    var gold = 24 + CurrentRun.floor * 6 + ArtifactBonusOpportunityGold();
+                    GrantGold(gold);
+                    if (TryUpgradeRandomCard(random, out var upgradedName))
+                    {
+                        return $"机遇：星斗残卷，获得 {Mathf.CeilToInt(gold * GoldMultiplier())} 金币，并使 {upgradedName} 升级。";
+                    }
+
+                    return $"机遇：星斗残卷，获得 {Mathf.CeilToInt(gold * GoldMultiplier())} 金币。";
+                }
+            }
+        }
+
+        private static OpportunityEventPreview OpportunityPreview(int templateIndex)
+        {
+            return templateIndex switch
+            {
+                0 => new OpportunityEventPreview
+                {
+                    title = "香火商队",
+                    story = "一支供奉队伍从战场边缘经过，愿意资助边境军。",
+                    reward = "获得一笔金币。",
+                    risk = "无直接风险。",
+                    templateIndex = templateIndex
+                },
+                1 => new OpportunityEventPreview
+                {
+                    title = "天庭旧符",
+                    story = "破碎符箓在掌心发光，似乎还能唤来一张基础战力牌。",
+                    reward = "获得 1 张等级 1 卡牌。",
+                    risk = "奖励质量偏稳定，不保证稀有。",
+                    templateIndex = templateIndex
+                },
+                2 => new OpportunityEventPreview
+                {
+                    title = "炼器炉火",
+                    story = "无主丹炉仍有余温，可以尝试淬炼现有卡牌。",
+                    reward = "随机升级 1 组可合成卡牌；没有可合成卡时改获卡牌。",
+                    risk = "升级目标不可指定。",
+                    templateIndex = templateIndex
+                },
+                3 => new OpportunityEventPreview
+                {
+                    title = "青莲泉眼",
+                    story = "灵泉从裂缝中涌出，可以修整队伍并搜得少量供奉。",
+                    reward = "恢复生命并获得少量金币。",
+                    risk = "收益温和。",
+                    templateIndex = templateIndex
+                },
+                4 => new OpportunityEventPreview
+                {
+                    title = "妖市秘约",
+                    story = "妖市商人拿出一张强力牌，但索要一缕气血作抵押。",
+                    reward = "获得 1 张可能带等级的卡牌。",
+                    risk = "失去少量生命。",
+                    templateIndex = templateIndex
+                },
+                _ => new OpportunityEventPreview
+                {
+                    title = "星斗残卷",
+                    story = "残卷记录着星斗阵图，可以换成供奉，也可能点亮旧牌。",
+                    reward = "获得金币，并尝试随机升级卡牌。",
+                    risk = "没有可升级目标时只获得金币。",
+                    templateIndex = templateIndex
+                }
+            };
         }
 
         private bool TryUpgradeRandomCard(System.Random random, out string upgradedName)
@@ -580,19 +823,24 @@ namespace XTD.Flow
             return true;
         }
 
-        private IReadOnlyList<CardDefinition> RandomCards(System.Random random, int count, bool includeUpgraded)
+        private IReadOnlyList<CardDefinition> RandomCards(System.Random random, int count, bool includeUpgraded, bool preferHighQuality = false)
         {
-            var cards = Catalog.cards
+            var candidates = Catalog.cards
                 .Where(card => card != null && (includeUpgraded || card.level == 1))
-                .OrderBy(_ => random.Next())
-                .Take(count)
                 .ToList();
-            return cards.Count > 0 ? cards : Catalog.cards.Take(count).ToList();
-        }
 
-        private CardDefinition RandomRewardCard(System.Random random, bool includeUpgraded)
-        {
-            return RandomCards(random, 1, includeUpgraded).First();
+            if (preferHighQuality)
+            {
+                candidates = candidates
+                    .OrderByDescending(card => card.level)
+                    .ThenByDescending(card => card.rarity)
+                    .ThenBy(_ => random.Next())
+                    .ToList();
+            }
+
+            var ordered = preferHighQuality ? candidates : candidates.OrderBy(_ => random.Next()).ToList();
+            var cards = ordered.Take(count).ToList();
+            return cards.Count > 0 ? cards : Catalog.cards.Take(count).ToList();
         }
 
         private void ResolvePendingNonBattle(string message)
