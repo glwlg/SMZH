@@ -29,7 +29,7 @@ namespace XTD.Content
         public List<BattleEffectDefinition> effects = new();
 
         public bool CanReceiveMorale =>
-            type == CardType.Soldier || type == CardType.EliteSoldier || type == CardType.Hero || type == CardType.Tactic;
+            type == CardType.Soldier || type == CardType.EliteSoldier || type == CardType.Hero;
 
         public int CommandCost()
         {
@@ -37,6 +37,11 @@ namespace XTD.Content
             foreach (var spawn in unitSpawns)
             {
                 if (spawn?.unit == null)
+                {
+                    continue;
+                }
+
+                if (spawn.unit.role == UnitRole.Structure)
                 {
                     continue;
                 }

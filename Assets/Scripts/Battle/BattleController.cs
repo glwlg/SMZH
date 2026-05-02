@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using XTD.Cards;
 using XTD.Content;
+using XTD.Flow;
 using XTD.Presentation;
 
 namespace XTD.Battle
@@ -45,23 +46,47 @@ namespace XTD.Battle
         private float tickAccumulator;
         private float enemySpawnTimer;
         private float mana;
+        private int baseMaxMana;
+        private int baseMaxCommand;
+        private float baseManaRegenPerSecond;
+        private GameFlowController flow;
 
         public BattleOutcome Outcome { get; private set; } = BattleOutcome.Running;
         public float PlayerBaseHp { get; private set; }
         public float EnemyBaseHp { get; private set; }
         public float Mana => mana;
         public int MaxMana => maxMana;
-        public int CurrentCommand => activeUnits.Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player).Sum(unit => unit.Definition.commandCost);
+        public int CurrentCommand => activeUnits
+            .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player && unit.Definition.role != UnitRole.Structure)
+            .Sum(unit => unit.Definition.commandCost);
         public int MaxCommand => maxCommand;
         public int MoraleCharges => morale.Charges;
+        public int MoralePendingSoldiers => morale.PendingSoldiers;
+        public int MoraleSoldiersPerCharge => morale.SoldiersPerCharge;
+        public bool NextCardWillUseMorale => morale.Charges > 0;
         public DeckRuntime Deck => deck;
         public float BattleMidY => (playerBaseY + enemyBaseY) * 0.5f;
+        public bool HasEnemyBase => encounter == null || encounter.coreEnemy == null;
+        public string EnemyObjectiveLabel => HasEnemyBase ? "敌方基地" : "敌方核心";
+        public float EnemyObjectiveHp => HasEnemyBase ? EnemyBaseHp : Mathf.Max(0f, EnemyCoreHp);
+        public float EnemyCoreHp => EnemyCoreUnit()?.CurrentHp ?? 0f;
 
         private void Awake()
         {
             catalog = ResolveContentCatalog();
-            encounter = !string.IsNullOrWhiteSpace(encounterId) ? catalog.FindEncounter(encounterId) : null;
+            DemoContentFactory.EnsureCatalogComplete(catalog);
+            flow = GameFlowController.Instance;
+            if (flow != null && flow.HasActiveRun && flow.HasPendingNode)
+            {
+                flow.ConfigureCatalog(catalog);
+                encounter = flow.PendingEncounterOrDefault(catalog);
+            }
+
+            encounter ??= !string.IsNullOrWhiteSpace(encounterId) ? catalog.FindEncounter(encounterId) : null;
             encounter ??= catalog.FirstEncounter(MapNodeType.NormalMonster);
+            baseMaxMana = maxMana;
+            baseMaxCommand = maxCommand;
+            baseManaRegenPerSecond = manaRegenPerSecond;
 
             unitPool = new ComponentPool<BattleUnit>(CreateUnitInstance);
             projectilePool = new ComponentPool<ProjectileView>(CreateProjectileInstance);
@@ -113,25 +138,32 @@ namespace XTD.Battle
 
             activeUnits.Clear();
             morale.Reset();
-            mana = 4f;
+            ApplyRunBattleModifiers();
+            mana = Mathf.Min(maxMana, 4f + (flow != null && flow.HasActiveRun ? flow.ExtraStartingMana() : 0f));
             enemySpawnTimer = 0.5f;
-            PlayerBaseHp = encounter != null ? encounter.playerBaseMaxHp : 100f;
-            EnemyBaseHp = encounter != null ? encounter.enemyBaseMaxHp : 120f;
+            var playerMaxHp = CurrentPlayerBattleMaxHp();
+            PlayerBaseHp = flow != null && flow.HasActiveRun
+                ? Mathf.Clamp(flow.CurrentRun.playerHp + flow.BattleStartHpBonus(), 1f, playerMaxHp)
+                : playerMaxHp;
+            EnemyBaseHp = HasEnemyBase && encounter != null ? encounter.enemyBaseMaxHp : 0f;
             EnsureBaseViews();
             RefreshBaseViews();
 
-            var runState = DemoContentFactory.CreateStartingRun(catalog);
+            var runState = flow != null && flow.HasActiveRun
+                ? flow.CurrentRun
+                : DemoContentFactory.CreateStartingRun(catalog);
             var startingCards = runState.deckCardIds
                 .Select(id => catalog.FindCard(id))
                 .Where(card => card != null);
             deck = new DeckRuntime(startingCards, runState.seed);
+            deck.MaxHandSize = 5 + (flow != null && flow.HasActiveRun ? flow.StartingHandBonus() : 0);
             deck.DrawFullHand();
             ui.HideResult();
             ui.Refresh();
 
             if (encounter != null && encounter.coreEnemy != null)
             {
-                SpawnUnit(encounter.coreEnemy, Faction.Enemy, RandomEnemySpawnPosition(0.65f), false);
+                SpawnUnit(encounter.coreEnemy, Faction.Enemy, EnemyCorePosition(), false);
             }
         }
 
@@ -167,6 +199,11 @@ namespace XTD.Battle
             mana -= card.cost;
             deck.Play(card);
             ResolveCard(card, strengthened, targetPosition);
+            if (strengthened)
+            {
+                ui.ShowNotice($"士气强化：{card.displayName} 额外召唤 1 个单位");
+            }
+
             deck.RefillHandIfEmpty();
             ui.Refresh();
             return true;
@@ -222,8 +259,28 @@ namespace XTD.Battle
 
         public bool IsEnemyBaseInRange(BattleUnit unit)
         {
+            if (!CanUnitAttackBase(unit))
+            {
+                return false;
+            }
+
             var targetBaseY = unit.Faction == Faction.Player ? enemyBaseY : playerBaseY;
             return Mathf.Abs(targetBaseY - unit.transform.position.y) <= Mathf.Max(0.25f, unit.Definition.range);
+        }
+
+        public bool CanUnitAttackBase(BattleUnit unit)
+        {
+            if (unit == null)
+            {
+                return false;
+            }
+
+            if (unit.Faction == Faction.Player)
+            {
+                return HasEnemyBase;
+            }
+
+            return unit.Definition.role != UnitRole.Boss;
         }
 
         public Vector3 GetAdvanceTargetFor(BattleUnit unit)
@@ -235,6 +292,11 @@ namespace XTD.Battle
 
         public void DamageEnemyBase(float damage)
         {
+            if (!HasEnemyBase)
+            {
+                return;
+            }
+
             EnemyBaseHp -= damage;
             enemyBaseView?.Flash();
             enemyBaseView?.UpdateHealth(EnemyBaseHp, encounter != null ? encounter.enemyBaseMaxHp : 120f);
@@ -246,7 +308,7 @@ namespace XTD.Battle
         {
             PlayerBaseHp -= damage;
             playerBaseView?.Flash();
-            playerBaseView?.UpdateHealth(PlayerBaseHp, encounter != null ? encounter.playerBaseMaxHp : 100f);
+            playerBaseView?.UpdateHealth(PlayerBaseHp, CurrentPlayerBattleMaxHp());
             SpawnDamageNumber(PlayerBaseViewPosition(), damage);
             CheckOutcome();
         }
@@ -289,7 +351,7 @@ namespace XTD.Battle
                 return false;
             }
 
-            if (faction == Faction.Player && CurrentCommand + unitDefinition.commandCost > maxCommand)
+            if (faction == Faction.Player && unitDefinition.role != UnitRole.Structure && CurrentCommand + unitDefinition.commandCost > maxCommand)
             {
                 return false;
             }
@@ -344,7 +406,7 @@ namespace XTD.Battle
         private int CalculateCommandCost(CardDefinition card, bool strengthened)
         {
             var total = card.CommandCost();
-            if (strengthened && card.unitSpawns.Count > 0 && card.unitSpawns[0].unit != null)
+            if (strengthened && card.unitSpawns.Count > 0 && card.unitSpawns[0].unit != null && card.unitSpawns[0].unit.role != UnitRole.Structure)
             {
                 total += card.unitSpawns[0].unit.commandCost;
             }
@@ -443,14 +505,21 @@ namespace XTD.Battle
             var playerBaseSprite = catalog.FindUnit("unit_incense_barracks")?.art;
             var enemyBaseSprite = catalog.FindUnit("unit_roadblock")?.art ?? catalog.FindUnit("enemy_alpha")?.art;
 
-            playerBaseView.Initialize(Faction.Player, playerBaseSprite, PlayerBaseViewPosition(), 0.85f, PlayerBaseHp);
-            enemyBaseView.Initialize(Faction.Enemy, enemyBaseSprite, EnemyBaseViewPosition(), 0.92f, EnemyBaseHp);
+            playerBaseView.Initialize(Faction.Player, playerBaseSprite, PlayerBaseViewPosition(), 0.85f, CurrentPlayerBattleMaxHp());
+            enemyBaseView.gameObject.SetActive(HasEnemyBase);
+            if (HasEnemyBase)
+            {
+                enemyBaseView.Initialize(Faction.Enemy, enemyBaseSprite, EnemyBaseViewPosition(), 0.92f, EnemyBaseHp);
+            }
         }
 
         private void RefreshBaseViews()
         {
-            playerBaseView?.UpdateHealth(PlayerBaseHp, encounter != null ? encounter.playerBaseMaxHp : 100f);
-            enemyBaseView?.UpdateHealth(EnemyBaseHp, encounter != null ? encounter.enemyBaseMaxHp : 120f);
+            playerBaseView?.UpdateHealth(PlayerBaseHp, CurrentPlayerBattleMaxHp());
+            if (HasEnemyBase)
+            {
+                enemyBaseView?.UpdateHealth(EnemyBaseHp, encounter != null ? encounter.enemyBaseMaxHp : 120f);
+            }
         }
 
         private BattleBaseView CreateBaseView(string objectName)
@@ -462,12 +531,17 @@ namespace XTD.Battle
 
         private Vector3 PlayerBaseViewPosition()
         {
-            return new Vector3(placementMinX + 1.05f, playerBaseY - 0.12f, 0f);
+            return new Vector3(laneX, playerBaseY - 0.12f, 0f);
         }
 
         private Vector3 EnemyBaseViewPosition()
         {
-            return new Vector3(placementMaxX - 1.05f, enemyBaseY + 0.18f, 0f);
+            return new Vector3(laneX, enemyBaseY + 0.18f, 0f);
+        }
+
+        private Vector3 EnemyCorePosition()
+        {
+            return new Vector3(laneX, enemyBaseY + 0.12f, 0f);
         }
 
         private BattleUnit SpawnUnit(UnitDefinition unitDefinition, Faction faction, Vector3 position, bool countCommand)
@@ -491,6 +565,7 @@ namespace XTD.Battle
             {
                 case EffectType.Damage:
                 case EffectType.AreaDamage:
+                    value *= flow != null && flow.HasActiveRun ? flow.SpellDamageMultiplier() : 1f;
                     if (isPlacedDamage)
                     {
                         SpawnSpellImpact(targetPosition);
@@ -531,11 +606,21 @@ namespace XTD.Battle
                 case EffectType.GainMana:
                     mana = Mathf.Min(maxMana, mana + value);
                     break;
+                case EffectType.GainMorale:
+                    var gainedMorale = Mathf.Max(1, Mathf.RoundToInt(value));
+                    morale.AddCharges(gainedMorale);
+                    ui.ShowNotice($"战鼓激发：士气 +{gainedMorale}，下一张出兵牌会强化");
+                    break;
             }
         }
 
         private bool IsEnemyBasePoint(Vector3 targetPosition, float radius)
         {
+            if (!HasEnemyBase)
+            {
+                return false;
+            }
+
             var effectiveRadius = Mathf.Max(0.75f, radius);
             return Mathf.Abs(targetPosition.y - enemyBaseY) <= effectiveRadius &&
                 targetPosition.x >= placementMinX - effectiveRadius &&
@@ -599,12 +684,12 @@ namespace XTD.Battle
                 return;
             }
 
-            if (EnemyBaseHp <= 0f)
+            if (encounter != null && encounter.coreEnemy != null && !HasLivingEnemyCore())
             {
                 Outcome = BattleOutcome.Victory;
                 ui.ShowResult("胜利");
             }
-            else if (encounter != null && encounter.coreEnemy != null && !HasLivingEnemyCore())
+            else if ((encounter == null || encounter.coreEnemy == null) && EnemyBaseHp <= 0f)
             {
                 Outcome = BattleOutcome.Victory;
                 ui.ShowResult("胜利");
@@ -616,6 +701,68 @@ namespace XTD.Battle
             }
         }
 
+        public void ContinueAfterResult()
+        {
+            if (flow != null && flow.HasActiveRun)
+            {
+                flow.CompleteBattle(Outcome, PlayerBaseHp);
+                return;
+            }
+
+            StartPrototypeBattle();
+        }
+
+        public void DebugWinNow()
+        {
+            if (Outcome != BattleOutcome.Running)
+            {
+                return;
+            }
+
+            Outcome = BattleOutcome.Victory;
+            ui.ShowResult("胜利");
+        }
+
+        public float AttackMultiplierFor(UnitDefinition unit)
+        {
+            return flow != null && flow.HasActiveRun ? flow.UnitAttackMultiplier(unit) : 1f;
+        }
+
+        public float MoveSpeedMultiplierFor(UnitDefinition unit)
+        {
+            return unit != null && unit.faction == Faction.Player && flow != null && flow.HasActiveRun
+                ? flow.UnitMoveSpeedMultiplier()
+                : 1f;
+        }
+
+        private void ApplyRunBattleModifiers()
+        {
+            maxMana = baseMaxMana;
+            maxCommand = baseMaxCommand;
+            manaRegenPerSecond = baseManaRegenPerSecond;
+            morale.SoldiersPerCharge = 5;
+
+            if (flow == null || !flow.HasActiveRun)
+            {
+                return;
+            }
+
+            maxMana += flow.ExtraMaxMana();
+            maxCommand += flow.PlayerExtraCommand();
+            morale.SoldiersPerCharge = flow.MoraleThreshold();
+        }
+
+        private float CurrentPlayerBattleMaxHp()
+        {
+            var encounterMax = encounter != null ? encounter.playerBaseMaxHp : 100f;
+            if (flow == null || !flow.HasActiveRun)
+            {
+                return encounterMax;
+            }
+
+            return encounterMax + Mathf.Max(0f, flow.PlayerMaxHpForRun() - 100f);
+        }
+
         private bool HasLivingEnemyCore()
         {
             return activeUnits.Any(unit =>
@@ -623,6 +770,17 @@ namespace XTD.Battle
                 unit.IsAlive &&
                 unit.Faction == Faction.Enemy &&
                 unit.Definition == encounter.coreEnemy);
+        }
+
+        private BattleUnit EnemyCoreUnit()
+        {
+            return encounter != null && encounter.coreEnemy != null
+                ? activeUnits.FirstOrDefault(unit =>
+                    unit != null &&
+                    unit.IsAlive &&
+                    unit.Faction == Faction.Enemy &&
+                    unit.Definition == encounter.coreEnemy)
+                : null;
         }
 
         private BattleUnit CreateUnitInstance()

@@ -10,6 +10,7 @@ namespace XTD.Battle
         }
 
         public int Charges { get; private set; }
+        public int PendingSoldiers => pendingSoldiers;
         public int SoldiersPerCharge { get; set; } = 5;
 
         public void RegisterSummonedSoldiers(int count)
@@ -42,6 +43,16 @@ namespace XTD.Battle
         public void RefundCharge()
         {
             Charges++;
+        }
+
+        public void AddCharges(int count)
+        {
+            if (count <= 0)
+            {
+                return;
+            }
+
+            Charges += count;
         }
 
         public void Reset()

@@ -23,6 +23,7 @@ namespace XTD.Presentation
         private Text noticeText;
         private Text resultText;
         private Button restartButton;
+        private Button debugWinButton;
         private float noticeTimer;
         private static Font cachedFont;
 
@@ -68,9 +69,12 @@ namespace XTD.Presentation
             var deck = battle.Deck;
             var cardPoolCount = deck != null ? deck.CardPool.Count : 0;
             var usedCount = deck != null ? deck.UsedPile.Count : 0;
+            var moraleHint = battle.NextCardWillUseMorale
+                ? "下张出兵+1"
+                : $"{battle.MoralePendingSoldiers}/{battle.MoraleSoldiersPerCharge}";
             statusText.text =
-                $"费用 {battle.Mana:0.0}/{battle.MaxMana}    统率 {battle.CurrentCommand}/{battle.MaxCommand}    士气 {battle.MoraleCharges}    卡池 {cardPoolCount} / 已用 {usedCount}\n" +
-                $"我方基地 {battle.PlayerBaseHp:0}    敌方基地 {battle.EnemyBaseHp:0}";
+                $"费用 {battle.Mana:0.0}/{battle.MaxMana}    统率 {battle.CurrentCommand}/{battle.MaxCommand}    士气 {battle.MoraleCharges}（{moraleHint}）    卡池 {cardPoolCount} / 已用 {usedCount}\n" +
+                $"我方基地 {battle.PlayerBaseHp:0}    {battle.EnemyObjectiveLabel} {battle.EnemyObjectiveHp:0}";
 
             TickNotice();
             RenderHand();
@@ -88,8 +92,14 @@ namespace XTD.Presentation
             if (restartButton != null)
             {
                 restartButton.gameObject.SetActive(true);
+                var buttonText = restartButton.GetComponentInChildren<Text>();
+                if (buttonText != null)
+                {
+                    buttonText.text = text == "胜利" ? "继续探索" : "返回营地";
+                }
+
                 restartButton.onClick.RemoveAllListeners();
-                restartButton.onClick.AddListener(() => battle.StartPrototypeBattle());
+                restartButton.onClick.AddListener(() => battle.ContinueAfterResult());
             }
         }
 
@@ -156,6 +166,10 @@ namespace XTD.Presentation
 
             restartButton = CreateButton("重新开始", root, new Vector2(0.5f, 0.46f), new Vector2(220f, 64f));
             restartButton.gameObject.SetActive(false);
+
+            debugWinButton = CreateButton("测试胜利", root, new Vector2(1f, 1f), new Vector2(132f, 42f));
+            debugWinButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(-92f, -34f);
+            debugWinButton.onClick.AddListener(() => battle?.DebugWinNow());
 
             var hand = new GameObject("手牌区", typeof(RectTransform));
             hand.transform.SetParent(root, false);
@@ -626,6 +640,12 @@ namespace XTD.Presentation
 
             private static string CardTypeLabel(CardDefinition definition)
             {
+                var moraleEffect = definition.effects.Find(effect => effect != null && effect.effectType == EffectType.GainMorale);
+                if (moraleEffect != null)
+                {
+                    return $"士气 +{Mathf.Max(1, Mathf.RoundToInt(moraleEffect.value))}";
+                }
+
                 return definition.type switch
                 {
                     CardType.Structure => "建筑",

@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 namespace XTD.Content
 {
     public static class DemoContentFactory
@@ -32,10 +28,12 @@ namespace XTD.Content
             catalog.encounters.RemoveAll(encounter => encounter == null || string.IsNullOrWhiteSpace(encounter.id));
 
             var militia = Unit(catalog, "unit_militia", "香火民兵", Faction.Player, UnitRole.Soldier, 16, 4, 1.1f, 0.75f, 1.2f, 1, new Color(0.65f, 0.85f, 1f), "Assets/_Project/Art/AI/Battle/unit_militia_battle.png");
-            var archer = Unit(catalog, "unit_archer", "灵弩射手", Faction.Player, UnitRole.Soldier, 12, 3, 1.2f, 3.6f, 0.85f, 1, new Color(0.75f, 1f, 0.6f), "Assets/_Project/Art/AI/Battle/unit_archer_battle.png");
+            var archer = Unit(catalog, "unit_archer", "灵弩射手", Faction.Player, UnitRole.Soldier, 12, 3, 1.2f, 2.15f, 0.85f, 1, new Color(0.75f, 1f, 0.6f), "Assets/_Project/Art/AI/Battle/unit_archer_battle.png");
             var shieldGuard = Unit(catalog, "unit_shield_guard", "金甲天将", Faction.Player, UnitRole.Elite, 58, 6, 1.2f, 0.85f, 0.72f, 4, new Color(0.55f, 0.65f, 1f), "Assets/_Project/Art/AI/Battle/unit_heaven_general_battle.png");
             var monkeyHero = Unit(catalog, "unit_monkey_vanguard", "齐天先锋", Faction.Player, UnitRole.Hero, 145, 15, 0.85f, 1.05f, 0.92f, 8, new Color(1f, 0.80f, 0.36f), "Assets/_Project/Art/AI/Battle/unit_heaven_general_battle.png");
             var thunderGuard = Unit(catalog, "unit_thunder_guard", "雷鼓卫", Faction.Player, UnitRole.Soldier, 24, 5, 1.0f, 1.05f, 0.95f, 2, new Color(0.70f, 0.95f, 1f), "Assets/_Project/Art/AI/Battle/unit_heaven_general_battle.png");
+            monkeyHero.art ??= shieldGuard.art;
+            thunderGuard.art ??= shieldGuard.art;
 
             var barracks = Unit(catalog, "unit_incense_barracks", "香火兵营", Faction.Player, UnitRole.Structure, 75, 0, 99f, 0f, 0f, 4, new Color(1f, 0.86f, 0.48f), "Assets/_Project/Art/AI/Battle/unit_incense_barracks_battle.png");
             barracks.producedUnit = militia;
@@ -54,22 +52,31 @@ namespace XTD.Content
             thunderTower.producedUnit = thunderGuard;
             thunderTower.productionInterval = 4.2f;
             thunderTower.productionCount = 1;
+            thunderTower.art ??= archerAltar.art;
 
             var grunt = Unit(catalog, "enemy_grunt", "山魈爪牙", Faction.Enemy, UnitRole.Monster, 16, 4, 1.2f, 0.75f, 0.95f, 0, new Color(1f, 0.55f, 0.45f), "Assets/_Project/Art/AI/Battle/enemy_grunt_battle.png");
             var brute = Unit(catalog, "enemy_brute", "蛮兽", Faction.Enemy, UnitRole.Monster, 42, 8, 1.5f, 0.8f, 0.55f, 0, new Color(1f, 0.35f, 0.25f), "Assets/_Project/Art/AI/Battle/enemy_brute_battle.png");
-            var impArcher = Unit(catalog, "enemy_imp_archer", "骨弩小妖", Faction.Enemy, UnitRole.Monster, 18, 4, 1.25f, 3.2f, 0.72f, 0, new Color(1f, 0.68f, 0.45f), "Assets/_Project/Art/AI/Battle/enemy_grunt_battle.png");
-            var venomShaman = Unit(catalog, "enemy_venom_shaman", "毒雾祭司", Faction.Enemy, UnitRole.Monster, 36, 7, 1.45f, 3.6f, 0.45f, 0, new Color(0.75f, 1f, 0.45f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
+            var impArcher = Unit(catalog, "enemy_imp_archer", "骨弩小妖", Faction.Enemy, UnitRole.Monster, 18, 4, 1.25f, 2.05f, 0.72f, 0, new Color(1f, 0.68f, 0.45f), "Assets/_Project/Art/AI/Battle/enemy_grunt_battle.png");
+            var venomShaman = Unit(catalog, "enemy_venom_shaman", "毒雾祭司", Faction.Enemy, UnitRole.Monster, 36, 7, 1.45f, 2.65f, 0.45f, 0, new Color(0.75f, 1f, 0.45f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
 
-            var wolfElite = Unit(catalog, "enemy_wolf_elite", "妖狼先锋", Faction.Enemy, UnitRole.Boss, 180, 11, 0.95f, 1.05f, 0.62f, 0, new Color(1f, 0.32f, 0.50f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
-            var boneElite = Unit(catalog, "enemy_bone_elite", "白骨督军", Faction.Enemy, UnitRole.Boss, 230, 13, 1.15f, 1.1f, 0.46f, 0, new Color(0.92f, 0.90f, 1f), "Assets/_Project/Art/AI/Battle/enemy_brute_battle.png");
-            var oxElite = Unit(catalog, "enemy_ox_elite", "牛魔校尉", Faction.Enemy, UnitRole.Boss, 270, 16, 1.35f, 1.25f, 0.40f, 0, new Color(1f, 0.50f, 0.28f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
-            var blackWindBoss = Unit(catalog, "boss_black_wind", "黑风小圣", Faction.Enemy, UnitRole.Boss, 360, 18, 1.05f, 1.4f, 0.42f, 0, new Color(0.70f, 0.55f, 1f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
-            var boneQueenBoss = Unit(catalog, "boss_bone_queen", "白骨军主", Faction.Enemy, UnitRole.Boss, 430, 21, 1.20f, 2.8f, 0.34f, 0, new Color(1f, 0.72f, 0.92f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
-            var finalBoss = Unit(catalog, "boss_chaos_lord", "混沌魔君", Faction.Enemy, UnitRole.Boss, 620, 26, 0.95f, 2.0f, 0.32f, 0, new Color(1f, 0.22f, 0.20f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
+            var wolfElite = Unit(catalog, "enemy_wolf_elite", "妖狼先锋", Faction.Enemy, UnitRole.Boss, 180, 11, 0.95f, 5.2f, 0f, 0, new Color(1f, 0.32f, 0.50f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
+            var boneElite = Unit(catalog, "enemy_bone_elite", "白骨督军", Faction.Enemy, UnitRole.Boss, 230, 13, 1.15f, 5.2f, 0f, 0, new Color(0.92f, 0.90f, 1f), "Assets/_Project/Art/AI/Battle/enemy_brute_battle.png");
+            var oxElite = Unit(catalog, "enemy_ox_elite", "牛魔校尉", Faction.Enemy, UnitRole.Boss, 270, 16, 1.35f, 5.2f, 0f, 0, new Color(1f, 0.50f, 0.28f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
+            var blackWindBoss = Unit(catalog, "boss_black_wind", "黑风小圣", Faction.Enemy, UnitRole.Boss, 360, 18, 1.05f, 5.2f, 0f, 0, new Color(0.70f, 0.55f, 1f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
+            var boneQueenBoss = Unit(catalog, "boss_bone_queen", "白骨军主", Faction.Enemy, UnitRole.Boss, 430, 21, 1.20f, 5.2f, 0f, 0, new Color(1f, 0.72f, 0.92f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
+            var finalBoss = Unit(catalog, "boss_chaos_lord", "混沌魔君", Faction.Enemy, UnitRole.Boss, 620, 26, 0.95f, 5.2f, 0f, 0, new Color(1f, 0.22f, 0.20f), "Assets/_Project/Art/AI/Battle/enemy_alpha_battle.png");
+            impArcher.art ??= grunt.art;
+            venomShaman.art ??= wolfElite.art;
+            wolfElite.art ??= catalog.FindUnit("enemy_alpha")?.art ?? brute.art;
+            boneElite.art ??= brute.art;
+            oxElite.art ??= wolfElite.art;
+            blackWindBoss.art ??= wolfElite.art;
+            boneQueenBoss.art ??= wolfElite.art;
+            finalBoss.art ??= wolfElite.art;
 
             UpsertLeveledCard(catalog, "card_incense_barracks", "香火兵营", CardType.Structure, 3, CardReleaseRule.PlayerSide, "放置后持续生产香火民兵。", "Assets/_Project/Art/AI/Cards/card_incense_barracks.png", level =>
             {
-                var card = CardPayload(level);
+                var card = CreateCardPayload(level);
                 card.spawns.Add(Spawn(barracks, 1));
                 if (level >= 2) card.effects.Add(Effect(EffectType.Shield, TargetRule.AllFriendlyUnits, 8 + level * 4, 0, 99f));
                 return card;
@@ -77,7 +84,7 @@ namespace XTD.Content
 
             UpsertLeveledCard(catalog, "card_spirit_arrow_altar", "灵弩坛", CardType.Structure, 3, CardReleaseRule.PlayerSide, "放置后持续生产灵弩射手。", "Assets/_Project/Art/AI/Cards/card_spirit_arrow_altar.png", level =>
             {
-                var card = CardPayload(level);
+                var card = CreateCardPayload(level);
                 card.spawns.Add(Spawn(archerAltar, 1));
                 if (level >= 3) card.effects.Add(Effect(EffectType.BuffAttackSpeed, TargetRule.AllFriendlyUnits, 0.12f, 5f, 99f));
                 return card;
@@ -85,14 +92,14 @@ namespace XTD.Content
 
             UpsertLeveledCard(catalog, "card_roadblock", "八卦石垒", CardType.Structure, 2, CardReleaseRule.PlayerSide, "放置一道临时防线，阻挡敌人推进。", "Assets/_Project/Art/AI/Cards/card_roadblock.png", level =>
             {
-                var card = CardPayload(level);
+                var card = CreateCardPayload(level);
                 card.spawns.Add(Spawn(roadblock, level));
                 return card;
             });
 
             UpsertLeveledCard(catalog, "card_thunder_drum_tower", "雷鼓台", CardType.Structure, 4, CardReleaseRule.PlayerSide, "放置后持续生产近战雷鼓卫。", "Assets/_Project/Art/AI/Cards/card_rally.png", level =>
             {
-                var card = CardPayload(level);
+                var card = CreateCardPayload(level);
                 card.spawns.Add(Spawn(thunderTower, 1));
                 if (level >= 2) card.effects.Add(Effect(EffectType.GainMana, TargetRule.Self, level, 0, 0));
                 return card;
@@ -100,14 +107,14 @@ namespace XTD.Content
 
             UpsertLeveledCard(catalog, "card_heaven_soldier_talisman", "天兵符", CardType.Soldier, 2, CardReleaseRule.PlayerSide, "一次性召来一队弱小天兵。", "Assets/_Project/Art/AI/Cards/card_heaven_soldier_talisman.png", level =>
             {
-                var card = CardPayload(level);
+                var card = CreateCardPayload(level);
                 card.spawns.Add(Spawn(militia, 4 + level * 2));
                 return card;
             });
 
             UpsertLeveledCard(catalog, "card_heaven_general_order", "天将令", CardType.EliteSoldier, 4, CardReleaseRule.PlayerSide, "一次性召来数名金甲天将。", "Assets/_Project/Art/AI/Cards/card_heaven_general_order.png", level =>
             {
-                var card = CardPayload(level);
+                var card = CreateCardPayload(level);
                 card.spawns.Add(Spawn(shieldGuard, level == 1 ? 2 : 3));
                 if (level >= 3) card.effects.Add(Effect(EffectType.Shield, TargetRule.AllFriendlyUnits, 18, 0, 99f));
                 return card;
@@ -115,7 +122,7 @@ namespace XTD.Content
 
             UpsertLeveledCard(catalog, "card_monkey_hero", "齐天先锋", CardType.Hero, 6, CardReleaseRule.PlayerSide, "召来一名高统率英雄士兵。", "Assets/_Project/Art/AI/Cards/card_heaven_general_order.png", level =>
             {
-                var card = CardPayload(level);
+                var card = CreateCardPayload(level);
                 card.spawns.Add(Spawn(monkeyHero, 1));
                 card.effects.Add(Effect(EffectType.BuffAttack, TargetRule.AllFriendlyUnits, 0.12f + level * 0.08f, 4f + level, 99f));
                 return card;
@@ -123,31 +130,43 @@ namespace XTD.Content
 
             UpsertLeveledCard(catalog, "card_fireball", "三昧真火", CardType.Spell, 3, CardReleaseRule.Anywhere, "在目标点燃起范围真火。", "Assets/_Project/Art/AI/Cards/card_fireball.png", level =>
             {
-                var card = CardPayload(level);
+                var card = CreateCardPayload(level);
                 card.effects.Add(Effect(EffectType.AreaDamage, TargetRule.AllEnemies, 18 + level * 12, 0, 1.25f + level * 0.25f));
                 return card;
             });
 
             UpsertLeveledCard(catalog, "card_thunder_talisman", "掌心雷符", CardType.Spell, 2, CardReleaseRule.Anywhere, "对目标点附近敌人造成雷击伤害。", "Assets/_Project/Art/AI/Cards/card_fireball.png", level =>
             {
-                var card = CardPayload(level);
+                var card = CreateCardPayload(level);
                 card.effects.Add(Effect(EffectType.Damage, TargetRule.AllEnemies, 24 + level * 14, 0, 0.9f + level * 0.15f));
                 return card;
             });
 
-            UpsertLeveledCard(catalog, "card_rally", "战鼓法令", CardType.Tactic, 2, CardReleaseRule.None, "短时间提升己方单位攻击。", "Assets/_Project/Art/AI/Cards/card_rally.png", level =>
+            UpsertLeveledCard(catalog, "card_rally", "战鼓法令", CardType.Tactic, 2, CardReleaseRule.None, "短时间提升己方单位攻击，并获得士气强化下一张出兵牌。", "Assets/_Project/Art/AI/Cards/card_rally.png", level =>
             {
-                var card = CardPayload(level);
+                var card = CreateCardPayload(level);
                 card.effects.Add(Effect(EffectType.BuffAttack, TargetRule.AllFriendlyUnits, 0.18f + level * 0.16f, 4f + level, 99f));
+                card.effects.Add(Effect(EffectType.GainMorale, TargetRule.Self, level >= 3 ? 2 : 1, 0, 0));
                 return card;
             });
 
             UpsertLeveledCard(catalog, "card_golden_barrier", "护阵金光", CardType.Tactic, 2, CardReleaseRule.None, "为己方单位附加护盾。", "Assets/_Project/Art/AI/Cards/card_roadblock.png", level =>
             {
-                var card = CardPayload(level);
+                var card = CreateCardPayload(level);
                 card.effects.Add(Effect(EffectType.Shield, TargetRule.AllFriendlyUnits, 12 + level * 12, 0, 99f));
                 return card;
             });
+            CopyLeveledCardArt(catalog, "card_incense_barracks", "card_incense_barracks");
+            CopyLeveledCardArt(catalog, "card_spirit_arrow_altar", "card_spirit_arrow_altar");
+            CopyLeveledCardArt(catalog, "card_roadblock", "card_roadblock");
+            CopyLeveledCardArt(catalog, "card_heaven_soldier_talisman", "card_heaven_soldier_talisman");
+            CopyLeveledCardArt(catalog, "card_heaven_general_order", "card_heaven_general_order");
+            CopyLeveledCardArt(catalog, "card_fireball", "card_fireball");
+            CopyLeveledCardArt(catalog, "card_rally", "card_rally");
+            CopyLeveledCardArt(catalog, "card_thunder_drum_tower", "card_rally");
+            CopyLeveledCardArt(catalog, "card_monkey_hero", "card_heaven_general_order");
+            CopyLeveledCardArt(catalog, "card_thunder_talisman", "card_fireball");
+            CopyLeveledCardArt(catalog, "card_golden_barrier", "card_roadblock");
 
             Artifact(catalog, "artifact_long_banner", "长旗", ArtifactRarity.Common, "统率上限 +5。");
             Artifact(catalog, "artifact_field_purse", "战地钱袋", ArtifactRarity.Common, "金币收益 +20%。");
@@ -288,7 +307,7 @@ namespace XTD.Content
             }
 
             var marker = id.LastIndexOf("_lv", StringComparison.Ordinal);
-            return marker > 0 ? id[..marker] : id;
+            return marker > 0 ? id.Substring(0, marker) : id;
         }
 
         public static string UpgradeCardId(string id)
@@ -309,7 +328,7 @@ namespace XTD.Content
             return 1;
         }
 
-        private static CardPayload CardPayload(int level)
+        private static CardPayload CreateCardPayload(int level)
         {
             return new CardPayload { costOffset = level == 3 ? 1 : 0 };
         }
@@ -383,21 +402,21 @@ namespace XTD.Content
             }
         }
 
+        private static void CopyLeveledCardArt(ContentCatalog catalog, string targetBaseId, string sourceBaseId)
+        {
+            for (var level = 1; level <= 3; level++)
+            {
+                var target = catalog.FindCard(LevelId(targetBaseId, level));
+                var source = catalog.FindCard(LevelId(sourceBaseId, level)) ?? catalog.FindCard(sourceBaseId);
+                if (target != null && target.art == null && source != null)
+                {
+                    target.art = source.art;
+                }
+            }
+        }
+
         private static Sprite LoadSprite(string path)
         {
-#if UNITY_EDITOR
-            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
-            if (sprite != null)
-            {
-                return sprite;
-            }
-
-            var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-            if (texture != null)
-            {
-                return Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect);
-            }
-#endif
             return null;
         }
 

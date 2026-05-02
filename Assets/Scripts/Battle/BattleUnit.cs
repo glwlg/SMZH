@@ -166,7 +166,7 @@ namespace XTD.Battle
                 }
             }
 
-            return Definition.attack * Mathf.Max(0.1f, multiplier);
+            return Definition.attack * Mathf.Max(0.1f, multiplier) * controller.AttackMultiplierFor(Definition);
         }
 
         public float EffectiveAttackInterval()
@@ -251,7 +251,7 @@ namespace XTD.Battle
                 return;
             }
 
-            var step = Definition.moveSpeed * deltaTime;
+            var step = Definition.moveSpeed * controller.MoveSpeedMultiplierFor(Definition) * deltaTime;
             var next = Vector2.MoveTowards(current, target, step);
             if ((next - current).sqrMagnitude > 0.000001f)
             {

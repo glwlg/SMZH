@@ -55,6 +55,35 @@ namespace XTD.Editor
             }
         }
 
+        [MenuItem("X-TD/验证/MVP 内容校验")]
+        public static void ValidateMvpContent()
+        {
+            var catalog = AssetDatabase.LoadAssetAtPath<ContentCatalog>(CatalogPath);
+            if (catalog == null)
+            {
+                catalog = DemoContentFactory.CreateCatalog();
+            }
+
+            var report = MvpValidationService.Validate(catalog);
+            var message = report.Passed
+                ? "MVP 校验通过：卡牌、神器、敌人、迷宫结构和最终首领闭环均满足当前范围。"
+                : report.ToString();
+
+            if (report.Passed)
+            {
+                Debug.Log(message);
+            }
+            else
+            {
+                Debug.LogError(message);
+            }
+
+            if (!Application.isBatchMode)
+            {
+                EditorUtility.DisplayDialog("X-TD MVP 校验", message, "知道了");
+            }
+        }
+
         private static void EnsureFolders()
         {
             Directory.CreateDirectory(ProjectRoot);
@@ -114,20 +143,35 @@ namespace XTD.Editor
             SetUnitArt(catalog, "unit_militia", LoadAiBattleSprite("unit_militia_battle"));
             SetUnitArt(catalog, "unit_archer", LoadAiBattleSprite("unit_archer_battle"));
             SetUnitArt(catalog, "unit_shield_guard", LoadAiBattleSprite("unit_heaven_general_battle"));
+            SetUnitArt(catalog, "unit_monkey_vanguard", LoadAiBattleSprite("unit_heaven_general_battle"));
+            SetUnitArt(catalog, "unit_thunder_guard", LoadAiBattleSprite("unit_heaven_general_battle"));
             SetUnitArt(catalog, "unit_incense_barracks", LoadAiBattleSprite("unit_incense_barracks_battle"));
             SetUnitArt(catalog, "unit_spirit_arrow_altar", LoadAiBattleSprite("unit_spirit_arrow_altar_battle"));
             SetUnitArt(catalog, "unit_roadblock", LoadAiBattleSprite("unit_bagua_wall_battle"));
+            SetUnitArt(catalog, "unit_thunder_drum_tower", LoadAiBattleSprite("unit_spirit_arrow_altar_battle"));
             SetUnitArt(catalog, "enemy_grunt", LoadAiBattleSprite("enemy_grunt_battle"));
             SetUnitArt(catalog, "enemy_brute", LoadAiBattleSprite("enemy_brute_battle"));
             SetUnitArt(catalog, "enemy_alpha", LoadAiBattleSprite("enemy_alpha_battle"));
+            SetUnitArt(catalog, "enemy_imp_archer", LoadAiBattleSprite("enemy_grunt_battle"));
+            SetUnitArt(catalog, "enemy_venom_shaman", LoadAiBattleSprite("enemy_alpha_battle"));
+            SetUnitArt(catalog, "enemy_wolf_elite", LoadAiBattleSprite("enemy_alpha_battle"));
+            SetUnitArt(catalog, "enemy_bone_elite", LoadAiBattleSprite("enemy_brute_battle"));
+            SetUnitArt(catalog, "enemy_ox_elite", LoadAiBattleSprite("enemy_alpha_battle"));
+            SetUnitArt(catalog, "boss_black_wind", LoadAiBattleSprite("enemy_alpha_battle"));
+            SetUnitArt(catalog, "boss_bone_queen", LoadAiBattleSprite("enemy_alpha_battle"));
+            SetUnitArt(catalog, "boss_chaos_lord", LoadAiBattleSprite("enemy_alpha_battle"));
 
-            SetCardArt(catalog, "card_incense_barracks", LoadAiCardSprite("card_incense_barracks"));
-            SetCardArt(catalog, "card_spirit_arrow_altar", LoadAiCardSprite("card_spirit_arrow_altar"));
-            SetCardArt(catalog, "card_roadblock", LoadAiCardSprite("card_roadblock"));
-            SetCardArt(catalog, "card_heaven_soldier_talisman", LoadAiCardSprite("card_heaven_soldier_talisman"));
-            SetCardArt(catalog, "card_heaven_general_order", LoadAiCardSprite("card_heaven_general_order"));
-            SetCardArt(catalog, "card_fireball", LoadAiCardSprite("card_fireball"));
-            SetCardArt(catalog, "card_rally", LoadAiCardSprite("card_rally"));
+            SetLeveledCardArt(catalog, "card_incense_barracks", LoadAiCardSprite("card_incense_barracks"));
+            SetLeveledCardArt(catalog, "card_spirit_arrow_altar", LoadAiCardSprite("card_spirit_arrow_altar"));
+            SetLeveledCardArt(catalog, "card_roadblock", LoadAiCardSprite("card_roadblock"));
+            SetLeveledCardArt(catalog, "card_heaven_soldier_talisman", LoadAiCardSprite("card_heaven_soldier_talisman"));
+            SetLeveledCardArt(catalog, "card_heaven_general_order", LoadAiCardSprite("card_heaven_general_order"));
+            SetLeveledCardArt(catalog, "card_fireball", LoadAiCardSprite("card_fireball"));
+            SetLeveledCardArt(catalog, "card_rally", LoadAiCardSprite("card_rally"));
+            SetLeveledCardArt(catalog, "card_thunder_drum_tower", LoadAiCardSprite("card_rally"));
+            SetLeveledCardArt(catalog, "card_monkey_hero", LoadAiCardSprite("card_heaven_general_order"));
+            SetLeveledCardArt(catalog, "card_thunder_talisman", LoadAiCardSprite("card_fireball"));
+            SetLeveledCardArt(catalog, "card_golden_barrier", LoadAiCardSprite("card_roadblock"));
         }
 
         private static void PrepareAiSprites()
@@ -193,6 +237,13 @@ namespace XTD.Editor
             {
                 Debug.LogWarning($"未找到卡牌素材：{cardId}");
             }
+        }
+
+        private static void SetLeveledCardArt(ContentCatalog catalog, string baseCardId, Sprite sprite)
+        {
+            SetCardArt(catalog, baseCardId, sprite);
+            SetCardArt(catalog, baseCardId + "_lv2", sprite);
+            SetCardArt(catalog, baseCardId + "_lv3", sprite);
         }
 
         private static Sprite LoadAiBattleSprite(string spriteName)

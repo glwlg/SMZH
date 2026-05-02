@@ -18,6 +18,8 @@ namespace XTD.Content
         public List<string> deckCardIds = new();
         public List<string> artifactIds = new();
         public List<string> permanentArtifactIds = new();
+        public List<int> availableNodeIndices = new();
+        public List<string> selectedNodeKeys = new();
 
         public RunState Clone()
         {
@@ -34,7 +36,9 @@ namespace XTD.Content
                 lastMessage = lastMessage,
                 deckCardIds = new List<string>(deckCardIds),
                 artifactIds = new List<string>(artifactIds),
-                permanentArtifactIds = new List<string>(permanentArtifactIds)
+                permanentArtifactIds = new List<string>(permanentArtifactIds),
+                availableNodeIndices = new List<int>(availableNodeIndices),
+                selectedNodeKeys = new List<string>(selectedNodeKeys)
             };
         }
     }

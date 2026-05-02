@@ -60,6 +60,7 @@ namespace XTD.Content
         Poison,
         DrawCard,
         GainMana,
+        GainMorale,
         GainGold
     }
 
