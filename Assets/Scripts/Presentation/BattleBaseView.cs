@@ -16,19 +16,21 @@ namespace XTD.Presentation
         private float flash;
         private float seed;
         private bool showWorldPresentation = true;
+        private bool showHealthBar = true;
 
         private void Awake()
         {
             BuildParts();
         }
 
-        public void Initialize(Faction side, Sprite sprite, Vector3 position, float scale, float maximumHp, bool visibleWorldPresentation = true)
+        public void Initialize(Faction side, Sprite sprite, Vector3 position, float scale, float maximumHp, bool visibleWorldPresentation = true, bool visibleHealthBar = true)
         {
             faction = side;
             baseScale = scale;
             maxHp = Mathf.Max(1f, maximumHp);
             seed = Random.Range(0f, 50f);
             showWorldPresentation = visibleWorldPresentation;
+            showHealthBar = visibleHealthBar;
             transform.position = position;
             transform.localScale = Vector3.one * baseScale;
             gameObject.name = side == Faction.Player ? "我方大本营" : "敌方大本营";
@@ -87,8 +89,8 @@ namespace XTD.Presentation
         {
             auraRenderer.enabled = visible;
             bodyRenderer.enabled = visible;
-            healthBack.enabled = true;
-            healthFill.enabled = true;
+            healthBack.enabled = showHealthBar;
+            healthFill.enabled = showHealthBar;
         }
 
         private void BuildParts()

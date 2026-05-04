@@ -6,6 +6,7 @@ namespace XTD.Presentation
     public sealed class DamageNumberView : MonoBehaviour
     {
         private const float Duration = 0.55f;
+
         private Action onComplete;
         private TextMesh text;
         private float age;
@@ -27,7 +28,7 @@ namespace XTD.Presentation
 
                 text.anchor = TextAnchor.MiddleCenter;
                 text.alignment = TextAlignment.Center;
-                text.fontSize = 36;
+                text.fontSize = 40;
                 text.characterSize = 0.08f;
                 var renderer = text.GetComponent<MeshRenderer>();
                 renderer.sortingOrder = 50;
@@ -41,14 +42,22 @@ namespace XTD.Presentation
         {
             age += Time.deltaTime;
             transform.position += new Vector3(0f, Time.deltaTime * 0.8f, 0f);
+
             var color = text.color;
             color.a = 1f - Mathf.Clamp01(age / Duration);
             text.color = color;
 
             if (age >= Duration)
             {
-                onComplete?.Invoke();
+                Complete();
             }
+        }
+
+        private void Complete()
+        {
+            var callback = onComplete;
+            onComplete = null;
+            callback?.Invoke();
         }
     }
 }

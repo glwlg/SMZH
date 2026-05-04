@@ -6,9 +6,27 @@
 
 | 批次 | 资源范围 | 来源工具 | 生成说明 | 二次处理 |
 | --- | --- | --- | --- | --- |
+| v0.10-3D战场演示链 | 3D战场远景背景、战场地面、我方阵门、敌方魔门 | imagegen CLI / 本地 OpenAI 兼容接口（`gpt-image-2`） | 面向 2.5D/3D 战场演示链的环境补图；敌上我下；强调中式神话、厚重材质、可承载高密度特效的清晰战场分层 | 是 |
 | v0.2 | 战斗单位、敌人、首领、卡牌图、迷宫节点图标、神器图标、战斗特效、战场背景 | imagegen CLI / OpenAI 兼容接口 | 中式神话、洪荒西游方向；战斗视角为敌方在上、我方在下；战斗落地图和卡牌正面图分开生成 | 是 |
 | v0.3-HD | 战场背景、战斗单位、建筑、敌人、Boss、卡牌图、特效、神器图标、迷宫节点图标、卡框 | imagegen CLI / 本地 OpenAI 兼容接口（`gpt-image-2`） | 按单个素材逐张生成高清 3D 风格，不再使用多素材拼图或像素风源图；透明素材先生成纯色绿幕再本地抠底 | 是 |
 | v0.8-补齐 | 新增卡牌图、职业选择图、职业神通特效、迷宫/商店背景、新增神器图标 | imagegen CLI / 本地 OpenAI 兼容接口（`gpt-image-2`） | 继续按单素材逐张生成，保持中式神话、洪荒西游、高精度 3D 风格；卡牌正向玩家，特效和神器使用绿幕抠底 | 是 |
+
+## v0.10-3D 战场演示链生成记录
+
+本批次用于把当前战斗从“2D 逻辑 + 平面底图”推进到“2D 逻辑 + 3D/2.5D 表现”的第一版演示链。
+
+- 新增 1 张远景背景：`Assets/_Project/Art/AI/Backgrounds/battlefield_honghuang_3d_backdrop.png`
+- 新增 1 张战场地面：`Assets/_Project/Art/AI/Backgrounds/battlefield_honghuang_3d_floor.png`
+- 新增 1 张我方阵门：`Assets/_Project/Art/AI/FX/battlefield_player_portal_3d.png`
+- 新增 1 张敌方魔门：`Assets/_Project/Art/AI/FX/battlefield_enemy_gate_3d.png`
+- 原始生成输出位于：`.codex-tmp/asset-generation/v10-stage3d-generated/`
+- 透明处理：
+  - `battlefield_player_portal_3d.png` 先以纯绿背景生成，再通过 `remove_chroma_key.py` 抠底为透明 PNG
+  - `battlefield_enemy_gate_3d.png` 先以纯绿背景生成，再通过 `remove_chroma_key.py` 抠底为透明 PNG
+- 运行时接入范围：
+  - `BattleStage3D` 优先加载新的远景背景、战场地面、我方阵门、敌方魔门
+  - `XtdProjectBootstrapper` 重建 `BattlePrototype` 场景时会优先写入这一批新素材引用
+  - 新图同时同步到 `Assets/Resources/Art/AI/`，用于运行时兜底加载
 
 ## v0.8-补齐生成记录
 

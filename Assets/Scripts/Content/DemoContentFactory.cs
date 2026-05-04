@@ -362,6 +362,7 @@ namespace XTD.Content
                     Add(run, "card_thunder_drum_tower", 1);
                     Add(run, "card_roadblock", 1);
                     Add(run, "card_heaven_soldier_talisman", 1);
+                    Add(run, "card_heaven_general_order", 1);
                     Add(run, "card_golden_barrier", 1);
                     Add(run, "card_rally", 1);
                     break;
@@ -374,6 +375,7 @@ namespace XTD.Content
                     Add(run, "card_binding_talisman", 1);
                     Add(run, "card_mountain_seal", 1);
                     Add(run, "card_cloud_banner", 1);
+                    Add(run, "card_heaven_general_order", 1);
                     break;
                 default:
                     Add(run, "card_incense_barracks", 2);
@@ -585,6 +587,7 @@ namespace XTD.Content
             encounter.enemySpawnInterval = interval;
             encounter.rewardGold = rewardGold;
             encounter.coreEnemy = coreEnemy;
+            encounter.enemySpawns ??= new List<EnemySpawnEntry>();
             encounter.enemySpawns.Clear();
             encounter.enemySpawns.AddRange(spawns.Where(spawn => spawn?.unit != null));
         }

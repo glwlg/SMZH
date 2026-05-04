@@ -10,8 +10,13 @@ namespace XTD.Presentation
 {
     public sealed class BattleUiController : MonoBehaviour
     {
+        private const float RuntimeRefreshInterval = 0.1f;
         private const float CardWidth = 112f;
         private const float CardHeight = 168f;
+        private const float HandCardSpacing = 82f;
+        private const float HandCancelPaddingX = 78f;
+        private const float HandCancelBottomPadding = 58f;
+        private const float HandCancelTopPadding = 78f;
         private const float CardArtMinX = 0.12f;
         private const float CardArtMaxX = 0.88f;
         private const float CardArtMinY = 0.24f;
@@ -25,10 +30,10 @@ namespace XTD.Presentation
         private RectTransform dragLayer;
         private Text resourceText;
         private Text moraleText;
-        private Text healthText;
         private Text battleInfoText;
         private Text bossNameText;
         private Text bossHpText;
+        private Text playerBaseHpText;
         private Text enemySkillText;
         private Text divinePowerText;
         private Text cardPoolCountText;
@@ -37,6 +42,8 @@ namespace XTD.Presentation
         private Text resultText;
         private Image bossPanel;
         private Image bossHpFill;
+        private Image playerBaseHpPanel;
+        private Image playerBaseHpFill;
         private Image divineChargeFill;
         private Image enemySkillPanel;
         private Image releasePreviewImage;
@@ -48,6 +55,7 @@ namespace XTD.Presentation
         private Button debugRewardButton;
         private Button debugMoraleButton;
         private Button debugSkipButton;
+        private Button debugGuardButton;
         private float noticeTimer;
         private static Font cachedFont;
         private static Sprite cachedPileCardFrameSprite;
@@ -55,6 +63,8 @@ namespace XTD.Presentation
         private static Sprite cachedCircleSprite;
         private readonly List<PileStackLayer> cardPoolStackLayers = new();
         private readonly List<PileStackLayer> usedPileStackLayers = new();
+        private bool refreshRequested;
+        private float nextRefreshAllowedAt;
 
         public RectTransform CanvasRect => canvasRect;
         public RectTransform HandRoot => handRoot;
@@ -90,7 +100,37 @@ namespace XTD.Presentation
 
         public void Refresh()
         {
-            if (battle == null || resourceText == null || moraleText == null || healthText == null)
+            RequestRefresh(true);
+        }
+
+        public void RequestRefresh(bool immediate = false)
+        {
+            refreshRequested = true;
+            if (immediate)
+            {
+                RefreshInternal();
+            }
+        }
+
+        private void Update()
+        {
+            TickNotice();
+            if (!refreshRequested)
+            {
+                return;
+            }
+
+            if (Time.unscaledTime < nextRefreshAllowedAt)
+            {
+                return;
+            }
+
+            RefreshInternal();
+        }
+
+        private void RefreshInternal()
+        {
+            if (battle == null || resourceText == null || moraleText == null)
             {
                 return;
             }
@@ -106,7 +146,6 @@ namespace XTD.Presentation
                 : string.Empty;
             resourceText.text = $"费用 {battle.Mana:0.0}/{battle.MaxMana}\n建筑位 {battle.CurrentCommand}/{battle.MaxCommand}{structureDiscountHint}";
             moraleText.text = $"士气 {battle.MoraleCharges}\n{moraleHint}";
-            healthText.text = $"我方基地 {battle.PlayerBaseHp:0}/{battle.PlayerBaseMaxHp:0}\n{battle.EnemyObjectiveLabel} {battle.EnemyObjectiveHp:0}/{battle.EnemyObjectiveMaxHp:0}";
             if (cardPoolCountText != null)
             {
                 cardPoolCountText.text = $"卡池\n{cardPoolCount}";
@@ -120,11 +159,12 @@ namespace XTD.Presentation
             RefreshPileStack(cardPoolStackLayers, deck != null ? deck.CardPool : null, false);
             RefreshPileStack(usedPileStackLayers, deck != null ? deck.UsedPile : null, true);
             RefreshBossHud();
+            RefreshPlayerBaseHud();
             RefreshBattleInfo();
             RefreshDivinePower();
-
-            TickNotice();
             RenderHand();
+            refreshRequested = false;
+            nextRefreshAllowedAt = Time.unscaledTime + RuntimeRefreshInterval;
         }
 
         private void RefreshBossHud()
@@ -149,6 +189,22 @@ namespace XTD.Presentation
                 : $"目标：{battle.EncounterDisplayName}";
             bossHpText.text = $"{hp:0}/{maxHp:0}";
             bossHpFill.rectTransform.anchorMax = new Vector2(ratio, 1f);
+        }
+
+        private void RefreshPlayerBaseHud()
+        {
+            if (playerBaseHpPanel == null || playerBaseHpFill == null || playerBaseHpText == null || battle == null)
+            {
+                return;
+            }
+
+            playerBaseHpPanel.gameObject.SetActive(true);
+            var hp = Mathf.Max(0f, battle.PlayerBaseHp);
+            var maxHp = Mathf.Max(1f, battle.PlayerBaseMaxHp);
+            var ratio = Mathf.Clamp01(hp / maxHp);
+            playerBaseHpFill.rectTransform.anchorMax = new Vector2(ratio, 1f);
+            playerBaseHpFill.color = Color.Lerp(new Color(0.95f, 0.16f, 0.10f, 0.96f), new Color(0.24f, 0.95f, 0.62f, 0.96f), ratio);
+            playerBaseHpText.text = $"\u6211\u65b9\u9635\u5fc3  {hp:0}/{maxHp:0}";
         }
 
         private void RefreshBattleInfo()
@@ -253,15 +309,37 @@ namespace XTD.Presentation
                 return Vector3.zero;
             }
 
-            var distance = Mathf.Abs(mainCamera.transform.position.z);
-            var world = mainCamera.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, distance));
+            var battlePlane = new Plane(Vector3.forward, Vector3.zero);
+            var ray = mainCamera.ScreenPointToRay(screenPosition);
+            if (!battlePlane.Raycast(ray, out var enter))
+            {
+                return Vector3.zero;
+            }
+
+            var world = ray.GetPoint(enter);
             world.z = 0f;
             return world;
         }
 
         public bool IsInHandArea(Vector2 screenPosition)
         {
-            return handRoot != null && RectTransformUtility.RectangleContainsScreenPoint(handRoot, screenPosition, null);
+            if (handRoot == null || !RectTransformUtility.ScreenPointToLocalPointInRectangle(handRoot, screenPosition, null, out var localPoint))
+            {
+                return false;
+            }
+
+            var cardCount = battle?.Deck?.Hand?.Count ?? cardViews.Count;
+            if (cardCount <= 0)
+            {
+                return false;
+            }
+
+            var cardSpan = CardWidth + Mathf.Max(0, cardCount - 1) * HandCardSpacing;
+            var cancelWidth = Mathf.Clamp(cardSpan + HandCancelPaddingX * 2f, 360f, 780f);
+            return localPoint.x >= -cancelWidth * 0.5f &&
+                   localPoint.x <= cancelWidth * 0.5f &&
+                   localPoint.y >= -HandCancelBottomPadding &&
+                   localPoint.y <= CardHeight + HandCancelTopPadding;
         }
 
         public void UpdateReleasePreview(CardDefinition card, Vector2 screenPosition)
@@ -297,12 +375,14 @@ namespace XTD.Presentation
                 return;
             }
 
-            var diameter = Mathf.Max(24f, Vector2.Distance(centerLocal, edgeLocal) * 2f);
+            var isStructurePreview = battle.CardPlacesStructure(card);
+            var minDiameter = isStructurePreview ? 16f : 24f;
+            var diameter = Mathf.Max(minDiameter, Vector2.Distance(centerLocal, edgeLocal) * 2f);
             var canRelease = battle.CanReleaseCardAt(card, world, out _);
             releasePreviewImage.rectTransform.anchoredPosition = centerLocal;
             releasePreviewImage.rectTransform.sizeDelta = new Vector2(diameter, diameter);
             releasePreviewImage.color = canRelease
-                ? battle.CardPlacesStructure(card)
+                ? isStructurePreview
                     ? new Color(1f, 0.78f, 0.26f, 0.36f)
                     : new Color(0.46f, 0.92f, 1f, 0.34f)
                 : new Color(1f, 0.18f, 0.10f, 0.36f);
@@ -356,7 +436,7 @@ namespace XTD.Presentation
                 root,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(164f, 56f),
+                new Vector2(248f, 56f),
                 new Vector2(156f, 62f),
                 new Color(0.025f, 0.035f, 0.045f, 0.48f));
             resourceText = CreateHudText("资源状态", resourcePanel.transform, Vector2.zero, Vector2.one, 18);
@@ -366,20 +446,10 @@ namespace XTD.Presentation
                 root,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(164f, 132f),
+                new Vector2(248f, 132f),
                 new Vector2(156f, 62f),
                 new Color(0.025f, 0.035f, 0.045f, 0.48f));
             moraleText = CreateHudText("士气状态", moralePanel.transform, Vector2.zero, Vector2.one, 18);
-
-            var healthPanel = CreatePanel(
-                "基地信息",
-                root,
-                new Vector2(0.5f, 0f),
-                new Vector2(0.5f, 0f),
-                new Vector2(0f, 232f),
-                new Vector2(300f, 78f),
-                new Color(0.025f, 0.035f, 0.045f, 0.48f));
-            healthText = CreateHudText("基地状态", healthPanel.transform, Vector2.zero, Vector2.one, 18);
 
             noticeText = CreateText("提示", root, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 330f), 20);
             noticeText.color = new Color(1f, 0.86f, 0.36f, 0.95f);
@@ -414,8 +484,8 @@ namespace XTD.Presentation
                 root,
                 new Vector2(1f, 1f),
                 new Vector2(1f, 1f),
-                new Vector2(-170f, -96f),
-                new Vector2(300f, 138f),
+                new Vector2(-170f, -118f),
+                new Vector2(300f, 180f),
                 new Color(0.025f, 0.035f, 0.045f, 0.58f));
             var debugTitle = CreateText("调试标题", debugPanel.transform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -17f), 15);
             debugTitle.text = "调试";
@@ -433,6 +503,8 @@ namespace XTD.Presentation
             debugMoraleButton.onClick.AddListener(() => battle?.DebugAddMorale());
             debugSkipButton = CreateDebugButton("跳节点", debugPanel.transform, 92f, -92f);
             debugSkipButton.onClick.AddListener(() => battle?.DebugSkipNode());
+            debugGuardButton = CreateDebugButton("召天将", debugPanel.transform, 0f, -136f);
+            debugGuardButton.onClick.AddListener(() => battle?.DebugSpawnTalismanGuard());
 
             var hand = new GameObject("手牌区", typeof(RectTransform));
             hand.transform.SetParent(root, false);
@@ -442,6 +514,7 @@ namespace XTD.Presentation
             handRoot.pivot = new Vector2(0.5f, 0f);
             handRoot.sizeDelta = new Vector2(820f, 210f);
             handRoot.anchoredPosition = new Vector2(0f, 8f);
+            BuildPlayerBaseHud(root);
 
             var drag = new GameObject("拖拽层", typeof(RectTransform));
             drag.transform.SetParent(root, false);
@@ -451,6 +524,52 @@ namespace XTD.Presentation
             dragLayer.pivot = new Vector2(0.5f, 0.5f);
             dragLayer.offsetMin = Vector2.zero;
             dragLayer.offsetMax = Vector2.zero;
+        }
+
+        private void BuildPlayerBaseHud(Transform root)
+        {
+            playerBaseHpPanel = CreatePanel(
+                "Player Base Hp",
+                root,
+                new Vector2(0.5f, 0f),
+                new Vector2(0.5f, 0f),
+                new Vector2(0f, 34f),
+                new Vector2(500f, 28f),
+                new Color(0.015f, 0.030f, 0.030f, 0.72f));
+            playerBaseHpPanel.raycastTarget = false;
+            playerBaseHpPanel.gameObject.AddComponent<Outline>().effectColor = new Color(0.28f, 0.95f, 0.78f, 0.34f);
+
+            var barBack = CreatePanel(
+                "Player Base Hp Back",
+                playerBaseHpPanel.transform,
+                Vector2.zero,
+                Vector2.one,
+                Vector2.zero,
+                Vector2.zero,
+                new Color(0.02f, 0.055f, 0.055f, 0.90f));
+            barBack.rectTransform.offsetMin = new Vector2(9f, 5f);
+            barBack.rectTransform.offsetMax = new Vector2(-9f, -5f);
+            barBack.raycastTarget = false;
+
+            playerBaseHpFill = CreatePanel(
+                "Player Base Hp Fill",
+                barBack.transform,
+                Vector2.zero,
+                Vector2.one,
+                Vector2.zero,
+                Vector2.zero,
+                new Color(0.24f, 0.95f, 0.62f, 0.96f));
+            playerBaseHpFill.rectTransform.offsetMin = Vector2.zero;
+            playerBaseHpFill.rectTransform.offsetMax = Vector2.zero;
+            playerBaseHpFill.rectTransform.pivot = new Vector2(0f, 0.5f);
+            playerBaseHpFill.raycastTarget = false;
+
+            playerBaseHpText = CreateText("Player Base Hp Text", playerBaseHpPanel.transform, Vector2.zero, Vector2.one, Vector2.zero, 16);
+            playerBaseHpText.rectTransform.offsetMin = Vector2.zero;
+            playerBaseHpText.rectTransform.offsetMax = Vector2.zero;
+            playerBaseHpText.rectTransform.sizeDelta = Vector2.zero;
+            playerBaseHpText.raycastTarget = false;
+            playerBaseHpText.color = new Color(0.94f, 1f, 0.90f, 0.98f);
         }
 
         private void BuildBossHud(Transform root)
@@ -1233,7 +1352,7 @@ namespace XTD.Presentation
                 var offset = index - center;
                 var normalized = count <= 1 ? 0f : offset / center;
 
-                homePosition = new Vector2(offset * 82f, Mathf.Abs(normalized) * -18f);
+                homePosition = new Vector2(offset * HandCardSpacing, Mathf.Abs(normalized) * -18f);
                 homeRotation = -normalized * 13f;
                 ApplyHomeTransform();
             }

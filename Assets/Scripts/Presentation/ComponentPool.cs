@@ -16,7 +16,23 @@ namespace XTD.Presentation
 
         public T Get()
         {
-            var item = inactive.Count > 0 ? inactive.Dequeue() : factory();
+            T item = null;
+            while (inactive.Count > 0 && item == null)
+            {
+                item = inactive.Dequeue();
+            }
+
+            if (item == null)
+            {
+                item = factory != null ? factory() : null;
+            }
+
+            if (item == null)
+            {
+                Debug.LogWarning($"神魔镇荒：对象池 {typeof(T).Name} 创建实例失败。");
+                return null;
+            }
+
             item.gameObject.SetActive(true);
             return item;
         }

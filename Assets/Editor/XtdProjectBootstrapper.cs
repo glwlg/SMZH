@@ -29,6 +29,7 @@ namespace XTD.Editor
         private const string AiUiRoot = AiArtRoot + "/UI";
         private const string AiNodeIconRoot = AiUiRoot + "/Nodes";
         private const string AiArtifactIconRoot = AiUiRoot + "/Artifacts";
+        private const string SettingsRoot = ProjectRoot + "/Settings";
         private const string ResourcesRoot = "Assets/Resources";
         private const string ResourcesAiArtRoot = ResourcesRoot + "/Art/AI";
         private const string BattleMusicAssetPath = "Assets/Resources/Audio/BGM/hyoshi_action_track_2.ogg";
@@ -108,6 +109,7 @@ namespace XTD.Editor
             Directory.CreateDirectory(ContentRoot);
             Directory.CreateDirectory(ArtRoot);
             Directory.CreateDirectory(AiArtRoot);
+            Directory.CreateDirectory(SettingsRoot);
             Directory.CreateDirectory(AiBattleRoot);
             Directory.CreateDirectory(AiCardsRoot);
             Directory.CreateDirectory(AiFxRoot);
@@ -233,9 +235,7 @@ namespace XTD.Editor
             foreach (var path in Directory.GetFiles(AiArtRoot, "*.png", SearchOption.AllDirectories))
             {
                 var unityPath = path.Replace("\\", "/");
-                var ppu = unityPath.Contains("/Backgrounds/", StringComparison.Ordinal) ? 128f : 256f;
-                var filterMode = unityPath.Contains("/FX/", StringComparison.Ordinal) ? FilterMode.Bilinear : FilterMode.Bilinear;
-                PrepareSpriteImport(unityPath, ppu, filterMode);
+                PrepareSpriteImport(unityPath);
             }
 
             if (Directory.Exists(ResourcesAiArtRoot))
@@ -243,9 +243,7 @@ namespace XTD.Editor
                 foreach (var path in Directory.GetFiles(ResourcesAiArtRoot, "*.png", SearchOption.AllDirectories))
                 {
                     var unityPath = path.Replace("\\", "/");
-                    var ppu = unityPath.Contains("/Backgrounds/", StringComparison.Ordinal) ? 128f : 256f;
-                    var filterMode = unityPath.Contains("/FX/", StringComparison.Ordinal) ? FilterMode.Bilinear : FilterMode.Bilinear;
-                    PrepareSpriteImport(unityPath, ppu, filterMode);
+                    PrepareSpriteImport(unityPath);
                 }
             }
         }
@@ -273,21 +271,88 @@ namespace XTD.Editor
             }
         }
 
-        private static void PrepareSpriteImport(string unityPath, float pixelsPerUnit, FilterMode filterMode)
+        private static void PrepareSpriteImport(string unityPath)
         {
             if (AssetImporter.GetAtPath(unityPath) is not TextureImporter importer)
             {
                 return;
             }
 
-            importer.textureType = TextureImporterType.Sprite;
-            importer.spriteImportMode = SpriteImportMode.Single;
-            importer.spritePixelsPerUnit = pixelsPerUnit;
-            importer.filterMode = filterMode;
-            importer.textureCompression = TextureImporterCompression.Uncompressed;
-            importer.alphaIsTransparency = true;
-            importer.mipmapEnabled = false;
-            importer.SaveAndReimport();
+            var isBackground = unityPath.Contains("/Backgrounds/", StringComparison.Ordinal);
+            var isBattle = unityPath.Contains("/Battle/", StringComparison.Ordinal);
+            var isCard = unityPath.Contains("/Cards/", StringComparison.Ordinal);
+            var pixelsPerUnit = isBackground ? 128f : 256f;
+            var filterMode = FilterMode.Bilinear;
+            var maxTextureSize = isBackground ? 2048 : isBattle ? 2048 : isCard ? 1024 : 512;
+            var compression = isBackground ? TextureImporterCompression.CompressedHQ : TextureImporterCompression.Compressed;
+            var mipmaps = isBackground;
+
+            var changed = false;
+
+            if (importer.textureType != TextureImporterType.Sprite)
+            {
+                importer.textureType = TextureImporterType.Sprite;
+                changed = true;
+            }
+
+            if (importer.spriteImportMode != SpriteImportMode.Single)
+            {
+                importer.spriteImportMode = SpriteImportMode.Single;
+                changed = true;
+            }
+
+            if (!Mathf.Approximately(importer.spritePixelsPerUnit, pixelsPerUnit))
+            {
+                importer.spritePixelsPerUnit = pixelsPerUnit;
+                changed = true;
+            }
+
+            if (importer.filterMode != filterMode)
+            {
+                importer.filterMode = filterMode;
+                changed = true;
+            }
+
+            if (importer.maxTextureSize != maxTextureSize)
+            {
+                importer.maxTextureSize = maxTextureSize;
+                changed = true;
+            }
+
+            if (importer.textureCompression != compression)
+            {
+                importer.textureCompression = compression;
+                changed = true;
+            }
+
+            if (importer.compressionQuality != 65)
+            {
+                importer.compressionQuality = 65;
+                changed = true;
+            }
+
+            if (importer.alphaIsTransparency != true)
+            {
+                importer.alphaIsTransparency = true;
+                changed = true;
+            }
+
+            if (importer.isReadable)
+            {
+                importer.isReadable = false;
+                changed = true;
+            }
+
+            if (importer.mipmapEnabled != mipmaps)
+            {
+                importer.mipmapEnabled = mipmaps;
+                changed = true;
+            }
+
+            if (changed)
+            {
+                importer.SaveAndReimport();
+            }
         }
 
         private static void SetUnitArt(ContentCatalog catalog, string unitId, Sprite sprite)
@@ -410,7 +475,6 @@ namespace XTD.Editor
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             var camera = CreateCamera();
-            camera.orthographicSize = 5.4f;
 
             var controller = new GameObject("战斗控制器").AddComponent<BattleController>();
             var serialized = new SerializedObject(controller);
@@ -422,7 +486,13 @@ namespace XTD.Editor
             SetSerializedObject(serialized, "battleMusicClip", LoadBattleMusicClip());
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
-            CreateBattlefield();
+            var stage = new GameObject("2D 战场背景").AddComponent<BattleStage2D>();
+            var stageSerialized = new SerializedObject(stage);
+            SetSerializedObject(stageSerialized, "backdropSprite", LoadAiBackgroundSprite("battlefield_honghuang_ai"));
+            SetSerializedObject(stageSerialized, "floorSprite", null);
+            SetSerializedObject(stageSerialized, "playerPortalSprite", null);
+            SetSerializedObject(stageSerialized, "enemyGateSprite", null);
+            stageSerialized.ApplyModifiedPropertiesWithoutUndo();
             CreateEventSystem();
 
             EditorSceneManager.SaveScene(scene, SceneRoot + "/BattlePrototype.unity");
@@ -451,17 +521,6 @@ namespace XTD.Editor
             return camera;
         }
 
-        private static void CreateBattlefield()
-        {
-            CreateSceneSprite(
-                "洪荒战场底图",
-                LoadAiBackgroundSprite("battlefield_honghuang_ai"),
-                new Vector3(0f, 0f, 0.6f),
-                new Vector3(1.35f, 1.35f, 1f),
-                Color.white,
-                -20);
-        }
-
         private static void CreateSceneSprite(string name, Sprite sprite, Vector3 position, Vector3 scale, Color color, int sortingOrder)
         {
             var spriteObject = new GameObject(name);
@@ -485,7 +544,7 @@ namespace XTD.Editor
 
         private static void CreateEventSystem()
         {
-            var eventSystem = UnityEngine.Object.FindFirstObjectByType<EventSystem>();
+            var eventSystem = UnityEngine.Object.FindAnyObjectByType<EventSystem>();
             if (eventSystem == null)
             {
                 eventSystem = new GameObject("EventSystem").AddComponent<EventSystem>();

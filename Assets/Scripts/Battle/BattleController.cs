@@ -28,9 +28,9 @@ namespace XTD.Battle
         private const float DivinePowerManaCost = 7f;
         private const float ThunderMageSpellRadiusMultiplier = 1.35f;
         private const int CloudBannerStructureCostReduction = 2;
-        private const float StructurePlacementRadius = 0.62f;
-        private const float StructurePlacementMinDistance = 1.18f;
-        private const float StructurePlacementSpacing = 1.32f;
+        private const float StructurePlacementRadius = 0.34f;
+        private const float StructurePlacementMinDistance = 0.64f;
+        private const float StructurePlacementSpacing = 0.78f;
         private static readonly string[] HitSfxResourcePaths =
         {
             "Audio/SFX/attack_hit",
@@ -118,8 +118,12 @@ namespace XTD.Battle
         public float EnemyBaseHp { get; private set; }
         public float Mana => mana;
         public int MaxMana => maxMana;
+        public float PlayerBaseLaneY => playerBaseY;
+        public float EnemyBaseLaneY => enemyBaseY;
+        public float LaneMinX => placementMinX;
+        public float LaneMaxX => placementMaxX;
         public int CurrentCommand => activeUnits
-            .Count(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player && unit.Definition.role == UnitRole.Structure);
+            .Count(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player && unit.Definition != null && unit.Definition.role == UnitRole.Structure);
         public int MaxCommand => maxCommand;
         public int MoraleCharges => morale.Charges;
         public int MoralePendingSoldiers => morale.PendingSoldiers;
@@ -218,7 +222,7 @@ namespace XTD.Battle
             }
 
             CleanupUnavailableHeroCards();
-            ui.Refresh();
+            ui.RequestRefresh();
         }
 
         public void StartPrototypeBattle()
@@ -553,7 +557,7 @@ namespace XTD.Battle
 
         public bool IsEnemyBaseInRange(BattleUnit unit)
         {
-            if (!CanUnitAttackBase(unit))
+            if (!CanUnitAttackBase(unit) || unit.Definition == null)
             {
                 return false;
             }
@@ -574,7 +578,7 @@ namespace XTD.Battle
                 return HasEnemyBase;
             }
 
-            return unit.Definition.role != UnitRole.Boss;
+            return unit.Definition != null && unit.Definition.role != UnitRole.Boss;
         }
 
         public Vector3 GetAdvanceTargetFor(BattleUnit unit)
@@ -766,6 +770,11 @@ namespace XTD.Battle
                 var x = Mathf.Lerp(-2.6f, 2.6f, i / 5f);
                 var y = playerBaseY + 0.85f + (i % 2) * 0.36f;
                 var unit = SpawnUnit(militia, Faction.Player, new Vector3(x, y, 0f), true);
+                if (unit == null)
+                {
+                    continue;
+                }
+
                 unit.AddShield(7f);
                 spawned++;
             }
@@ -779,6 +788,11 @@ namespace XTD.Battle
 
                 var x = i == 0 ? -1.25f : 1.25f;
                 var unit = SpawnUnit(archer, Faction.Player, new Vector3(x, playerBaseY + 0.55f, 0f), true);
+                if (unit == null)
+                {
+                    continue;
+                }
+
                 unit.AddModifier(EffectType.BuffAttackSpeed, 0.18f, 6f);
                 spawned++;
             }
@@ -803,7 +817,7 @@ namespace XTD.Battle
             {
                 SpawnWarningCircle(target.transform.position, 1.25f);
                 target.TakeDamage(damage);
-                if (target.IsAlive && target.Definition.role != UnitRole.Boss)
+                if (target.IsAlive && target.Definition != null && target.Definition.role != UnitRole.Boss)
                 {
                     target.AddModifier(EffectType.Stun, 1f, 0.55f);
                     target.AddModifier(EffectType.Slow, 0.45f, 3.2f);
@@ -832,7 +846,12 @@ namespace XTD.Battle
                 return false;
             }
 
-            SpawnUnit(unitDefinition, faction, position, true);
+            var unit = SpawnUnit(unitDefinition, faction, position, true);
+            if (unit == null)
+            {
+                return false;
+            }
+
             if (faction == Faction.Player && (unitDefinition.role == UnitRole.Soldier || unitDefinition.role == UnitRole.Elite))
             {
                 morale.RegisterSummonedSoldiers(1);
@@ -900,7 +919,7 @@ namespace XTD.Battle
 
         private void TickEnemyBase(float deltaTime)
         {
-            if (encounter == null || encounter.enemySpawns.Count == 0)
+            if (encounter == null || encounter.enemySpawns == null || encounter.enemySpawns.Count == 0)
             {
                 return;
             }
@@ -913,7 +932,16 @@ namespace XTD.Battle
 
             var spawnMultiplier = CoreSpawnIntervalMultiplier() * (flow != null && flow.HasActiveRun ? flow.EnemySpawnIntervalMultiplier() : 1f);
             enemySpawnTimer = Mathf.Max(0.2f, encounter.enemySpawnInterval * spawnMultiplier);
-            var entry = encounter.enemySpawns[Random.Range(0, encounter.enemySpawns.Count)];
+            var validSpawns = encounter.enemySpawns
+                .Where(spawn => spawn != null && spawn.unit != null && spawn.count > 0)
+                .ToList();
+            if (validSpawns.Count == 0)
+            {
+                Debug.LogWarning($"神魔镇荒：遭遇 {encounter.id} 没有可用的敌方刷怪配置。");
+                return;
+            }
+
+            var entry = validSpawns[Random.Range(0, validSpawns.Count)];
             for (var i = 0; i < entry.count; i++)
             {
                 SpawnUnit(entry.unit, Faction.Enemy, RandomEnemySpawnPosition(0.25f + i * 0.22f), false);
@@ -988,12 +1016,13 @@ namespace XTD.Battle
 
         private void SpawnEmergencyEnemyWave(float yOffset)
         {
-            if (encounter == null || encounter.enemySpawns.Count == 0)
+            if (encounter == null || encounter.enemySpawns == null || encounter.enemySpawns.Count == 0)
             {
                 return;
             }
 
             var wave = encounter.enemySpawns
+                .Where(entry => entry != null && entry.unit != null && entry.count > 0)
                 .OrderByDescending(entry => entry.unit != null ? entry.unit.maxHp + entry.unit.attack * 3f : 0f)
                 .Take(2)
                 .ToList();
@@ -1010,7 +1039,7 @@ namespace XTD.Battle
         private void DamagePlayerStructures(float damage)
         {
             var structures = activeUnits
-                .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player && unit.Definition.role == UnitRole.Structure)
+                .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player && unit.Definition != null && unit.Definition.role == UnitRole.Structure)
                 .OrderByDescending(unit => unit.transform.position.y)
                 .Take(4)
                 .ToList();
@@ -1024,7 +1053,7 @@ namespace XTD.Battle
         private void PrepareCoreAreaBlast(BattleUnit core, bool enrage)
         {
             var target = activeUnits
-                .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player && unit.Definition.role != UnitRole.Structure)
+                .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player && unit.Definition != null && unit.Definition.role != UnitRole.Structure)
                 .OrderByDescending(unit => unit.transform.position.y)
                 .FirstOrDefault();
             if (target == null)
@@ -1044,7 +1073,7 @@ namespace XTD.Battle
         {
             SpawnSpellImpact(pendingCoreBlastPosition);
             var targets = activeUnits
-                .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player && unit.Definition.role != UnitRole.Structure)
+                .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Player && unit.Definition != null && unit.Definition.role != UnitRole.Structure)
                 .Where(unit => Vector2.Distance(unit.transform.position, pendingCoreBlastPosition) <= pendingCoreBlastRadius)
                 .ToList();
 
@@ -1057,7 +1086,7 @@ namespace XTD.Battle
         private void BuffEnemyWave(bool enrage)
         {
             var enemies = activeUnits
-                .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Enemy && unit.Definition.role != UnitRole.Boss)
+                .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Enemy && unit.Definition != null && unit.Definition.role != UnitRole.Boss)
                 .OrderByDescending(unit => unit.transform.position.y)
                 .Take(enrage ? 6 : 4)
                 .ToList();
@@ -1077,7 +1106,7 @@ namespace XTD.Battle
 
         private bool IsCoreEnraged(BattleUnit core)
         {
-            return core != null && core.Definition.maxHp > 0f && core.CurrentHp / core.Definition.maxHp <= 0.5f;
+            return core != null && core.Definition != null && core.Definition.maxHp > 0f && core.CurrentHp / core.Definition.maxHp <= 0.5f;
         }
 
         private float CoreSpawnIntervalMultiplier()
@@ -1135,12 +1164,17 @@ namespace XTD.Battle
                             spawnCenter.y - row * spawn.spacing * 0.65f,
                             0f);
                     var unit = SpawnUnit(spawn.unit, Faction.Player, position, true);
-                    if (unit.Definition.role == UnitRole.Soldier || unit.Definition.role == UnitRole.Elite)
+                    if (unit == null)
+                    {
+                        continue;
+                    }
+
+                    if (unit.Definition != null && (unit.Definition.role == UnitRole.Soldier || unit.Definition.role == UnitRole.Elite))
                     {
                         spawnedSoldiers++;
                     }
 
-                    if (strengthened && unit.Definition.role != UnitRole.Structure)
+                    if (strengthened && unit.Definition != null && unit.Definition.role != UnitRole.Structure)
                     {
                         moraleUnits.Add(unit);
                     }
@@ -1381,7 +1415,7 @@ namespace XTD.Battle
 
                 foreach (var unit in activeUnits)
                 {
-                    if (unit == null || !unit.IsAlive || unit.Faction != Faction.Player || unit.Definition.role != UnitRole.Structure)
+                    if (unit == null || !unit.IsAlive || unit.Faction != Faction.Player || unit.Definition == null || unit.Definition.role != UnitRole.Structure)
                     {
                         continue;
                     }
@@ -1528,11 +1562,11 @@ namespace XTD.Battle
                 enemyBaseView = CreateBaseView("Enemy Base View");
             }
 
-            playerBaseView.Initialize(Faction.Player, null, PlayerBaseViewPosition(), 0.85f, CurrentPlayerBattleMaxHp(), false);
+            playerBaseView.Initialize(Faction.Player, null, PlayerBaseViewPosition(), 0.85f, CurrentPlayerBattleMaxHp(), false, false);
             enemyBaseView.gameObject.SetActive(HasEnemyBase);
             if (HasEnemyBase)
             {
-                enemyBaseView.Initialize(Faction.Enemy, null, EnemyBaseViewPosition(), 0.92f, EnemyBaseHp, false);
+                enemyBaseView.Initialize(Faction.Enemy, null, EnemyBaseViewPosition(), 0.92f, EnemyBaseHp, false, true);
             }
         }
 
@@ -1569,8 +1603,31 @@ namespace XTD.Battle
 
         private BattleUnit SpawnUnit(UnitDefinition unitDefinition, Faction faction, Vector3 position, bool countCommand)
         {
+            if (unitDefinition == null)
+            {
+                Debug.LogWarning($"神魔镇荒：尝试生成空单位，阵营={faction}，位置={position}");
+                return null;
+            }
+
+            unitPool ??= new ComponentPool<BattleUnit>(CreateUnitInstance);
             var unit = unitPool.Get();
-            unit.Initialize(this, unitDefinition, faction, position);
+            if (unit == null)
+            {
+                Debug.LogWarning($"神魔镇荒：单位对象池没有返回可用实例，单位={unitDefinition.id}");
+                return null;
+            }
+
+            try
+            {
+                unit.Initialize(this, unitDefinition, faction, position);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogWarning($"神魔镇荒：生成单位失败，已跳过。单位={unitDefinition.id}，阵营={faction}，位置={position}，错误={exception.Message}");
+                Destroy(unit.gameObject);
+                return null;
+            }
+
             activeUnits.Add(unit);
             if (countCommand && faction == Faction.Player)
             {
@@ -1841,6 +1898,32 @@ namespace XTD.Battle
             morale.AddCharges(1);
             ui.ShowNotice("调试：士气 +1，下一张出兵牌会强化");
             ui.Refresh();
+        }
+
+        public void DebugSpawnTalismanGuard()
+        {
+            if (Outcome != BattleOutcome.Running)
+            {
+                return;
+            }
+
+            var guard = catalog.FindUnit("unit_shield_guard");
+            if (guard == null)
+            {
+                ui.ShowNotice("调试：没有找到金甲天将配置");
+                return;
+            }
+
+            for (var i = 0; i < 2; i++)
+            {
+                var x = laneX + (i == 0 ? -0.42f : 0.42f);
+                var y = playerBaseY + 1.28f + i * 0.14f;
+                SpawnUnit(guard, Faction.Player, new Vector3(x, y, 0f), true);
+            }
+
+            morale.RegisterSummonedSoldiers(2);
+            SpawnMoraleEffect(new Vector3(laneX, playerBaseY + 1.28f, 0f));
+            ui.ShowNotice("调试：已召来金甲天将");
         }
 
         public void DebugAddGold()

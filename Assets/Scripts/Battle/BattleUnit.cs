@@ -8,6 +8,11 @@ namespace XTD.Battle
     [RequireComponent(typeof(SpriteRenderer))]
     public sealed class BattleUnit : MonoBehaviour
     {
+        private const float VisualScaleMultiplier = 0.5f;
+
+        private static readonly Dictionary<int, Sprite[]> spriteSheetCache = new();
+        private static readonly int[] WalkCycleFrames = { 0, 2, 1, 2 };
+
         private readonly List<TimedUnitModifier> modifiers = new();
         private BattleController controller;
         private SpriteRenderer spriteRenderer;
@@ -27,6 +32,8 @@ namespace XTD.Battle
         private float movementSignal;
         private float attackPulse;
         private float hitFlash;
+        private int cachedSortingOrder = int.MinValue;
+        private Sprite[] animationFrames;
 
         public UnitDefinition Definition { get; private set; }
         public Faction Faction { get; private set; }
@@ -53,7 +60,7 @@ namespace XTD.Battle
             gameObject.name = $"{faction}_{definition.displayName}";
             gameObject.SetActive(true);
             transform.localRotation = Quaternion.identity;
-            baseScale = ScaleFor(definition.role);
+            baseScale = ScaleFor(definition);
             transform.localScale = baseScale;
             animationSeed = Random.Range(0f, 100f);
             movementSignal = 0f;
@@ -61,19 +68,35 @@ namespace XTD.Battle
             hitFlash = 0f;
             shieldGlowTimer = 0f;
             attackGlowTimer = 0f;
+            cachedSortingOrder = int.MinValue;
 
             if (spriteRenderer == null)
             {
                 spriteRenderer = GetComponent<SpriteRenderer>();
+                if (spriteRenderer == null)
+                {
+                    spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
+                }
             }
 
-            spriteRenderer.sprite = definition.art != null ? definition.art : RuntimeSpriteFactory.UnitSprite;
+            var baseSprite = definition.art != null ? definition.art : RuntimeSpriteFactory.UnitSprite;
+            animationFrames = CreateAnimationFrames(definition, baseSprite);
+            spriteRenderer.sprite = animationFrames is { Length: > 0 } ? animationFrames[0] : baseSprite;
             baseColor = definition.tint;
             spriteRenderer.color = baseColor;
             spriteRenderer.flipX = false;
-            EnsureStatusGlows();
+            spriteRenderer.enabled = true;
+            if (shieldGlow != null)
+            {
+                shieldGlow.gameObject.SetActive(false);
+            }
+
+            if (attackGlow != null)
+            {
+                attackGlow.gameObject.SetActive(false);
+            }
+
             UpdateSortingOrder();
-            UpdateStatusGlows();
             EnsureHealthBar();
             UpdateHealthBar();
         }
@@ -409,18 +432,28 @@ namespace XTD.Battle
 
         private void EnsureHealthBar()
         {
-            if (healthBarRoot != null)
+            if (healthBarRoot != null && healthBarBack != null && healthBarFill != null)
             {
                 return;
             }
 
-            var root = new GameObject("生命条").transform;
-            root.SetParent(transform, false);
-            root.localPosition = new Vector3(0f, 0.7f, -0.02f);
-            healthBarRoot = root;
+            if (healthBarRoot == null)
+            {
+                var root = new GameObject("生命条").transform;
+                root.SetParent(transform, false);
+                root.localPosition = new Vector3(0f, 0.38f, -0.02f);
+                healthBarRoot = root;
+            }
 
-            healthBarBack = CreateHealthBarPart("底色", new Color(0.05f, 0.06f, 0.08f, 0.88f), 39);
-            healthBarFill = CreateHealthBarPart("血量", Color.green, 40);
+            if (healthBarBack == null)
+            {
+                healthBarBack = CreateHealthBarPart("底色", new Color(0.05f, 0.06f, 0.08f, 0.88f), 39);
+            }
+
+            if (healthBarFill == null)
+            {
+                healthBarFill = CreateHealthBarPart("血量", Color.green, 40);
+            }
         }
 
         private SpriteRenderer CreateHealthBarPart(string name, Color color, int sortingOrder)
@@ -436,16 +469,16 @@ namespace XTD.Battle
 
         private void UpdateHealthBar()
         {
-            if (healthBarRoot == null || Definition == null)
+            if (healthBarRoot == null || healthBarBack == null || healthBarFill == null || Definition == null)
             {
                 return;
             }
 
             var percent = Mathf.Clamp01(CurrentHp / Mathf.Max(1f, EffectiveMaxHp()));
             healthBarBack.transform.localPosition = Vector3.zero;
-            healthBarBack.transform.localScale = new Vector3(0.78f, 0.08f, 1f);
-            healthBarFill.transform.localPosition = new Vector3(-0.39f + 0.39f * percent, 0f, -0.01f);
-            healthBarFill.transform.localScale = new Vector3(0.78f * percent, 0.055f, 1f);
+            healthBarBack.transform.localScale = new Vector3(0.42f, 0.05f, 1f);
+            healthBarFill.transform.localPosition = new Vector3(-0.21f + 0.21f * percent, 0f, -0.01f);
+            healthBarFill.transform.localScale = new Vector3(0.42f * percent, 0.035f, 1f);
             healthBarFill.color = Color.Lerp(new Color(1f, 0.18f, 0.12f), new Color(0.28f, 1f, 0.36f), percent);
         }
 
@@ -461,19 +494,25 @@ namespace XTD.Battle
             var frequency = isStructure ? 2.1f : Mathf.Lerp(2.4f, 9.5f, movementSignal);
             var wave = Mathf.Sin(Time.time * frequency + animationSeed);
             var idleBreath = isStructure ? 0.022f : 0.028f;
-            var walkSquash = movementSignal * 0.045f;
+            var hasFrameAnimation = animationFrames is { Length: > 0 };
+            var walkSquash = movementSignal * (hasFrameAnimation ? 0.018f : 0.045f);
             var punch = attackPulse * (isStructure ? 0.035f : 0.12f);
 
             var xScale = baseScale.x * (1f + wave * idleBreath - wave * walkSquash + punch);
             var yScale = baseScale.y * (1f + wave * idleBreath + wave * walkSquash * 0.65f - punch * 0.35f);
             transform.localScale = new Vector3(xScale, yScale, baseScale.z);
 
-            var tilt = isStructure ? 0f : wave * movementSignal * 4.5f;
+            var tiltStrength = hasFrameAnimation ? 1.2f : 4.5f;
+            var tilt = isStructure ? 0f : wave * movementSignal * tiltStrength;
             transform.localRotation = Quaternion.Euler(0f, 0f, tilt);
 
             spriteRenderer.color = Color.Lerp(baseColor, Color.white, hitFlash);
+            UpdateAnimatedSprite();
             UpdateSortingOrder();
-            UpdateStatusGlows();
+            if (ShouldUpdateStatusGlows())
+            {
+                UpdateStatusGlows();
+            }
         }
 
         private void UpdateSortingOrder()
@@ -483,7 +522,14 @@ namespace XTD.Battle
                 return;
             }
 
-            spriteRenderer.sortingOrder = 16 + Mathf.RoundToInt((5.2f - transform.position.y) * 3f);
+            var targetSortingOrder = 16 + Mathf.RoundToInt((5.2f - transform.position.y) * 3f);
+            if (cachedSortingOrder == targetSortingOrder)
+            {
+                return;
+            }
+
+            cachedSortingOrder = targetSortingOrder;
+            spriteRenderer.sortingOrder = targetSortingOrder;
             if (healthBarBack != null)
             {
                 healthBarBack.sortingOrder = spriteRenderer.sortingOrder + 20;
@@ -531,6 +577,15 @@ namespace XTD.Battle
             return renderer;
         }
 
+        private bool ShouldUpdateStatusGlows()
+        {
+            return shield > 0.01f
+                   || shieldGlowTimer > 0f
+                   || attackGlowTimer > 0f
+                   || (shieldGlow != null && shieldGlow.gameObject.activeSelf)
+                   || (attackGlow != null && attackGlow.gameObject.activeSelf);
+        }
+
         private void UpdateStatusGlows()
         {
             if (Definition == null)
@@ -539,13 +594,14 @@ namespace XTD.Battle
             }
 
             EnsureStatusGlows();
+            var visualSizeMultiplier = VisualSizeMultiplierFor(Definition);
             var roleScale = Definition.role switch
             {
-                UnitRole.Structure => 2.25f,
-                UnitRole.Boss => 1.9f,
-                UnitRole.Hero => 1.55f,
-                UnitRole.Elite => 1.45f,
-                _ => 1.25f
+                UnitRole.Structure => 2.25f * VisualScaleMultiplier,
+                UnitRole.Boss => 1.9f * VisualScaleMultiplier * visualSizeMultiplier,
+                UnitRole.Hero => 1.55f * VisualScaleMultiplier * visualSizeMultiplier,
+                UnitRole.Elite => 1.45f * VisualScaleMultiplier * visualSizeMultiplier,
+                _ => 1.25f * VisualScaleMultiplier * visualSizeMultiplier
             };
 
             var pulse = 0.92f + Mathf.Sin(Time.time * 4.5f + animationSeed) * 0.08f;
@@ -568,17 +624,147 @@ namespace XTD.Battle
             }
         }
 
-        private static Vector3 ScaleFor(UnitRole role)
+        private void UpdateAnimatedSprite()
         {
+            if (animationFrames == null || animationFrames.Length == 0 || spriteRenderer == null)
+            {
+                return;
+            }
+
+            var frameIndex = 0;
+            if (hitFlash > 0.25f && animationFrames.Length > 5)
+            {
+                frameIndex = 5;
+            }
+            else if (attackPulse > 0.08f && animationFrames.Length > 4)
+            {
+                frameIndex = attackPulse > 0.45f ? 3 : 4;
+            }
+            else if (movementSignal > 0.15f && animationFrames.Length > 2)
+            {
+                var cycleIndex = Mathf.FloorToInt(Time.time * 8.5f + animationSeed) % WalkCycleFrames.Length;
+                frameIndex = WalkCycleFrames[cycleIndex];
+            }
+            else if (animationFrames.Length > 1)
+            {
+                frameIndex = Mathf.FloorToInt(Time.time * 2.4f + animationSeed) % 2;
+            }
+
+            spriteRenderer.sprite = animationFrames[Mathf.Clamp(frameIndex, 0, animationFrames.Length - 1)];
+        }
+
+        private static Sprite[] CreateAnimationFrames(UnitDefinition definition, Sprite source)
+        {
+            if (!CanUseAnimationSheet(definition, source))
+            {
+                return null;
+            }
+
+            var key = source.GetInstanceID();
+            if (spriteSheetCache.TryGetValue(key, out var cached))
+            {
+                return cached;
+            }
+
+            const int columns = 3;
+            const int rows = 2;
+            var texture = source.texture;
+            if (texture.width < columns || texture.height < rows)
+            {
+                return null;
+            }
+
+            var cellWidth = texture.width / columns;
+            var cellHeight = texture.height / rows;
+            var frames = new Sprite[columns * rows];
+            for (var row = 0; row < rows; row++)
+            {
+                for (var column = 0; column < columns; column++)
+                {
+                    var frameIndex = row * columns + column;
+                    var rect = new Rect(
+                        column * cellWidth,
+                        texture.height - (row + 1) * cellHeight,
+                        cellWidth,
+                        cellHeight);
+
+                    frames[frameIndex] = Sprite.Create(
+                        texture,
+                        rect,
+                        new Vector2(0.5f, 0.5f),
+                        source.pixelsPerUnit,
+                        0,
+                        SpriteMeshType.FullRect);
+                    frames[frameIndex].name = $"{source.name}_{frameIndex + 1}";
+                }
+            }
+
+            spriteSheetCache[key] = frames;
+            return frames;
+        }
+
+        private static bool CanUseAnimationSheet(UnitDefinition definition, Sprite source)
+        {
+            if (definition == null || source == null || source.texture == null || definition.role == UnitRole.Structure)
+            {
+                return false;
+            }
+
+            var texture = source.texture;
+            if (texture.width < 384 || texture.height < 256)
+            {
+                return false;
+            }
+
+            var ratio = texture.width / (float)texture.height;
+            return texture.width % 3 == 0
+                   && texture.height % 2 == 0
+                   && Mathf.Abs(ratio - 1.5f) <= 0.04f;
+        }
+
+        private static Vector3 ScaleFor(UnitDefinition definition)
+        {
+            var role = definition != null ? definition.role : UnitRole.Soldier;
+            var visualSizeMultiplier = VisualSizeMultiplierFor(definition);
             return role switch
             {
-                UnitRole.Elite => new Vector3(0.72f, 0.72f, 1f),
-                UnitRole.Hero => new Vector3(0.9f, 0.9f, 1f),
-                UnitRole.Structure => new Vector3(0.42f, 0.42f, 1f),
-                UnitRole.Monster => new Vector3(0.56f, 0.56f, 1f),
-                UnitRole.Boss => new Vector3(1.12f, 1.12f, 1f),
-                _ => new Vector3(0.50f, 0.50f, 1f)
+                UnitRole.Elite => new Vector3(0.72f, 0.72f, 1f) * VisualScaleMultiplier * visualSizeMultiplier,
+                UnitRole.Hero => new Vector3(0.9f, 0.9f, 1f) * VisualScaleMultiplier * visualSizeMultiplier,
+                UnitRole.Structure => new Vector3(0.42f, 0.42f, 1f) * VisualScaleMultiplier,
+                UnitRole.Monster => new Vector3(0.56f, 0.56f, 1f) * VisualScaleMultiplier * visualSizeMultiplier,
+                UnitRole.Boss => new Vector3(1.12f, 1.12f, 1f) * VisualScaleMultiplier * visualSizeMultiplier,
+                _ => new Vector3(0.50f, 0.50f, 1f) * VisualScaleMultiplier * visualSizeMultiplier
             };
         }
+
+        private static float VisualSizeMultiplierFor(UnitDefinition definition)
+        {
+            if (definition == null)
+            {
+                return 1.5f;
+            }
+
+            if (definition.role == UnitRole.Structure)
+            {
+                return 1f;
+            }
+
+            if (definition.id == "boss_chaos_lord")
+            {
+                return 4f;
+            }
+
+            if (definition.id is "boss_black_wind" or "boss_bone_queen")
+            {
+                return 3f;
+            }
+
+            return definition.role switch
+            {
+                UnitRole.Boss => 2f,
+                _ => 1.5f
+            };
+        }
+
     }
 }
