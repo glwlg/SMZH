@@ -1,3 +1,3 @@
-需要画图的时候还是可以用API画，"OPENAI_API_KEY": "sk-enhQeu4RYyVR9KEoT" "OPENAI_BASE_URL": "http://192.168.1.100:8317/v1"
+需要画图的时候如果tools不可用，则可以用API画，"OPENAI_API_KEY": "sk-enhQeu4RYyVR9KEoT" "OPENAI_BASE_URL": "http://192.168.1.100:8317/v1"
 使用参考：
 $env:OPENAI_API_KEY='sk-enhQeu4RYyVR9KEoT'; $env:OPENAI_BASE_URL='http://192.168.1.100:8317/v1'; & "$env:LOCALAPPDATA\Microsoft\WinGet\Links\uv.exe" run --with openai --with pillow C:\Users\luwei\.codex\skills\.system\imagegen\scripts\image_gen.py generate-batch --input .codex-tmp\asset-generation\v02-imagegen-prompts.jsonl --out-dir .codex-tmp\asset-generation\v02-generated --concurrency 2 --force

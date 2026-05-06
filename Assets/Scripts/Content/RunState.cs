@@ -8,7 +8,7 @@ namespace XTD.Content
     {
         public int floor = 1;
         public int row = 1;
-        public HeroClassType heroClass = HeroClassType.BorderCommander;
+        public HeroClassType heroClass = GameContentFactory.DefaultHeroClass;
         public int gold;
         public float playerHp = 100f;
         public int heroExperience;
@@ -22,6 +22,7 @@ namespace XTD.Content
         public List<int> availableNodeIndices = new();
         public List<string> selectedNodeKeys = new();
         public List<string> eventLog = new();
+        public List<string> playtestRecords = new();
         public List<FloorAffixType> floorAffixes = new();
         public List<string> pendingCardRewardIds = new();
         public int pendingCardRewardPickCount;
@@ -53,6 +54,7 @@ namespace XTD.Content
                 availableNodeIndices = new List<int>(availableNodeIndices),
                 selectedNodeKeys = new List<string>(selectedNodeKeys),
                 eventLog = new List<string>(eventLog),
+                playtestRecords = new List<string>(playtestRecords),
                 floorAffixes = new List<FloorAffixType>(floorAffixes),
                 pendingCardRewardIds = new List<string>(pendingCardRewardIds),
                 pendingCardRewardPickCount = pendingCardRewardPickCount,

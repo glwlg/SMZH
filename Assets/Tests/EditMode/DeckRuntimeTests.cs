@@ -11,7 +11,7 @@ namespace XTD.Tests
         [Test]
         public void RefillHandIfEmpty_DoesNotDrawWhileHandStillHasCards()
         {
-            var catalog = DemoContentFactory.CreateCatalog();
+            var catalog = GameContentFactory.CreateCatalog();
             var cards = catalog.cards.Take(6).ToList();
             var deck = new DeckRuntime(cards, 1)
             {
@@ -31,7 +31,7 @@ namespace XTD.Tests
         [Test]
         public void RefillHandIfEmpty_RecyclesUsedPileIntoCardPool()
         {
-            var catalog = DemoContentFactory.CreateCatalog();
+            var catalog = GameContentFactory.CreateCatalog();
             var cards = catalog.cards.Take(3).ToList();
             var deck = new DeckRuntime(cards, 1)
             {

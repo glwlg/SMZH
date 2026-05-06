@@ -33,7 +33,7 @@ namespace XTD.Editor
         private const string ResourcesRoot = "Assets/Resources";
         private const string ResourcesAiArtRoot = ResourcesRoot + "/Art/AI";
         private const string BattleMusicAssetPath = "Assets/Resources/Audio/BGM/hyoshi_action_track_2.ogg";
-        private const string CatalogPath = ContentRoot + "/DemoContentCatalog.asset";
+        private const string CatalogPath = ContentRoot + "/GameContentCatalog.asset";
 
         [MenuItem("神魔镇荒/初始化/重建 MVP 原型内容")]
         [MenuItem("神魔镇荒/Bootstrap/Create MVP Project Content")]
@@ -70,7 +70,7 @@ namespace XTD.Editor
             var catalog = AssetDatabase.LoadAssetAtPath<ContentCatalog>(CatalogPath);
             if (catalog == null)
             {
-                catalog = DemoContentFactory.CreateCatalog();
+                catalog = GameContentFactory.CreateCatalog();
             }
 
             var report = MvpValidationService.Validate(catalog);
@@ -134,7 +134,7 @@ namespace XTD.Editor
                 AssetDatabase.DeleteAsset(CatalogPath);
             }
 
-            var catalog = DemoContentFactory.CreateCatalog();
+            var catalog = GameContentFactory.CreateCatalog();
             AssignPrototypeArt(catalog);
             AssetDatabase.CreateAsset(catalog, CatalogPath);
 

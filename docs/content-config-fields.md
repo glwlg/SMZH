@@ -5,7 +5,7 @@
 
 ## ContentCatalog
 
-内容总表，当前由 `DemoContentFactory` 生成，也可以保存为 `Assets/_Project/Content/DemoContentCatalog.asset`。
+内容总表，当前由 `GameContentFactory` 生成，也可以保存为 `Assets/_Project/Content/GameContentCatalog.asset`。
 
 | 字段 | 说明 |
 | --- | --- |

@@ -24,5 +24,6 @@ namespace XTD.Content
         public int rewardGold = 20;
         public List<EnemySpawnEntry> enemySpawns = new();
         public UnitDefinition coreEnemy;
+        public EncounterPressurePattern pressurePattern = EncounterPressurePattern.None;
     }
 }

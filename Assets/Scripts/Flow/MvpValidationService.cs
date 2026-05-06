@@ -21,7 +21,7 @@ namespace XTD.Flow
     {
         public static MvpValidationReport Validate(ContentCatalog catalog, int seed = 12345)
         {
-            DemoContentFactory.EnsureCatalogComplete(catalog);
+            GameContentFactory.EnsureCatalogComplete(catalog);
 
             var report = new MvpValidationReport();
             ValidateContent(catalog, report);
@@ -38,12 +38,16 @@ namespace XTD.Flow
                 return;
             }
 
-            var playableCards = catalog.cards.Where(card => card != null).ToList();
-            if (playableCards.Count < 25 || playableCards.Count > 35)
+            var allCards = catalog.cards.Where(card => card != null).ToList();
+            var countableCardFamilies = allCards
+                .GroupBy(card => GameContentFactory.BaseCardId(card.id))
+                .Count();
+            if (countableCardFamilies < 25 || countableCardFamilies > 35)
             {
-                report.issues.Add($"卡牌数量应为 25-35，当前为 {playableCards.Count}。");
+                report.issues.Add($"卡牌内容族应为 25-35，当前为 {countableCardFamilies}。");
             }
 
+            var playableCards = allCards.Where(card => card.type != CardType.Curse).ToList();
             if (playableCards.All(card => card.type != CardType.Structure || card.unitSpawns.All(spawn => spawn.unit == null || !spawn.unit.ProducesUnits)))
             {
                 report.issues.Add("缺少能持续生产士兵的建筑牌。");
@@ -66,7 +70,9 @@ namespace XTD.Flow
             RequireCardType(playableCards, CardType.Spell, "法术牌", report);
             RequireCardType(playableCards, CardType.Tactic, "战术牌", report);
 
-            var levelGroups = playableCards.GroupBy(card => DemoContentFactory.BaseCardId(card.id));
+            var levelGroups = playableCards
+                .GroupBy(card => GameContentFactory.BaseCardId(card.id))
+                .Where(group => group.Any(card => GameContentFactory.CardLevelFromId(card.id) > 1));
             foreach (var group in levelGroups)
             {
                 var levels = group.Select(card => card.level).OrderBy(level => level).ToList();
@@ -86,6 +92,17 @@ namespace XTD.Flow
             RequireEncounterCount(catalog, MapNodeType.EliteMonster, 3, "精英怪", report);
             RequireEncounterCount(catalog, MapNodeType.SmallBoss, 2, "小首领", report);
             RequireEncounterCount(catalog, MapNodeType.FinalBoss, 1, "最终首领", report);
+
+            var pressurePatterns = catalog.encounters
+                .Where(encounter => encounter != null && encounter.nodeType is MapNodeType.EliteMonster or MapNodeType.SmallBoss)
+                .Select(encounter => encounter.pressurePattern)
+                .Where(pattern => pattern != EncounterPressurePattern.None)
+                .Distinct()
+                .Count();
+            if (pressurePatterns < 3)
+            {
+                report.issues.Add($"精英和小首领至少需要 3 类压力机制，当前为 {pressurePatterns} 类。");
+            }
 
             if (playableCards.Count == 0)
             {
@@ -125,12 +142,26 @@ namespace XTD.Flow
 
         private static void ValidateHeroClassStartingDecks(ContentCatalog catalog, MvpValidationReport report)
         {
-            foreach (var heroClass in new[] { HeroClassType.BorderCommander, HeroClassType.SpiritSummoner, HeroClassType.ThunderMage })
+            foreach (var heroClass in GameContentFactory.AvailableHeroClasses())
             {
-                var run = DemoContentFactory.CreateStartingRun(catalog, heroClass);
+                var run = GameContentFactory.CreateStartingRun(catalog, heroClass);
                 if (run.deckCardIds.Count < 8)
                 {
                     report.issues.Add($"{GameFlowController.HeroClassName(heroClass)} 初始卡组过少，当前 {run.deckCardIds.Count} 张。");
+                }
+
+                var fullPool = GameContentFactory.HeroClassCardPoolBaseIds(heroClass);
+                if (fullPool.Count == 0)
+                {
+                    report.issues.Add($"{GameFlowController.HeroClassName(heroClass)} 职业卡包为空。");
+                }
+
+                foreach (var baseId in fullPool)
+                {
+                    if (catalog.FindCard(baseId) == null)
+                    {
+                        report.issues.Add($"{GameFlowController.HeroClassName(heroClass)} 职业卡包包含不存在的卡牌：{baseId}。");
+                    }
                 }
 
                 foreach (var cardId in run.deckCardIds)
@@ -138,6 +169,11 @@ namespace XTD.Flow
                     if (catalog.FindCard(cardId) == null)
                     {
                         report.issues.Add($"{GameFlowController.HeroClassName(heroClass)} 初始卡组包含不存在的卡牌：{cardId}。");
+                    }
+
+                    if (!fullPool.Contains(GameContentFactory.BaseCardId(cardId)))
+                    {
+                        report.issues.Add($"{GameFlowController.HeroClassName(heroClass)} 初始卡组卡牌未纳入职业卡包：{cardId}。");
                     }
                 }
 
@@ -195,21 +231,9 @@ namespace XTD.Flow
                     }
                 }
 
-                if (row < 5 && nodes.Any(node => node.NodeType != MapNodeType.NormalMonster))
+                if (row < 3 && nodes.Any(node => node.NodeType != MapNodeType.NormalMonster))
                 {
                     report.issues.Add($"迷宫 {floor} · 房间 {row}/10 不应出现特殊节点。");
-                }
-
-                if (row < 10)
-                {
-                    var nextRow = rows.FirstOrDefault(candidate =>
-                        candidate.Count > 0 &&
-                        candidate[0].Floor == floor &&
-                        candidate[0].Row == row + 1);
-                    if (nextRow != null && nextRow.Count > 1 && nodes.Any(node => node.NextNodeIndices.Count >= nextRow.Count))
-                    {
-                        report.issues.Add($"迷宫 {floor} · 房间 {row}/10 存在单个房间连接上方全部房间的路线。");
-                    }
                 }
             }
 
@@ -219,6 +243,14 @@ namespace XTD.Flow
                 .Select(node => node.NodeType)
                 .Distinct()
                 .ToList();
+            var hasEarlyFork = rows
+                .Where(row => row.Count > 0 && row[0].Row is 3 or 4)
+                .SelectMany(row => row)
+                .Any(node => node.NodeType != MapNodeType.NormalMonster);
+            if (!hasEarlyFork)
+            {
+                report.issues.Add("精英房间前需要至少 1 个特殊分叉，避免前半层只有普通战斗。");
+            }
 
             foreach (var required in new[] { MapNodeType.Shop, MapNodeType.Rest, MapNodeType.Opportunity, MapNodeType.Artifact, MapNodeType.Mystery })
             {
@@ -229,6 +261,7 @@ namespace XTD.Flow
             }
 
             ValidateEveryRoomCanReachFloorEnd(rows, report);
+            ValidateEveryRoomCanBeReachedFromFloorStart(rows, report);
         }
 
         private static void ValidateEveryRoomCanReachFloorEnd(IReadOnlyList<List<MapNodeRuntime>> rows, MvpValidationReport report)
@@ -286,9 +319,60 @@ namespace XTD.Flow
             return false;
         }
 
+        private static void ValidateEveryRoomCanBeReachedFromFloorStart(IReadOnlyList<List<MapNodeRuntime>> rows, MvpValidationReport report)
+        {
+            foreach (var floorRows in rows.GroupBy(row => row[0].Floor))
+            {
+                var orderedRows = floorRows.OrderBy(row => row[0].Row).ToList();
+                var startRow = orderedRows.FirstOrDefault(row => row.Count > 0 && row[0].Row == 1);
+                if (startRow == null)
+                {
+                    continue;
+                }
+
+                var queue = new Queue<MapNodeRuntime>();
+                var visited = new HashSet<string>();
+                foreach (var node in startRow)
+                {
+                    queue.Enqueue(node);
+                    visited.Add(node.Key);
+                }
+
+                while (queue.Count > 0)
+                {
+                    var node = queue.Dequeue();
+                    var nextRow = orderedRows.FirstOrDefault(row => row.Count > 0 && row[0].Row == node.Row + 1);
+                    if (nextRow == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var nextIndex in node.NextNodeIndices)
+                    {
+                        var next = nextRow.FirstOrDefault(candidate => candidate.NodeIndex == nextIndex);
+                        if (next == null || visited.Contains(next.Key))
+                        {
+                            continue;
+                        }
+
+                        visited.Add(next.Key);
+                        queue.Enqueue(next);
+                    }
+                }
+
+                foreach (var node in orderedRows.SelectMany(row => row))
+                {
+                    if (!visited.Contains(node.Key))
+                    {
+                        report.issues.Add($"迷宫第 {node.Floor} 层房间 {node.Row}-{node.NodeIndex} 没有入口路线。");
+                    }
+                }
+            }
+        }
+
         private static void ValidateRunCanReachFinalBoss(ContentCatalog catalog, int seed, MvpValidationReport report)
         {
-            var run = DemoContentFactory.CreateStartingRun(catalog);
+            var run = GameContentFactory.CreateStartingRun(catalog);
             var rows = new MapGenerationService().Generate(seed);
             foreach (var nodes in rows)
             {

@@ -17,10 +17,10 @@ namespace XTD.Presentation
         private const float HandCancelPaddingX = 78f;
         private const float HandCancelBottomPadding = 58f;
         private const float HandCancelTopPadding = 78f;
-        private const float CardArtMinX = 0.12f;
-        private const float CardArtMaxX = 0.88f;
-        private const float CardArtMinY = 0.24f;
-        private const float CardArtMaxY = 0.84f;
+        private const float CardArtMinX = 0.115f;
+        private const float CardArtMaxX = 0.885f;
+        private const float CardArtMinY = 0.305f;
+        private const float CardArtMaxY = 0.90f;
 
         private readonly List<CardView> cardViews = new();
         private BattleController battle;
@@ -55,7 +55,6 @@ namespace XTD.Presentation
         private Button debugRewardButton;
         private Button debugMoraleButton;
         private Button debugSkipButton;
-        private Button debugGuardButton;
         private float noticeTimer;
         private static Font cachedFont;
         private static Sprite cachedPileCardFrameSprite;
@@ -484,8 +483,8 @@ namespace XTD.Presentation
                 root,
                 new Vector2(1f, 1f),
                 new Vector2(1f, 1f),
-                new Vector2(-170f, -118f),
-                new Vector2(300f, 180f),
+                new Vector2(-170f, -96f),
+                new Vector2(300f, 136f),
                 new Color(0.025f, 0.035f, 0.045f, 0.58f));
             var debugTitle = CreateText("调试标题", debugPanel.transform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -17f), 15);
             debugTitle.text = "调试";
@@ -503,8 +502,6 @@ namespace XTD.Presentation
             debugMoraleButton.onClick.AddListener(() => battle?.DebugAddMorale());
             debugSkipButton = CreateDebugButton("跳节点", debugPanel.transform, 92f, -92f);
             debugSkipButton.onClick.AddListener(() => battle?.DebugSkipNode());
-            debugGuardButton = CreateDebugButton("召天将", debugPanel.transform, 0f, -136f);
-            debugGuardButton.onClick.AddListener(() => battle?.DebugSpawnTalismanGuard());
 
             var hand = new GameObject("手牌区", typeof(RectTransform));
             hand.transform.SetParent(root, false);
@@ -954,13 +951,13 @@ namespace XTD.Presentation
                 return cachedPileCardFrameSprite;
             }
 
-            cachedPileCardFrameSprite = Resources.Load<Sprite>("UI/card_frame_honghuang");
+            cachedPileCardFrameSprite = Resources.Load<Sprite>("Art/AI/UI/card_frame_honghuang");
             if (cachedPileCardFrameSprite != null)
             {
                 return cachedPileCardFrameSprite;
             }
 
-            var texture = Resources.Load<Texture2D>("UI/card_frame_honghuang");
+            var texture = Resources.Load<Texture2D>("Art/AI/UI/card_frame_honghuang");
             if (texture == null)
             {
                 return null;
@@ -1095,6 +1092,7 @@ namespace XTD.Presentation
             private BattleController battle;
             private CardDefinition card;
             private RectTransform rect;
+            private RectTransform visualRoot;
             private CanvasGroup canvasGroup;
             private Image frame;
             private Image innerPanel;
@@ -1126,12 +1124,9 @@ namespace XTD.Presentation
                 view.rect.pivot = new Vector2(0.5f, 0f);
 
                 view.canvasGroup = go.GetComponent<CanvasGroup>();
-                view.frame = go.GetComponent<Image>();
-                view.frame.sprite = CardFrameSprite();
-                view.frame.type = Image.Type.Simple;
-                view.frame.preserveAspect = false;
-                view.frame.color = view.frame.sprite != null ? Color.white : new Color(0.20f, 0.10f, 0.08f, 0.97f);
-                view.frame.raycastTarget = true;
+                var hitArea = go.GetComponent<Image>();
+                hitArea.color = new Color(1f, 1f, 1f, 0f);
+                hitArea.raycastTarget = true;
 
                 view.BuildVisuals(font);
                 return view;
@@ -1163,7 +1158,7 @@ namespace XTD.Presentation
                     : (playable ? playableColor : new Color(0.07f, 0.07f, 0.08f, 0.82f));
                 if (innerPanel != null)
                 {
-                    innerPanel.color = playable ? WithAlpha(playableColor, 0.64f) : new Color(0.07f, 0.07f, 0.08f, 0.68f);
+                    innerPanel.color = playable ? WithAlpha(playableColor, 0.44f) : new Color(0.07f, 0.07f, 0.08f, 0.60f);
                 }
 
                 if (artFrameImage != null)
@@ -1173,8 +1168,11 @@ namespace XTD.Presentation
 
                 if (typeBand != null)
                 {
-                    typeBand.color = playable ? WithAlpha(playableColor, 0.78f) : new Color(0.06f, 0.06f, 0.07f, 0.72f);
+                    typeBand.color = playable ? CardInfoPanelColor(definition.type) : new Color(0.11f, 0.10f, 0.09f, 0.78f);
                 }
+
+                title.color = playable ? new Color(1f, 0.93f, 0.66f, 0.99f) : new Color(0.68f, 0.68f, 0.70f, 0.92f);
+                description.color = playable ? new Color(0.96f, 0.99f, 0.86f, 0.98f) : new Color(0.62f, 0.62f, 0.66f, 0.90f);
 
                 if (costBgImage != null)
                 {
@@ -1265,8 +1263,19 @@ namespace XTD.Presentation
 
             private void BuildVisuals(Font font)
             {
+                var visualGo = new GameObject("卡牌整体视觉", typeof(RectTransform));
+                visualGo.transform.SetParent(transform, false);
+                visualRoot = visualGo.GetComponent<RectTransform>();
+                visualRoot.anchorMin = Vector2.zero;
+                visualRoot.anchorMax = Vector2.one;
+                visualRoot.offsetMin = Vector2.zero;
+                visualRoot.offsetMax = Vector2.zero;
+                visualRoot.pivot = new Vector2(0.5f, 0.5f);
+                visualRoot.localRotation = Quaternion.identity;
+                visualRoot.localScale = Vector3.one;
+
                 var inner = new GameObject("Card Interior", typeof(RectTransform), typeof(Image));
-                inner.transform.SetParent(transform, false);
+                inner.transform.SetParent(visualRoot, false);
                 var innerRect = inner.GetComponent<RectTransform>();
                 innerRect.anchorMin = new Vector2(0.08f, 0.08f);
                 innerRect.anchorMax = new Vector2(0.92f, 0.91f);
@@ -1276,9 +1285,8 @@ namespace XTD.Presentation
                 innerPanel.color = new Color(0.16f, 0.08f, 0.05f, 0.64f);
                 innerPanel.raycastTarget = false;
 
-                var artFrame = new GameObject("卡图框", typeof(RectTransform), typeof(Image));
-                artFrame.transform.SetParent(transform, false);
-                artFrame.AddComponent<RectMask2D>();
+                var artFrame = new GameObject("卡图裁剪", typeof(RectTransform), typeof(Image), typeof(Mask));
+                artFrame.transform.SetParent(visualRoot, false);
                 var artFrameRect = artFrame.GetComponent<RectTransform>();
                 artFrameRect.anchorMin = new Vector2(CardArtMinX, CardArtMinY);
                 artFrameRect.anchorMax = new Vector2(CardArtMaxX, CardArtMaxY);
@@ -1287,6 +1295,8 @@ namespace XTD.Presentation
                 artFrameImage = artFrame.GetComponent<Image>();
                 artFrameImage.color = new Color(0.08f, 0.06f, 0.05f, 0.44f);
                 artFrameImage.raycastTarget = false;
+                var artMask = artFrame.GetComponent<Mask>();
+                artMask.showMaskGraphic = false;
 
                 var iconGo = new GameObject("图标", typeof(RectTransform), typeof(Image));
                 iconGo.transform.SetParent(artFrame.transform, false);
@@ -1301,21 +1311,37 @@ namespace XTD.Presentation
                 icon.raycastTarget = false;
 
                 var typeBandGo = new GameObject("Card Type Band", typeof(RectTransform), typeof(Image));
-                typeBandGo.transform.SetParent(transform, false);
+                typeBandGo.transform.SetParent(visualRoot, false);
                 var typeBandRect = typeBandGo.GetComponent<RectTransform>();
-                typeBandRect.anchorMin = new Vector2(0.12f, 0.07f);
-                typeBandRect.anchorMax = new Vector2(0.88f, 0.20f);
+                typeBandRect.anchorMin = new Vector2(0.105f, 0.055f);
+                typeBandRect.anchorMax = new Vector2(0.895f, 0.300f);
                 typeBandRect.offsetMin = Vector2.zero;
                 typeBandRect.offsetMax = Vector2.zero;
                 typeBand = typeBandGo.GetComponent<Image>();
-                typeBand.color = new Color(0.14f, 0.08f, 0.05f, 0.78f);
+                typeBand.color = new Color(0.42f, 0.18f, 0.09f, 0.86f);
                 typeBand.raycastTarget = false;
 
-                title = CreateCardText("标题", transform, font, new Vector2(0.08f, 0.205f), new Vector2(0.92f, 0.345f), 17, TextAnchor.MiddleCenter);
-                description = CreateCardText("类型", transform, font, new Vector2(0.08f, 0.045f), new Vector2(0.92f, 0.205f), 12, TextAnchor.UpperCenter);
+                var frameGo = new GameObject("牌框覆盖", typeof(RectTransform), typeof(Image));
+                frameGo.transform.SetParent(visualRoot, false);
+                var frameRect = frameGo.GetComponent<RectTransform>();
+                frameRect.anchorMin = Vector2.zero;
+                frameRect.anchorMax = Vector2.one;
+                frameRect.offsetMin = Vector2.zero;
+                frameRect.offsetMax = Vector2.zero;
+                frame = frameGo.GetComponent<Image>();
+                frame.sprite = CardFrameSprite();
+                frame.type = Image.Type.Simple;
+                frame.preserveAspect = false;
+                frame.color = frame.sprite != null ? Color.white : new Color(0.20f, 0.10f, 0.08f, 0.97f);
+                frame.raycastTarget = false;
+
+                title = CreateCardText("标题", visualRoot, font, new Vector2(0.115f, 0.168f), new Vector2(0.885f, 0.292f), 16, TextAnchor.MiddleCenter);
+                description = CreateCardText("类型", visualRoot, font, new Vector2(0.115f, 0.066f), new Vector2(0.885f, 0.170f), 13, TextAnchor.MiddleCenter);
+                AddCardTextOutline(title, new Color(0.12f, 0.04f, 0.015f, 0.92f), new Vector2(1.1f, -1.1f));
+                AddCardTextOutline(description, new Color(0.08f, 0.035f, 0.012f, 0.92f), new Vector2(1f, -1f));
 
                 var costBg = new GameObject("费用底", typeof(RectTransform), typeof(Image));
-                costBg.transform.SetParent(transform, false);
+                costBg.transform.SetParent(visualRoot, false);
                 var costRect = costBg.GetComponent<RectTransform>();
                 costRect.anchorMin = new Vector2(0.145f, 0.815f);
                 costRect.anchorMax = new Vector2(0.145f, 0.815f);
@@ -1451,10 +1477,30 @@ namespace XTD.Presentation
                 };
             }
 
+            private static Color CardInfoPanelColor(CardType type)
+            {
+                return type switch
+                {
+                    CardType.Structure => new Color(0.48f, 0.22f, 0.11f, 0.90f),
+                    CardType.Spell => new Color(0.50f, 0.16f, 0.13f, 0.90f),
+                    CardType.Tactic => new Color(0.34f, 0.31f, 0.14f, 0.90f),
+                    CardType.EliteSoldier or CardType.Hero => new Color(0.46f, 0.30f, 0.12f, 0.90f),
+                    CardType.Curse => new Color(0.24f, 0.12f, 0.25f, 0.90f),
+                    _ => new Color(0.32f, 0.25f, 0.17f, 0.90f)
+                };
+            }
+
             private static Color WithAlpha(Color color, float alpha)
             {
                 color.a = alpha;
                 return color;
+            }
+
+            private static void AddCardTextOutline(Text text, Color color, Vector2 distance)
+            {
+                var outline = text.gameObject.AddComponent<Outline>();
+                outline.effectColor = color;
+                outline.effectDistance = distance;
             }
 
             private static Sprite CardFrameSprite()
@@ -1464,13 +1510,13 @@ namespace XTD.Presentation
                     return cachedCardFrameSprite;
                 }
 
-                cachedCardFrameSprite = Resources.Load<Sprite>("UI/card_frame_honghuang");
+                cachedCardFrameSprite = Resources.Load<Sprite>("Art/AI/UI/card_frame_honghuang");
                 if (cachedCardFrameSprite != null)
                 {
                     return cachedCardFrameSprite;
                 }
 
-                var texture = Resources.Load<Texture2D>("UI/card_frame_honghuang");
+                var texture = Resources.Load<Texture2D>("Art/AI/UI/card_frame_honghuang");
                 if (texture == null)
                 {
                     return null;

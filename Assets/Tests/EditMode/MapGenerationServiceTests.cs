@@ -37,10 +37,26 @@ namespace XTD.Tests
             for (var index = 0; index < rows.Count; index++)
             {
                 var row = (index % 10) + 1;
-                if (row < 5)
+                if (row < 3)
                 {
                     Assert.That(rows[index], Has.All.Matches<MapNodeRuntime>(node => node.NodeType == MapNodeType.NormalMonster));
                 }
+            }
+        }
+
+        [Test]
+        public void Generate_AddsEarlyRouteForkBeforeEliteRows()
+        {
+            var service = new MapGenerationService();
+            var rows = service.Generate(123, 3, 10);
+
+            foreach (var floorRows in rows.GroupBy(row => row[0].Floor))
+            {
+                var earlyRows = floorRows
+                    .Where(row => row[0].Row is 3 or 4)
+                    .ToList();
+                Assert.That(earlyRows.SelectMany(row => row).Any(node => node.NodeType != MapNodeType.NormalMonster), Is.True);
+                Assert.That(earlyRows.SelectMany(row => row).Any(node => node.NodeType == MapNodeType.NormalMonster), Is.True);
             }
         }
 
@@ -64,7 +80,7 @@ namespace XTD.Tests
         }
 
         [Test]
-        public void Generate_ConnectsRoomsWithoutFanOutToEveryNextRoom()
+        public void Generate_ConnectsEveryVisibleRoomFromPreviousRows()
         {
             var service = new MapGenerationService();
             var rows = service.Generate(123, 3, 10);
@@ -82,9 +98,13 @@ namespace XTD.Tests
                 var nextRow = rows[index + 1];
                 foreach (var node in row)
                 {
-                    Assert.That(node.NextNodeIndices.Count, Is.InRange(1, 2));
+                    Assert.That(node.NextNodeIndices.Count, Is.InRange(1, nextRow.Count));
                     Assert.That(node.NextNodeIndices, Has.All.InRange(0, nextRow.Count - 1));
-                    Assert.That(node.NextNodeIndices.Count, Is.LessThan(nextRow.Count));
+                }
+
+                foreach (var nextNode in nextRow)
+                {
+                    Assert.That(row.Any(node => node.NextNodeIndices.Contains(nextNode.NodeIndex)), Is.True, $"{nextNode.Key} should have an incoming route.");
                 }
             }
         }
@@ -108,6 +128,25 @@ namespace XTD.Tests
             }
         }
 
+        [Test]
+        public void Generate_EveryRoomCanBeReachedFromFloorStart()
+        {
+            var service = new MapGenerationService();
+            var rows = service.Generate(123, 3, 10);
+
+            foreach (var floorRows in rows.GroupBy(row => row[0].Floor))
+            {
+                var orderedRows = floorRows.OrderBy(row => row[0].Row).ToList();
+                foreach (var row in orderedRows)
+                {
+                    foreach (var node in row)
+                    {
+                        Assert.That(CanReachFromFloorStart(node, orderedRows), Is.True, $"{node.Key} should be reachable from this floor start.");
+                    }
+                }
+            }
+        }
+
         private static bool CanReachFloorEnd(MapNodeRuntime start, System.Collections.Generic.IReadOnlyList<System.Collections.Generic.List<MapNodeRuntime>> floorRows)
         {
             var queue = new System.Collections.Generic.Queue<MapNodeRuntime>();
@@ -119,6 +158,52 @@ namespace XTD.Tests
             {
                 var node = queue.Dequeue();
                 if (node.Row == 10)
+                {
+                    return true;
+                }
+
+                var nextRow = floorRows.FirstOrDefault(row => row.Count > 0 && row[0].Row == node.Row + 1);
+                if (nextRow == null)
+                {
+                    continue;
+                }
+
+                foreach (var nextIndex in node.NextNodeIndices)
+                {
+                    var next = nextRow.FirstOrDefault(candidate => candidate.NodeIndex == nextIndex);
+                    if (next == null || visited.Contains(next.Key))
+                    {
+                        continue;
+                    }
+
+                    visited.Add(next.Key);
+                    queue.Enqueue(next);
+                }
+            }
+
+            return false;
+        }
+
+        private static bool CanReachFromFloorStart(MapNodeRuntime target, System.Collections.Generic.IReadOnlyList<System.Collections.Generic.List<MapNodeRuntime>> floorRows)
+        {
+            var startRow = floorRows.FirstOrDefault(row => row.Count > 0 && row[0].Row == 1);
+            if (startRow == null)
+            {
+                return false;
+            }
+
+            var queue = new System.Collections.Generic.Queue<MapNodeRuntime>();
+            var visited = new System.Collections.Generic.HashSet<string>();
+            foreach (var node in startRow)
+            {
+                queue.Enqueue(node);
+                visited.Add(node.Key);
+            }
+
+            while (queue.Count > 0)
+            {
+                var node = queue.Dequeue();
+                if (node.Key == target.Key)
                 {
                     return true;
                 }

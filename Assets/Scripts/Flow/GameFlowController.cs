@@ -29,6 +29,7 @@ namespace XTD.Flow
         private const int ShopBaseRemoveCost = 58;
         private const int MinimumDeckSizeAfterRemove = 6;
         private const int MaxRunLogEntries = 42;
+        private const int MaxPlaytestRecords = 10;
 
         private readonly MapGenerationService mapGeneration = new();
         private readonly List<List<MapNodeRuntime>> mapRows = new();
@@ -45,6 +46,7 @@ namespace XTD.Flow
         public PermanentProgressData PermanentProgress => permanentProgress ??= PermanentProgressStore.Load();
         public IReadOnlyList<string> PermanentArtifactIds => PermanentProgress.permanentArtifactIds;
         public IReadOnlyList<string> RunEventLog => CurrentRun != null ? CurrentRun.eventLog : Array.Empty<string>();
+        public IReadOnlyList<string> RunPlaytestRecords => CurrentRun != null ? CurrentRun.playtestRecords : Array.Empty<string>();
         public bool HasActiveRun => CurrentRun != null && !CurrentRun.isComplete && !CurrentRun.isDefeated;
         public bool HasPendingNode => hasPendingNode;
         public bool HasPendingCardReward => CurrentRun != null && CurrentRun.pendingCardRewardPickCount > 0 && CurrentRun.pendingCardRewardIds.Count > 0;
@@ -91,19 +93,19 @@ namespace XTD.Flow
 
         public void ConfigureCatalog(ContentCatalog catalog)
         {
-            Catalog = catalog ?? Catalog ?? DemoContentFactory.CreateCatalog();
-            DemoContentFactory.EnsureCatalogComplete(Catalog);
+            Catalog = catalog ?? Catalog ?? GameContentFactory.CreateCatalog();
+            GameContentFactory.EnsureCatalogComplete(Catalog);
         }
 
         public void StartNewRun(ContentCatalog catalog)
         {
-            StartNewRun(catalog, HeroClassType.BorderCommander);
+            StartNewRun(catalog, GameContentFactory.DefaultHeroClass);
         }
 
         public void StartNewRun(ContentCatalog catalog, HeroClassType heroClass)
         {
             ConfigureCatalog(catalog);
-            CurrentRun = DemoContentFactory.CreateStartingRun(Catalog, heroClass);
+            CurrentRun = GameContentFactory.CreateStartingRun(Catalog, heroClass);
             AssignFloorAffixes(CurrentRun);
             ApplyPermanentStartBonuses(CurrentRun);
             AppendRunLog(CurrentRun.lastMessage);
@@ -114,7 +116,8 @@ namespace XTD.Flow
             LoadMainMenu();
         }
 
-        public HeroClassType CurrentHeroClass => CurrentRun != null ? CurrentRun.heroClass : HeroClassType.BorderCommander;
+        public HeroClassType CurrentHeroClass => CurrentRun != null ? CurrentRun.heroClass : GameContentFactory.DefaultHeroClass;
+        public HeroClassDefinition CurrentHeroClassDefinition => GameContentFactory.GetHeroClassDefinition(CurrentHeroClass);
 
         public void LoadMainMenu()
         {
@@ -206,7 +209,7 @@ namespace XTD.Flow
             return Catalog.FirstEncounter(MapNodeType.NormalMonster);
         }
 
-        public void CompleteBattle(BattleOutcome outcome, float remainingPlayerHp)
+        public void CompleteBattle(BattleOutcome outcome, float remainingPlayerHp, string playtestSummary = null)
         {
             if (CurrentRun == null)
             {
@@ -220,6 +223,7 @@ namespace XTD.Flow
                 CurrentRun.isDefeated = true;
                 CurrentRun.lastMessage = "本次探索失败，已返回营地。";
                 AppendRunLog(CurrentRun.lastMessage);
+                AppendPlaytestRecord(playtestSummary, pendingNode);
                 RecordRunFinished(false, CurrentRun.heroExperience);
                 ClearPendingNode();
                 LoadMainMenu();
@@ -232,6 +236,7 @@ namespace XTD.Flow
             var rewardText = pendingBattleSuppressRewards
                 ? "凶阵被破，没有额外奖励。"
                 : GrantBattleRewards(resolvedNode, encounter);
+            AppendPlaytestRecord(playtestSummary, resolvedNode);
 
             if (HasPendingCardReward)
             {
@@ -656,7 +661,7 @@ namespace XTD.Flow
             }
 
             return CurrentRun.deckCardIds
-                .Where(id => DemoContentFactory.CardLevelFromId(id) < 3)
+                .Where(id => GameContentFactory.CardLevelFromId(id) < 3)
                 .GroupBy(id => id)
                 .Where(group => group.Count() >= 3)
                 .ToList();
@@ -721,9 +726,7 @@ namespace XTD.Flow
 
         public int PlayerExtraCommand()
         {
-            var value = 0;
-            if (CurrentHeroClass == HeroClassType.SpiritSummoner) value += 6;
-            if (CurrentHeroClass == HeroClassType.ThunderMage) value -= 2;
+            var value = CurrentHeroClassDefinition.extraCommand;
             if (HasArtifact("artifact_long_banner")) value += 5;
             if (HasArtifact("artifact_command_seal")) value += 3;
             if (HasArtifact("artifact_vajra")) value += 8;
@@ -732,16 +735,14 @@ namespace XTD.Flow
 
         public int ExtraMaxMana()
         {
-            var value = CurrentHeroClass == HeroClassType.ThunderMage ? 2 : 0;
+            var value = CurrentHeroClassDefinition.extraMaxMana;
             if (HasArtifact("artifact_heaven_seal")) value += 2;
             return value;
         }
 
         public float ExtraStartingMana()
         {
-            var value = 0f;
-            if (CurrentHeroClass == HeroClassType.ThunderMage) value += 2f;
-            if (CurrentHeroClass == HeroClassType.BorderCommander) value += 0.5f;
+            var value = CurrentHeroClassDefinition.extraStartingMana;
             if (HasArtifact("artifact_heaven_seal")) value += 1f;
             if (HasArtifact("artifact_star_sand")) value += 1f;
             return value;
@@ -749,27 +750,21 @@ namespace XTD.Flow
 
         public int StartingHandBonus()
         {
-            var value = CurrentHeroClass == HeroClassType.ThunderMage ? 1 : 0;
+            var value = CurrentHeroClassDefinition.startingHandBonus;
             if (HasArtifact("artifact_command_seal")) value += 1;
             return value;
         }
 
         public int MoraleThreshold()
         {
-            var threshold = CurrentHeroClass switch
-            {
-                HeroClassType.SpiritSummoner => 4,
-                HeroClassType.ThunderMage => 6,
-                _ => 5
-            };
+            var threshold = CurrentHeroClassDefinition.moraleThreshold;
             if (HasArtifact("artifact_war_drum")) threshold--;
             return Mathf.Max(3, threshold);
         }
 
         public float SpellDamageMultiplier()
         {
-            var multiplier = 1f;
-            if (CurrentHeroClass == HeroClassType.ThunderMage) multiplier += 0.22f;
+            var multiplier = 1f + CurrentHeroClassDefinition.spellDamageBonus;
             if (HasArtifact("artifact_fire_pearl")) multiplier += 0.25f;
             if (HasArtifact("artifact_thunder_fire_box")) multiplier += 0.15f;
             if (CurrentFloorAffix() == FloorAffixType.ThunderTribulation) multiplier += 0.08f;
@@ -784,14 +779,20 @@ namespace XTD.Flow
         public float UnitAttackMultiplier(UnitDefinition unit)
         {
             var multiplier = 1f;
-            if (CurrentHeroClass == HeroClassType.BorderCommander && unit != null && (unit.role == UnitRole.Soldier || unit.role == UnitRole.Elite))
+            var definition = CurrentHeroClassDefinition;
+            if (unit != null && unit.role == UnitRole.Soldier)
             {
-                multiplier += 0.08f;
+                multiplier += definition.soldierAttackBonus;
             }
 
-            if (CurrentHeroClass == HeroClassType.SpiritSummoner && unit != null && unit.role == UnitRole.Soldier)
+            if (unit != null && unit.role == UnitRole.Elite)
             {
-                multiplier += 0.06f;
+                multiplier += definition.eliteAttackBonus;
+            }
+
+            if (unit != null && unit.role == UnitRole.Hero)
+            {
+                multiplier += definition.heroAttackBonus;
             }
 
             if (HasArtifact("artifact_dragon_bone") && unit != null && unit.role == UnitRole.Soldier)
@@ -934,13 +935,7 @@ namespace XTD.Flow
 
         public float PlayerMaxHpForRun()
         {
-            var maxHp = 100f;
-            maxHp += CurrentHeroClass switch
-            {
-                HeroClassType.SpiritSummoner => 10f,
-                HeroClassType.ThunderMage => -8f,
-                _ => 0f
-            };
+            var maxHp = CurrentHeroClassDefinition.startingHp;
             maxHp += Mathf.Max(0, PermanentHeroLevel() - 1) * 2f;
             if (PermanentProgress.permanentArtifactIds.Contains("artifact_permanent_relic") ||
                 (CurrentRun != null && CurrentRun.permanentArtifactIds.Contains("artifact_permanent_relic")))
@@ -986,18 +981,7 @@ namespace XTD.Flow
                 return 0;
             }
 
-            var modifier = 0;
-            if (CurrentHeroClass == HeroClassType.SpiritSummoner)
-            {
-                if (card.type == CardType.Structure) modifier -= 1;
-                if (card.type == CardType.Spell) modifier += 1;
-            }
-
-            if (CurrentHeroClass == HeroClassType.ThunderMage)
-            {
-                if (card.type == CardType.Spell || card.type == CardType.Debuff) modifier -= 1;
-                if (card.type == CardType.Structure) modifier += 1;
-            }
+            var modifier = CurrentHeroClassDefinition.CostModifierFor(card);
 
             if (HasArtifact("artifact_ten_thousand_banner"))
             {
@@ -1019,11 +1003,19 @@ namespace XTD.Flow
             return modifier;
         }
 
+        public float EffectRadiusMultiplierForCard(CardDefinition card)
+        {
+            if (card == null || (card.type != CardType.Spell && card.type != CardType.Debuff))
+            {
+                return 1f;
+            }
+
+            return Mathf.Max(0.01f, CurrentHeroClassDefinition.effectRadiusMultiplier);
+        }
+
         public float StructureProductionIntervalMultiplier()
         {
-            var multiplier = 1f;
-            if (CurrentHeroClass == HeroClassType.SpiritSummoner) multiplier *= 0.84f;
-            if (CurrentHeroClass == HeroClassType.ThunderMage) multiplier *= 1.12f;
+            var multiplier = CurrentHeroClassDefinition.structureProductionIntervalMultiplier;
             if (HasArtifact("artifact_ten_thousand_banner")) multiplier *= 0.65f;
             if (CurrentFloorAffix() == FloorAffixType.ImmortalArray) multiplier *= 0.88f;
             return multiplier;
@@ -1078,9 +1070,7 @@ namespace XTD.Flow
 
         public float ManaRegenMultiplier()
         {
-            var multiplier = 1f;
-            if (CurrentHeroClass == HeroClassType.ThunderMage) multiplier *= 1.12f;
-            if (CurrentHeroClass == HeroClassType.SpiritSummoner) multiplier *= 0.94f;
+            var multiplier = CurrentHeroClassDefinition.manaRegenMultiplier;
             if (CurrentFloorAffix() == FloorAffixType.ImmortalArray) multiplier *= 0.92f;
             return multiplier;
         }
@@ -1144,10 +1134,12 @@ namespace XTD.Flow
             if (cardChoiceCount > 0)
             {
                 var rewardTier = RewardTierForNode(node.NodeType);
-                var cards = RandomCards(random, cardChoiceCount, includeUpgraded: true, rewardTier);
+                var includeUpgraded = node.NodeType != MapNodeType.NormalMonster;
+                var cards = RandomCards(random, cardChoiceCount, includeUpgraded, rewardTier);
                 var skipGold = node.NodeType == MapNodeType.NormalMonster ? 8 : 0;
                 QueueCardReward(cards, pickCount, skipGold);
-                messages.Add($"卡牌奖励：从 {cards.Count} 张中选择 {pickCount} 张");
+                var rewardHint = includeUpgraded ? "卡牌" : "等级 1 卡牌";
+                messages.Add($"卡牌奖励：从 {cards.Count} 张{rewardHint}中选择 {pickCount} 张");
             }
 
             if (node.NodeType == MapNodeType.SmallBoss)
@@ -1456,7 +1448,7 @@ namespace XTD.Flow
                 return false;
             }
 
-            var upgradedId = DemoContentFactory.UpgradeCardId(cardId);
+            var upgradedId = GameContentFactory.UpgradeCardId(cardId);
             var upgradedCard = Catalog.FindCard(upgradedId);
             if (upgradedCard == null)
             {
@@ -1492,7 +1484,7 @@ namespace XTD.Flow
 
         private bool IsCardUpgradable(string cardId)
         {
-            if (string.IsNullOrWhiteSpace(cardId) || DemoContentFactory.CardLevelFromId(cardId) >= 3)
+            if (string.IsNullOrWhiteSpace(cardId) || GameContentFactory.CardLevelFromId(cardId) >= 3)
             {
                 return false;
             }
@@ -1503,7 +1495,7 @@ namespace XTD.Flow
                 return false;
             }
 
-            return Catalog.FindCard(DemoContentFactory.UpgradeCardId(cardId)) != null;
+            return Catalog.FindCard(GameContentFactory.UpgradeCardId(cardId)) != null;
         }
 
         private enum CardRewardTier
@@ -1521,8 +1513,13 @@ namespace XTD.Flow
 
         private IReadOnlyList<CardDefinition> RandomCards(System.Random random, int count, bool includeUpgraded, CardRewardTier rewardTier)
         {
+            var classCardPool = GameContentFactory.HeroClassCardPoolBaseIds(CurrentHeroClass).ToHashSet(StringComparer.Ordinal);
             var candidates = Catalog.cards
-                .Where(card => card != null && card.type != CardType.Curse && (includeUpgraded || card.level == 1))
+                .Where(card =>
+                    card != null &&
+                    card.type != CardType.Curse &&
+                    (includeUpgraded || card.level == 1) &&
+                    classCardPool.Contains(GameContentFactory.BaseCardId(card.id)))
                 .ToList();
 
             var result = new List<CardDefinition>();
@@ -1549,7 +1546,10 @@ namespace XTD.Flow
 
             return result.Count > 0
                 ? result
-                : Catalog.cards.Where(card => card != null && card.type != CardType.Curse).Take(count).ToList();
+                : Catalog.cards
+                    .Where(card => card != null && card.type != CardType.Curse && classCardPool.Contains(GameContentFactory.BaseCardId(card.id)))
+                    .Take(count)
+                    .ToList();
         }
 
         private static CardRewardTier RewardTierForNode(MapNodeType nodeType)
@@ -1624,35 +1624,7 @@ namespace XTD.Flow
                 return 1.0;
             }
 
-            return CurrentHeroClass switch
-            {
-                HeroClassType.SpiritSummoner => card.type switch
-                {
-                    CardType.Structure => 1.65,
-                    CardType.Soldier => 1.35,
-                    CardType.Tactic => 1.15,
-                    CardType.Spell => 0.72,
-                    CardType.Debuff => 0.82,
-                    _ => 1.0
-                },
-                HeroClassType.ThunderMage => card.type switch
-                {
-                    CardType.Spell => 1.65,
-                    CardType.Debuff => 1.45,
-                    CardType.Economy => 1.25,
-                    CardType.Structure => 0.70,
-                    CardType.Soldier => 0.78,
-                    _ => 1.0
-                },
-                _ => card.type switch
-                {
-                    CardType.Soldier => 1.20,
-                    CardType.EliteSoldier => 1.20,
-                    CardType.Tactic => 1.25,
-                    CardType.Structure => 1.08,
-                    _ => 1.0
-                }
-            };
+            return CurrentHeroClassDefinition.RewardWeightFor(card);
         }
 
         private void ResolvePendingNonBattle(string message)
@@ -1765,6 +1737,25 @@ namespace XTD.Flow
             {
                 CurrentRun.eventLog.RemoveAt(0);
             }
+        }
+
+        private void AppendPlaytestRecord(string summary, MapNodeRuntime resolvedNode)
+        {
+            if (CurrentRun == null || string.IsNullOrWhiteSpace(summary))
+            {
+                return;
+            }
+
+            var floor = resolvedNode != null ? resolvedNode.Floor : CurrentRun.floor;
+            var row = resolvedNode != null ? resolvedNode.Row : CurrentRun.row;
+            var record = $"迷宫 {Mathf.Max(1, floor)} · 房间 {Mathf.Clamp(row, 1, 10)}/10  {summary}";
+            CurrentRun.playtestRecords.Add(record);
+            while (CurrentRun.playtestRecords.Count > MaxPlaytestRecords)
+            {
+                CurrentRun.playtestRecords.RemoveAt(0);
+            }
+
+            AppendRunLog($"试玩记录：{summary}", floor, row);
         }
 
         private void DebugJumpTo(int row, string message)
@@ -2000,35 +1991,17 @@ namespace XTD.Flow
 
         public static string HeroClassName(HeroClassType heroClass)
         {
-            return heroClass switch
-            {
-                HeroClassType.SpiritSummoner => "万灵召使",
-                HeroClassType.ThunderMage => "雷火方士",
-                _ => "边境指挥官"
-            };
+            return GameContentFactory.GetHeroClassDefinition(heroClass).displayName;
         }
 
         public static string HeroClassShortStyle(HeroClassType heroClass)
         {
-            return heroClass switch
-            {
-                HeroClassType.SpiritSummoner => "建筑生产 / 兵潮召唤",
-                HeroClassType.ThunderMage => "法术爆发 / 控场节奏",
-                _ => "士兵推进 / 战术士气"
-            };
+            return GameContentFactory.GetHeroClassDefinition(heroClass).shortStyle;
         }
 
         public static string HeroClassDescription(HeroClassType heroClass)
         {
-            return heroClass switch
-            {
-                HeroClassType.SpiritSummoner =>
-                    "阵位更多，建筑更便宜、产兵更快，士气触发更早；费用回复略慢，法术更贵。",
-                HeroClassType.ThunderMage =>
-                    "费用上限和开局费用更高，法术与控制牌更便宜且伤害更高；建筑较慢，阵位略少。",
-                _ =>
-                    "均衡指挥职业，士兵和精英攻击略高，依靠士气强化士兵、精英、英雄和战术牌。"
-            };
+            return GameContentFactory.GetHeroClassDefinition(heroClass).description;
         }
     }
 }

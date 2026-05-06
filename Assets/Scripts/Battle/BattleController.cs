@@ -26,7 +26,6 @@ namespace XTD.Battle
         private const string SummonerDivineEffectResourcePath = "Art/AI/FX/fx_divine_summon_gate";
         private const string ThunderDivineEffectResourcePath = "Art/AI/FX/fx_divine_thunder_fire";
         private const float DivinePowerManaCost = 7f;
-        private const float ThunderMageSpellRadiusMultiplier = 1.35f;
         private const int CloudBannerStructureCostReduction = 2;
         private const float StructurePlacementRadius = 0.34f;
         private const float StructurePlacementMinDistance = 0.64f;
@@ -95,7 +94,18 @@ namespace XTD.Battle
         private bool corePhaseThreeTriggered;
         private float manaSuppressionTimer;
         private float floorAffixTimer;
+        private float pressureSkillTimer;
+        private float pressureWarningTimer;
+        private EncounterPressurePattern pendingPressurePattern;
+        private Vector3 pendingPressurePosition;
         private float mana;
+        private float battleElapsedTime;
+        private float fullManaSeconds;
+        private float battleStartPlayerBaseHp;
+        private int cardsPlayedThisBattle;
+        private int moraleSpentThisBattle;
+        private int pressureEventsThisBattle;
+        private int enemyWavesThisBattle;
         private int baseMaxMana;
         private int baseMaxCommand;
         private float baseManaRegenPerSecond;
@@ -163,6 +173,7 @@ namespace XTD.Battle
         {
             HeroClassType.SpiritSummoner => "万灵开阵",
             HeroClassType.ThunderMage => "九霄雷火",
+            HeroClassType.TalismanSealer => "镇妖符阵",
             _ => "边境战令"
         };
 
@@ -171,7 +182,7 @@ namespace XTD.Battle
         private void Awake()
         {
             catalog = ResolveContentCatalog();
-            DemoContentFactory.EnsureCatalogComplete(catalog);
+            GameContentFactory.EnsureCatalogComplete(catalog);
             flow = GameFlowController.Instance;
             if (flow != null && flow.HasActiveRun && flow.HasPendingNode)
             {
@@ -249,21 +260,31 @@ namespace XTD.Battle
             corePhaseThreeTriggered = false;
             manaSuppressionTimer = 0f;
             floorAffixTimer = 3.0f;
+            pressureSkillTimer = InitialPressureDelay();
+            pressureWarningTimer = 0f;
+            pendingPressurePattern = EncounterPressurePattern.None;
             hitSfxCooldown = 0f;
             temporaryStructureCostReduction = 0;
             defeatedEnemyCount = 0;
+            battleElapsedTime = 0f;
+            fullManaSeconds = 0f;
+            cardsPlayedThisBattle = 0;
+            moraleSpentThisBattle = 0;
+            pressureEventsThisBattle = 0;
+            enemyWavesThisBattle = 0;
             StartBattleMusic();
             var playerMaxHp = CurrentPlayerBattleMaxHp();
             PlayerBaseHp = flow != null && flow.HasActiveRun
                 ? Mathf.Clamp(flow.CurrentRun.playerHp + flow.BattleStartHpBonus(), 1f, playerMaxHp)
                 : playerMaxHp;
+            battleStartPlayerBaseHp = PlayerBaseHp;
             EnemyBaseHp = HasEnemyBase && encounter != null ? encounter.enemyBaseMaxHp : 0f;
             EnsureBaseViews();
             RefreshBaseViews();
 
             var runState = flow != null && flow.HasActiveRun
                 ? flow.CurrentRun
-                : DemoContentFactory.CreateStartingRun(catalog);
+                : GameContentFactory.CreateStartingRun(catalog);
             var startingCards = runState.deckCardIds
                 .Select(id => catalog.FindCard(id))
                 .Where(card => card != null);
@@ -315,6 +336,12 @@ namespace XTD.Battle
             if (consumesCloudBannerDiscount)
             {
                 temporaryStructureCostReduction = 0;
+            }
+
+            cardsPlayedThisBattle++;
+            if (strengthened)
+            {
+                moraleSpentThisBattle++;
             }
 
             ResolveCard(card, strengthened, targetPosition);
@@ -703,6 +730,9 @@ namespace XTD.Battle
                 case HeroClassType.ThunderMage:
                     ReleaseThunderMageDivinePower();
                     break;
+                case HeroClassType.TalismanSealer:
+                    ReleaseCommanderDivinePower();
+                    break;
                 default:
                     ReleaseCommanderDivinePower();
                     break;
@@ -862,6 +892,12 @@ namespace XTD.Battle
 
         private void Tick(float deltaTime)
         {
+            battleElapsedTime += deltaTime;
+            if (mana >= maxMana - 0.05f)
+            {
+                fullManaSeconds += deltaTime;
+            }
+
             var manaRegenMultiplier = manaSuppressionTimer > 0f ? 0.55f : 1f;
             mana = Mathf.Min(maxMana, mana + manaRegenPerSecond * manaRegenMultiplier * deltaTime);
             manaSuppressionTimer = Mathf.Max(0f, manaSuppressionTimer - deltaTime);
@@ -870,6 +906,7 @@ namespace XTD.Battle
 
             TickEnemyBase(deltaTime);
             TickEnemyCoreSkills(deltaTime);
+            TickEncounterPressure(deltaTime);
 
             for (var i = activeUnits.Count - 1; i >= 0; i--)
             {
@@ -946,6 +983,8 @@ namespace XTD.Battle
             {
                 SpawnUnit(entry.unit, Faction.Enemy, RandomEnemySpawnPosition(0.25f + i * 0.22f), false);
             }
+
+            enemyWavesThisBattle++;
         }
 
         private void TickEnemyCoreSkills(float deltaTime)
@@ -981,6 +1020,199 @@ namespace XTD.Battle
                 BuffEnemyWave(enrage);
                 coreBuffSkillTimer = enrage ? 5.2f : 8.0f;
             }
+        }
+
+        private void TickEncounterPressure(float deltaTime)
+        {
+            if (encounter == null || encounter.pressurePattern == EncounterPressurePattern.None)
+            {
+                pressureWarningTimer = 0f;
+                pendingPressurePattern = EncounterPressurePattern.None;
+                return;
+            }
+
+            if (pressureWarningTimer > 0f)
+            {
+                pressureWarningTimer -= deltaTime;
+                if (pressureWarningTimer <= 0f)
+                {
+                    ResolveEncounterPressure();
+                }
+
+                return;
+            }
+
+            pressureSkillTimer -= deltaTime;
+            if (pressureSkillTimer > 0f)
+            {
+                return;
+            }
+
+            PrepareEncounterPressure();
+            pressureSkillTimer = PressureIntervalFor(encounter.pressurePattern);
+        }
+
+        private float InitialPressureDelay()
+        {
+            return encounter != null && encounter.pressurePattern != EncounterPressurePattern.None ? 6.0f : 999f;
+        }
+
+        private static float PressureIntervalFor(EncounterPressurePattern pattern)
+        {
+            return pattern switch
+            {
+                EncounterPressurePattern.VanguardRush => 9.5f,
+                EncounterPressurePattern.BacklineVolley => 11.0f,
+                EncounterPressurePattern.ShieldStandard => 12.0f,
+                _ => 999f
+            };
+        }
+
+        private void PrepareEncounterPressure()
+        {
+            pendingPressurePattern = encounter.pressurePattern;
+            pendingPressurePosition = pendingPressurePattern switch
+            {
+                EncounterPressurePattern.VanguardRush => new Vector3(Random.Range(placementMinX + 1.2f, placementMaxX - 1.2f), BattleMidY + 0.45f, 0f),
+                EncounterPressurePattern.BacklineVolley => new Vector3(laneX, enemyBaseY - 0.62f, 0f),
+                EncounterPressurePattern.ShieldStandard => EnemyCoreUnit() != null ? EnemyCoreUnit().transform.position : new Vector3(laneX, BattleMidY + 0.8f, 0f),
+                _ => Vector3.zero
+            };
+            pressureWarningTimer = pendingPressurePattern == EncounterPressurePattern.ShieldStandard ? 0.62f : 0.88f;
+            pressureEventsThisBattle++;
+
+            SpawnWarningCircle(pendingPressurePosition, pendingPressurePattern == EncounterPressurePattern.BacklineVolley ? 1.45f : 1.15f);
+            ui.ShowNotice(PressureWarningText(pendingPressurePattern), 1.35f);
+        }
+
+        private void ResolveEncounterPressure()
+        {
+            switch (pendingPressurePattern)
+            {
+                case EncounterPressurePattern.VanguardRush:
+                    ResolveVanguardRush();
+                    break;
+                case EncounterPressurePattern.BacklineVolley:
+                    ResolveBacklineVolley();
+                    break;
+                case EncounterPressurePattern.ShieldStandard:
+                    ResolveShieldStandard();
+                    break;
+            }
+
+            pendingPressurePattern = EncounterPressurePattern.None;
+        }
+
+        private void ResolveVanguardRush()
+        {
+            var entry = StrongestEnemySpawnEntry();
+            if (entry?.unit == null)
+            {
+                return;
+            }
+
+            var count = Mathf.Clamp(entry.count + 1, 2, 4);
+            for (var i = 0; i < count; i++)
+            {
+                var offset = new Vector3((i - (count - 1) * 0.5f) * 0.42f, -i * 0.12f, 0f);
+                var unit = SpawnUnit(entry.unit, Faction.Enemy, ClampToLane(pendingPressurePosition + offset), false);
+                if (unit == null)
+                {
+                    continue;
+                }
+
+                unit.AddShield(Mathf.Max(8f, entry.unit.maxHp * 0.12f));
+                unit.AddModifier(EffectType.BuffAttackSpeed, 0.20f, 5.0f);
+            }
+
+            ui.ShowNotice("突袭压线：用石垒、定身或法术截住前锋", 1.6f);
+        }
+
+        private void ResolveBacklineVolley()
+        {
+            var entry = RangedEnemySpawnEntry() ?? StrongestEnemySpawnEntry();
+            if (entry?.unit == null)
+            {
+                return;
+            }
+
+            var count = Mathf.Clamp(entry.count + 1, 2, 3);
+            for (var i = 0; i < count; i++)
+            {
+                var x = Mathf.Lerp(placementMinX + 1.6f, placementMaxX - 1.6f, count == 1 ? 0.5f : i / (float)(count - 1));
+                var position = new Vector3(x, enemyBaseY - 0.68f - i * 0.08f, 0f);
+                var unit = SpawnUnit(entry.unit, Faction.Enemy, position, false);
+                if (unit == null)
+                {
+                    continue;
+                }
+
+                unit.AddModifier(EffectType.BuffAttack, 0.16f, 6.0f);
+            }
+
+            ui.ShowNotice("后排箭雨：尽快用点杀或范围法术清掉远程", 1.6f);
+        }
+
+        private void ResolveShieldStandard()
+        {
+            var enemies = activeUnits
+                .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Enemy && unit.Definition != null && unit.Definition.role != UnitRole.Boss)
+                .OrderByDescending(unit => unit.transform.position.y)
+                .Take(6)
+                .ToList();
+            if (enemies.Count == 0)
+            {
+                SpawnEmergencyEnemyWave(0.72f);
+                enemies = activeUnits
+                    .Where(unit => unit != null && unit.IsAlive && unit.Faction == Faction.Enemy && unit.Definition != null && unit.Definition.role != UnitRole.Boss)
+                    .OrderByDescending(unit => unit.transform.position.y)
+                    .Take(6)
+                    .ToList();
+            }
+
+            foreach (var enemy in enemies)
+            {
+                enemy.AddShield(Mathf.Max(14f, enemy.Definition.maxHp * 0.20f));
+                enemy.AddModifier(EffectType.BuffAttack, 0.10f, 4.5f);
+                SpawnMoraleEffect(enemy.transform.position);
+            }
+
+            ui.ShowNotice("护阵展开：敌军获得护盾，优先压低前排或等护盾后爆发", 1.6f);
+        }
+
+        private string PressureWarningText(EncounterPressurePattern pattern)
+        {
+            return pattern switch
+            {
+                EncounterPressurePattern.VanguardRush => $"{EncounterDisplayName}准备突袭前线",
+                EncounterPressurePattern.BacklineVolley => $"{EncounterDisplayName}正在召集远程后排",
+                EncounterPressurePattern.ShieldStandard => $"{EncounterDisplayName}即将展开护阵",
+                _ => string.Empty
+            };
+        }
+
+        private EnemySpawnEntry StrongestEnemySpawnEntry()
+        {
+            return encounter?.enemySpawns?
+                .Where(entry => entry != null && entry.unit != null && entry.count > 0)
+                .OrderByDescending(entry => entry.unit.maxHp + entry.unit.attack * 3f)
+                .FirstOrDefault();
+        }
+
+        private EnemySpawnEntry RangedEnemySpawnEntry()
+        {
+            return encounter?.enemySpawns?
+                .Where(entry => entry != null && entry.unit != null && entry.count > 0 && entry.unit.IsRanged)
+                .OrderByDescending(entry => entry.unit.attack)
+                .FirstOrDefault();
+        }
+
+        private Vector3 ClampToLane(Vector3 position)
+        {
+            return new Vector3(
+                Mathf.Clamp(position.x, placementMinX + 0.35f, placementMaxX - 0.35f),
+                Mathf.Clamp(position.y, playerBaseY + 1.15f, enemyBaseY - 0.35f),
+                0f);
         }
 
         private void TickEnemyCorePhaseTriggers(BattleUnit core)
@@ -1352,9 +1584,12 @@ namespace XTD.Battle
 
         private IReadOnlyList<string> BuildEnemySkillHints()
         {
+            var pressureHint = PressureHintFor(encounter != null ? encounter.pressurePattern : EncounterPressurePattern.None);
             if (!IsBossLikeEncounter)
             {
-                return new[] { "妖兵潮汐  持续", "据点守备  持续" };
+                return string.IsNullOrWhiteSpace(pressureHint)
+                    ? new[] { "妖兵潮汐  持续", "据点守备  持续" }
+                    : new[] { "妖兵潮汐  持续", pressureHint };
             }
 
             if (encounter != null && encounter.nodeType == MapNodeType.FinalBoss)
@@ -1364,10 +1599,25 @@ namespace XTD.Battle
 
             if (encounter != null && encounter.nodeType == MapNodeType.SmallBoss)
             {
-                return new[] { "首领蓄力  10秒", "妖兵号令  16秒", "狂暴半血  被动" };
+                return string.IsNullOrWhiteSpace(pressureHint)
+                    ? new[] { "首领蓄力  10秒", "妖兵号令  16秒", "狂暴半血  被动" }
+                    : new[] { pressureHint, "首领蓄力  10秒", "狂暴半血  被动" };
             }
 
-            return new[] { "精英威压  9秒", "妖兵号令  15秒", "半血狂暴  被动" };
+            return string.IsNullOrWhiteSpace(pressureHint)
+                ? new[] { "精英威压  9秒", "妖兵号令  15秒", "半血狂暴  被动" }
+                : new[] { pressureHint, "妖兵号令  15秒", "半血狂暴  被动" };
+        }
+
+        private static string PressureHintFor(EncounterPressurePattern pattern)
+        {
+            return pattern switch
+            {
+                EncounterPressurePattern.VanguardRush => "突袭压线  9秒",
+                EncounterPressurePattern.BacklineVolley => "后排箭雨  11秒",
+                EncounterPressurePattern.ShieldStandard => "护阵军旗  12秒",
+                _ => string.Empty
+            };
         }
 
         private Vector3 ResolveSpawnCenter(CardDefinition card, Vector3 targetPosition)
@@ -1506,14 +1756,14 @@ namespace XTD.Battle
             }
 
 #if UNITY_EDITOR
-            var assetCatalog = UnityEditor.AssetDatabase.LoadAssetAtPath<ContentCatalog>("Assets/_Project/Content/DemoContentCatalog.asset");
+            var assetCatalog = UnityEditor.AssetDatabase.LoadAssetAtPath<ContentCatalog>("Assets/_Project/Content/GameContentCatalog.asset");
             if (assetCatalog != null)
             {
                 return assetCatalog;
             }
 #endif
 
-            return DemoContentFactory.CreateCatalog();
+            return GameContentFactory.CreateCatalog();
         }
 
         private void EnsurePresentationSprites()
@@ -1778,7 +2028,7 @@ namespace XTD.Battle
             }
 
             var radius = effect.radius;
-            if (!usePlacementTarget || sourceCard == null || CurrentHeroClassForBattle() != HeroClassType.ThunderMage)
+            if (!usePlacementTarget || sourceCard == null)
             {
                 return radius;
             }
@@ -1788,14 +2038,20 @@ namespace XTD.Battle
                 return radius;
             }
 
+            var radiusMultiplier = flow != null ? flow.EffectRadiusMultiplierForCard(sourceCard) : 1f;
+            if (radiusMultiplier <= 1.001f)
+            {
+                return radius;
+            }
+
             return effect.effectType is EffectType.Damage or EffectType.AreaDamage or EffectType.Slow or EffectType.Stun or EffectType.Burn or EffectType.Poison or EffectType.Knockback
-                ? radius * ThunderMageSpellRadiusMultiplier
+                ? radius * radiusMultiplier
                 : radius;
         }
 
         private HeroClassType CurrentHeroClassForBattle()
         {
-            return flow != null && flow.HasActiveRun ? flow.CurrentHeroClass : HeroClassType.BorderCommander;
+            return flow != null && flow.HasActiveRun ? flow.CurrentHeroClass : GameContentFactory.DefaultHeroClass;
         }
 
         private List<BattleUnit> SelectTargets(TargetRule targetRule, float radius)
@@ -1858,11 +2114,22 @@ namespace XTD.Battle
         {
             if (flow != null && flow.HasActiveRun)
             {
-                flow.CompleteBattle(Outcome, PlayerBaseHp);
+                flow.CompleteBattle(Outcome, PlayerBaseHp, BuildPlaytestSummary());
                 return;
             }
 
             StartPrototypeBattle();
+        }
+
+        private string BuildPlaytestSummary()
+        {
+            if (battleElapsedTime <= 0f)
+            {
+                return string.Empty;
+            }
+
+            var hpLost = Mathf.Max(0f, battleStartPlayerBaseHp - Mathf.Max(0f, PlayerBaseHp));
+            return $"耗时 {battleElapsedTime:0}s，出牌 {cardsPlayedThisBattle}，士气 {moraleSpentThisBattle}，满费停滞 {fullManaSeconds:0}s，压力事件 {pressureEventsThisBattle}，刷怪 {enemyWavesThisBattle}，击败 {defeatedEnemyCount}，阵心损失 {hpLost:0}";
         }
 
         public void DebugWinNow()
@@ -1898,32 +2165,6 @@ namespace XTD.Battle
             morale.AddCharges(1);
             ui.ShowNotice("调试：士气 +1，下一张出兵牌会强化");
             ui.Refresh();
-        }
-
-        public void DebugSpawnTalismanGuard()
-        {
-            if (Outcome != BattleOutcome.Running)
-            {
-                return;
-            }
-
-            var guard = catalog.FindUnit("unit_shield_guard");
-            if (guard == null)
-            {
-                ui.ShowNotice("调试：没有找到金甲天将配置");
-                return;
-            }
-
-            for (var i = 0; i < 2; i++)
-            {
-                var x = laneX + (i == 0 ? -0.42f : 0.42f);
-                var y = playerBaseY + 1.28f + i * 0.14f;
-                SpawnUnit(guard, Faction.Player, new Vector3(x, y, 0f), true);
-            }
-
-            morale.RegisterSummonedSoldiers(2);
-            SpawnMoraleEffect(new Vector3(laneX, playerBaseY + 1.28f, 0f));
-            ui.ShowNotice("调试：已召来金甲天将");
         }
 
         public void DebugAddGold()

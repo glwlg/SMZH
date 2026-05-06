@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
@@ -30,8 +31,8 @@ namespace XTD.Tests
         [Test]
         public void TakeRestHeal_LogsResolvedRoomInsteadOfNextRoom()
         {
-            var catalog = DemoContentFactory.CreateCatalog();
-            var run = DemoContentFactory.CreateStartingRun(catalog);
+            var catalog = GameContentFactory.CreateCatalog();
+            var run = GameContentFactory.CreateStartingRun(catalog);
             run.seed = 12345;
             run.floor = 2;
             run.row = 6;
@@ -50,8 +51,8 @@ namespace XTD.Tests
         [Test]
         public void ChooseCardReward_UsesResolvedRoomForLogAndAdvancesRun()
         {
-            var catalog = DemoContentFactory.CreateCatalog();
-            var run = DemoContentFactory.CreateStartingRun(catalog);
+            var catalog = GameContentFactory.CreateCatalog();
+            var run = GameContentFactory.CreateStartingRun(catalog);
             run.seed = 6789;
             run.floor = 1;
             run.row = 5;
@@ -73,8 +74,8 @@ namespace XTD.Tests
         [Test]
         public void SkipCardRewardForGold_GrantsGoldAndLogsResolvedRoom()
         {
-            var catalog = DemoContentFactory.CreateCatalog();
-            var run = DemoContentFactory.CreateStartingRun(catalog);
+            var catalog = GameContentFactory.CreateCatalog();
+            var run = GameContentFactory.CreateStartingRun(catalog);
             run.seed = 2222;
             run.floor = 1;
             run.row = 3;
@@ -97,8 +98,8 @@ namespace XTD.Tests
         [Test]
         public void ShopActions_UpdateOfferStateAndDeck()
         {
-            var catalog = DemoContentFactory.CreateCatalog();
-            var run = DemoContentFactory.CreateStartingRun(catalog);
+            var catalog = GameContentFactory.CreateCatalog();
+            var run = GameContentFactory.CreateStartingRun(catalog);
             run.seed = 9999;
             run.floor = 2;
             run.row = 8;
@@ -131,6 +132,77 @@ namespace XTD.Tests
             Assert.That(run.shopOfferCardIds.Count, Is.EqualTo(5));
         }
 
+        [Test]
+        public void GrantBattleRewards_NormalMonsterOffersOnlyLevelOneCards()
+        {
+            var catalog = GameContentFactory.CreateCatalog();
+            var run = GameContentFactory.CreateStartingRun(catalog);
+            run.seed = 2468;
+
+            var flow = CreateFlow(catalog, run);
+            var node = new MapNodeRuntime(1, 2, 0, MapNodeType.NormalMonster, string.Empty, new[] { 0 });
+            var encounter = catalog.FirstEncounter(MapNodeType.NormalMonster);
+
+            InvokePrivate<string>(flow, "GrantBattleRewards", node, encounter);
+
+            Assert.That(run.pendingCardRewardIds, Is.Not.Empty);
+            Assert.That(run.pendingCardRewardIds
+                .Select(GameContentFactory.CardLevelFromId), Has.All.EqualTo(1));
+        }
+
+        [Test]
+        public void AppendPlaytestRecord_StoresRecordAndRunLog()
+        {
+            var catalog = GameContentFactory.CreateCatalog();
+            var run = GameContentFactory.CreateStartingRun(catalog);
+            run.seed = 1357;
+            run.floor = 1;
+            run.row = 2;
+
+            var flow = CreateFlow(catalog, run);
+            var node = new MapNodeRuntime(1, 2, 0, MapNodeType.NormalMonster, string.Empty, new[] { 0 });
+
+            InvokePrivate<object>(flow, "AppendPlaytestRecord", "耗时 42s，出牌 7", node);
+
+            Assert.That(run.playtestRecords, Has.Count.EqualTo(1));
+            Assert.That(run.playtestRecords[0], Does.Contain("耗时 42s"));
+            Assert.That(run.eventLog.Any(log => log.Contains("试玩记录")), Is.True);
+        }
+
+        [Test]
+        public void HeroClassDefinitions_ExposeFullCardPoolsForEveryAvailableClass()
+        {
+            var catalog = GameContentFactory.CreateCatalog();
+            var classes = GameContentFactory.AvailableHeroClasses();
+
+            Assert.That(classes.Count, Is.GreaterThanOrEqualTo(4));
+            Assert.That(classes, Does.Contain(HeroClassType.TalismanSealer));
+
+            foreach (var heroClass in classes)
+            {
+                var pool = GameContentFactory.HeroClassCardPoolBaseIds(heroClass);
+                var startingDeck = GameContentFactory.StartingDeckCardIds(heroClass);
+
+                Assert.That(pool, Is.Not.Empty, $"{GameFlowController.HeroClassName(heroClass)} should have a full card pool.");
+                Assert.That(startingDeck, Is.Not.Empty, $"{GameFlowController.HeroClassName(heroClass)} should have a starting deck.");
+                Assert.That(pool, Is.Unique);
+
+                foreach (var baseId in pool)
+                {
+                    Assert.That(catalog.FindCard(baseId), Is.Not.Null, $"{heroClass} card pool contains missing card {baseId}.");
+                }
+
+                foreach (var cardId in startingDeck)
+                {
+                    Assert.That(pool, Does.Contain(GameContentFactory.BaseCardId(cardId)), $"{heroClass} starting card {cardId} should belong to its full card pool.");
+                }
+            }
+
+            Assert.That(
+                GameContentFactory.HeroClassCardPoolBaseIds(HeroClassType.BorderCommander),
+                Is.Not.EquivalentTo(GameContentFactory.HeroClassCardPoolBaseIds(HeroClassType.TalismanSealer)));
+        }
+
         private GameFlowController CreateFlow(ContentCatalog catalog, RunState run)
         {
             var go = new GameObject("GameFlowControllerFlowTests");
@@ -158,6 +230,13 @@ namespace XTD.Tests
         {
             var field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
             field?.SetValue(target, value);
+        }
+
+        private static T InvokePrivate<T>(object target, string methodName, params object[] args)
+        {
+            var method = target.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(method, Is.Not.Null);
+            return (T)method.Invoke(target, args);
         }
 
         private static void SetStaticBackingField(System.Type type, string fieldName, object value)

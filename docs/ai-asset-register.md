@@ -15,10 +15,10 @@
 
 本批次用于把当前战斗从“2D 逻辑 + 平面底图”推进到“2D 逻辑 + 3D/2.5D 表现”的第一版演示链。
 
-- 新增 1 张远景背景：`Assets/_Project/Art/AI/Backgrounds/battlefield_honghuang_3d_backdrop.png`
-- 新增 1 张战场地面：`Assets/_Project/Art/AI/Backgrounds/battlefield_honghuang_3d_floor.png`
-- 新增 1 张我方阵门：`Assets/_Project/Art/AI/FX/battlefield_player_portal_3d.png`
-- 新增 1 张敌方魔门：`Assets/_Project/Art/AI/FX/battlefield_enemy_gate_3d.png`
+- 新增 1 张远景背景：`backup/Assets/_Project/Art/AI/Backgrounds/battlefield_honghuang_3d_backdrop.png`
+- 新增 1 张战场地面：`backup/Assets/_Project/Art/AI/Backgrounds/battlefield_honghuang_3d_floor.png`
+- 新增 1 张我方阵门：`backup/Assets/_Project/Art/AI/FX/battlefield_player_portal_3d.png`
+- 新增 1 张敌方魔门：`backup/Assets/_Project/Art/AI/FX/battlefield_enemy_gate_3d.png`
 - 原始生成输出位于：`.codex-tmp/asset-generation/v10-stage3d-generated/`
 - 透明处理：
   - `battlefield_player_portal_3d.png` 先以纯绿背景生成，再通过 `remove_chroma_key.py` 抠底为透明 PNG
@@ -73,8 +73,8 @@
 | `Assets/_Project/Art/AI/Cards/*.png` | 手牌、奖励和卡牌详情图 | 从卡牌源图裁切，保持正向玩家视角。 |
 | `Assets/_Project/Art/AI/FX/*.png` | 弹道、命中、法术和反馈特效 | 从特效源图裁切，保留透明背景。 |
 | `Assets/_Project/Art/AI/UI/Nodes/*.png` | 迷宫路线节点图标 | 同步复制到 `Assets/Resources/UI/Nodes/`，运行时可直接加载。 |
-| `Assets/_Project/Art/AI/UI/Artifacts/*.png` | 神器图标 | 已写入当前 `DemoContentCatalog.asset` 的神器 icon 引用。 |
-| `Assets/_Project/Art/AI/Backgrounds/battlefield_honghuang_ai.png` | 战斗场景背景 | 同步复制到 `Assets/Resources/UI/battlefield_honghuang_ai.png`。 |
+| `Assets/_Project/Art/AI/UI/Artifacts/*.png` | 神器图标 | 已写入当前 `GameContentCatalog.asset` 的神器 icon 引用。 |
+| `Assets/_Project/Art/AI/Backgrounds/battlefield_honghuang_ai.png` | 战斗场景背景 | 同步复制到 `Assets/Resources/Art/AI/Backgrounds/battlefield_honghuang_ai.png`。 |
 
 ## 处理脚本
 
@@ -87,7 +87,7 @@
 - 从 `v02-generated` 源图按固定网格裁切素材。
 - 去除纯品红背景并导出透明 PNG。
 - 为新素材生成 Unity 可识别的 `.meta`。
-- 同步更新 `DemoContentCatalog.asset` 中已有单位、卡牌和神器图标引用。
+- 同步更新 `GameContentCatalog.asset` 中已有单位、卡牌和神器图标引用。
 - 将迷宫节点图标和战场背景复制到 `Assets/Resources/UI/`，方便运行时加载。
 
 ## 记录规则

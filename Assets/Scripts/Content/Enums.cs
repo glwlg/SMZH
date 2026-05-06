@@ -10,7 +10,8 @@ namespace XTD.Content
     {
         BorderCommander,
         SpiritSummoner,
-        ThunderMage
+        ThunderMage,
+        TalismanSealer
     }
 
     public enum UnitRole
@@ -124,5 +125,13 @@ namespace XTD.Content
         ThunderTribulation,
         DemonTide,
         ImmortalArray
+    }
+
+    public enum EncounterPressurePattern
+    {
+        None,
+        VanguardRush,
+        BacklineVolley,
+        ShieldStandard
     }
 }

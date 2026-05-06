@@ -6,7 +6,8 @@ namespace XTD.Roguelike
 {
     public sealed class MapGenerationService
     {
-        private const int SpecialStartRow = 6;
+        private const int SpecialStartRow = 3;
+        private const int EarlySpecialEndRow = 4;
         private const int SpecialEndRow = 9;
 
         public List<List<MapNodeRuntime>> Generate(int seed, int floors = 3, int rowsPerFloor = 10)
@@ -120,9 +121,9 @@ namespace XTD.Roguelike
         {
             var result = new Dictionary<int, MapNodeType>();
             var counts = new Dictionary<MapNodeType, int>();
-            var maxSpecials = floor == 1 ? random.Next(2, 4) : random.Next(3, 5);
+            var maxSpecials = floor == 1 ? random.Next(3, 5) : random.Next(4, 6);
 
-            AddSpecial(random, result, counts, MapNodeType.Opportunity);
+            AddSpecial(random, result, counts, MapNodeType.Opportunity, SpecialStartRow, EarlySpecialEndRow);
             if (forceShop)
             {
                 AddSpecial(random, result, counts, MapNodeType.Shop);
@@ -183,8 +184,13 @@ namespace XTD.Roguelike
 
         private static bool AddSpecial(Random random, Dictionary<int, MapNodeType> result, Dictionary<MapNodeType, int> counts, MapNodeType nodeType)
         {
+            return AddSpecial(random, result, counts, nodeType, SpecialStartRow, SpecialEndRow);
+        }
+
+        private static bool AddSpecial(Random random, Dictionary<int, MapNodeType> result, Dictionary<MapNodeType, int> counts, MapNodeType nodeType, int startRow, int endRow)
+        {
             var candidates = new List<int>();
-            for (var row = SpecialStartRow; row <= SpecialEndRow; row++)
+            for (var row = startRow; row <= endRow; row++)
             {
                 if (!result.ContainsKey(row) && IsSpecialAllowedOnRow(nodeType, row))
                 {
@@ -273,9 +279,9 @@ namespace XTD.Roguelike
                         AddUnique(links[nodeIndex], extra);
                     }
                 }
-
-                CapFullFanOut(random, links[nodeIndex], nextCount);
             }
+
+            EnsureEveryNextNodeHasIncoming(random, links, nextCount);
 
             for (var i = 0; i < links.Length; i++)
             {
@@ -285,18 +291,100 @@ namespace XTD.Roguelike
             return links;
         }
 
-        private static void CapFullFanOut(Random random, List<int> link, int nextCount)
+        private static void EnsureEveryNextNodeHasIncoming(Random random, List<int>[] links, int nextCount)
         {
-            if (nextCount <= 1 || link.Count < nextCount)
+            if (links.Length == 0 || nextCount <= 0)
             {
                 return;
             }
 
-            link.RemoveAt(random.Next(link.Count));
-            if (link.Count == 0)
+            var incomingCounts = CountIncoming(links, nextCount);
+            for (var target = 0; target < nextCount; target++)
             {
-                link.Add(random.Next(nextCount));
+                if (incomingCounts[target] > 0)
+                {
+                    continue;
+                }
+
+                var sourceIndex = PickSourceForMissingIncoming(random, links, incomingCounts, target, nextCount);
+                if (sourceIndex < 0)
+                {
+                    continue;
+                }
+
+                var source = links[sourceIndex];
+                var replacementIndex = FindReplaceableDuplicateLink(source, incomingCounts);
+                if (replacementIndex >= 0)
+                {
+                    incomingCounts[source[replacementIndex]]--;
+                    source[replacementIndex] = target;
+                    incomingCounts[target]++;
+                    continue;
+                }
+
+                AddUnique(source, target);
+                incomingCounts[target]++;
             }
+        }
+
+        private static int[] CountIncoming(List<int>[] links, int nextCount)
+        {
+            var incomingCounts = new int[nextCount];
+            foreach (var link in links)
+            {
+                foreach (var target in link)
+                {
+                    if (target >= 0 && target < nextCount)
+                    {
+                        incomingCounts[target]++;
+                    }
+                }
+            }
+
+            return incomingCounts;
+        }
+
+        private static int PickSourceForMissingIncoming(Random random, List<int>[] links, int[] incomingCounts, int target, int nextCount)
+        {
+            var maxLinks = links.Length == 1 ? nextCount : Math.Min(2, nextCount);
+            var bestIndex = -1;
+            var bestScore = int.MaxValue;
+            for (var i = 0; i < links.Length; i++)
+            {
+                if (links[i].Contains(target))
+                {
+                    return i;
+                }
+
+                if (links[i].Count >= maxLinks && FindReplaceableDuplicateLink(links[i], incomingCounts) < 0)
+                {
+                    continue;
+                }
+
+                var projected = ProjectIndex(i, links.Length, nextCount);
+                var score = Math.Abs(projected - target) * 10 + links[i].Count + random.Next(0, 2);
+                if (score < bestScore)
+                {
+                    bestScore = score;
+                    bestIndex = i;
+                }
+            }
+
+            return bestIndex >= 0 ? bestIndex : random.Next(links.Length);
+        }
+
+        private static int FindReplaceableDuplicateLink(List<int> link, int[] incomingCounts)
+        {
+            for (var i = link.Count - 1; i >= 0; i--)
+            {
+                var target = link[i];
+                if (target >= 0 && target < incomingCounts.Length && incomingCounts[target] > 1)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
         }
 
         private static int ProjectIndex(int index, int sourceCount, int targetCount)
