@@ -14,5 +14,16 @@ namespace XTD.Tests
 
             Assert.That(report.Passed, Is.True, report.ToString());
         }
+
+        [Test]
+        public void Content_FinalBossHasDistinctPressureAndAuthoredSpawnIntervals()
+        {
+            var catalog = GameContentFactory.CreateCatalog();
+            var finalBoss = catalog.FindEncounter("encounter_chaos_lord");
+
+            Assert.That(finalBoss, Is.Not.Null);
+            Assert.That(finalBoss.pressurePattern, Is.EqualTo(EncounterPressurePattern.ChaosRift));
+            Assert.That(finalBoss.enemySpawns, Has.All.Matches<EnemySpawnEntry>(spawn => spawn.interval > 0f));
+        }
     }
 }

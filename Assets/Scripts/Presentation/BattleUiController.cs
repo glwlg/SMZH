@@ -36,6 +36,7 @@ namespace XTD.Presentation
         private Text playerBaseHpText;
         private Text enemySkillText;
         private Text divinePowerText;
+        private Text tacticalRedrawText;
         private Text cardPoolCountText;
         private Text usedPileCountText;
         private Text noticeText;
@@ -46,9 +47,12 @@ namespace XTD.Presentation
         private Image playerBaseHpFill;
         private Image divineChargeFill;
         private Image enemySkillPanel;
+        private Image debugPanel;
         private Image releasePreviewImage;
         private Button restartButton;
         private Button divinePowerButton;
+        private Button tacticalRedrawButton;
+        private Button debugToggleButton;
         private Button debugWinButton;
         private Button debugLoseButton;
         private Button debugGoldButton;
@@ -161,6 +165,7 @@ namespace XTD.Presentation
             RefreshPlayerBaseHud();
             RefreshBattleInfo();
             RefreshDivinePower();
+            RefreshTacticalRedraw();
             RenderHand();
             refreshRequested = false;
             nextRefreshAllowedAt = Time.unscaledTime + RuntimeRefreshInterval;
@@ -216,6 +221,7 @@ namespace XTD.Presentation
             battleInfoText.text =
                 $"{battle.HeroClassLabel} · {battle.BattleStageLabel}\n" +
                 $"{battle.HeroClassStyle}\n" +
+                $"{battle.HeroClassDecisionHint}\n" +
                 $"房间进度 {battle.CurrentRow}/10\n" +
                 $"场上 我方 {battle.PlayerUnitCount}  敌方 {battle.EnemyUnitCount}\n" +
                 $"击杀妖怪 {battle.DefeatedEnemyCount}\n" +
@@ -248,6 +254,25 @@ namespace XTD.Presentation
             divineChargeFill.color = battle.CanReleaseDivinePower
                 ? new Color(0.40f, 0.88f, 1f, 0.88f)
                 : new Color(0.22f, 0.48f, 0.78f, 0.68f);
+        }
+
+        private void RefreshTacticalRedraw()
+        {
+            if (tacticalRedrawButton == null || tacticalRedrawText == null || battle == null)
+            {
+                return;
+            }
+
+            tacticalRedrawButton.interactable = battle.CanTacticalRedraw;
+            if (battle.CanTacticalRedraw)
+            {
+                tacticalRedrawText.text = $"急令\n换手\n-{battle.TacticalRedrawCost:0}";
+                return;
+            }
+
+            tacticalRedrawText.text = battle.TacticalRedrawCooldown > 0.05f
+                ? $"换手\n{battle.TacticalRedrawCooldown:0.0}s"
+                : $"急令\n{battle.Mana:0.0}/{battle.TacticalRedrawCost:0}";
         }
 
         public void ShowResult(string text)
@@ -429,6 +454,7 @@ namespace XTD.Presentation
             BuildBattleInfoHud(root);
             BuildEnemySkillHud(root);
             BuildDivinePowerHud(root);
+            BuildTacticalRedrawHud(root);
 
             var resourcePanel = CreatePanel(
                 "资源信息",
@@ -438,6 +464,7 @@ namespace XTD.Presentation
                 new Vector2(248f, 56f),
                 new Vector2(156f, 62f),
                 new Color(0.025f, 0.035f, 0.045f, 0.48f));
+            resourcePanel.gameObject.AddComponent<Outline>().effectColor = new Color(0.70f, 0.56f, 0.34f, 0.22f);
             resourceText = CreateHudText("资源状态", resourcePanel.transform, Vector2.zero, Vector2.one, 18);
 
             var moralePanel = CreatePanel(
@@ -448,6 +475,7 @@ namespace XTD.Presentation
                 new Vector2(248f, 132f),
                 new Vector2(156f, 62f),
                 new Color(0.025f, 0.035f, 0.045f, 0.48f));
+            moralePanel.gameObject.AddComponent<Outline>().effectColor = new Color(0.70f, 0.56f, 0.34f, 0.22f);
             moraleText = CreateHudText("士气状态", moralePanel.transform, Vector2.zero, Vector2.one, 18);
 
             noticeText = CreateText("提示", root, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 330f), 20);
@@ -478,7 +506,7 @@ namespace XTD.Presentation
             restartButton = CreateButton("重新开始", root, new Vector2(0.5f, 0.46f), new Vector2(220f, 64f));
             restartButton.gameObject.SetActive(false);
 
-            var debugPanel = CreatePanel(
+            debugPanel = CreatePanel(
                 "调试区",
                 root,
                 new Vector2(1f, 1f),
@@ -502,6 +530,20 @@ namespace XTD.Presentation
             debugMoraleButton.onClick.AddListener(() => battle?.DebugAddMorale());
             debugSkipButton = CreateDebugButton("跳节点", debugPanel.transform, 92f, -92f);
             debugSkipButton.onClick.AddListener(() => battle?.DebugSkipNode());
+            debugPanel.gameObject.SetActive(false);
+
+            debugToggleButton = CreateButton("调试", root, new Vector2(1f, 1f), new Vector2(88f, 34f));
+            debugToggleButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(-52f, -26f);
+            debugToggleButton.GetComponent<Image>().color = new Color(0.01f, 0.012f, 0.014f, 0.28f);
+            var debugToggleText = debugToggleButton.GetComponentInChildren<Text>();
+            if (debugToggleText != null)
+            {
+                debugToggleText.fontSize = 14;
+                debugToggleText.resizeTextMaxSize = 14;
+                debugToggleText.color = new Color(0.82f, 0.82f, 0.78f, 0.54f);
+            }
+
+            debugToggleButton.onClick.AddListener(ToggleDebugPanel);
 
             var hand = new GameObject("手牌区", typeof(RectTransform));
             hand.transform.SetParent(root, false);
@@ -510,7 +552,7 @@ namespace XTD.Presentation
             handRoot.anchorMax = new Vector2(0.5f, 0f);
             handRoot.pivot = new Vector2(0.5f, 0f);
             handRoot.sizeDelta = new Vector2(820f, 210f);
-            handRoot.anchoredPosition = new Vector2(0f, 8f);
+            handRoot.anchoredPosition = new Vector2(0f, 16f);
             BuildPlayerBaseHud(root);
 
             var drag = new GameObject("拖拽层", typeof(RectTransform));
@@ -613,11 +655,11 @@ namespace XTD.Presentation
                 root,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(178f, 318f),
-                new Vector2(286f, 152f),
+                new Vector2(178f, 334f),
+                new Vector2(286f, 188f),
                 new Color(0.015f, 0.018f, 0.024f, 0.44f));
             panel.gameObject.AddComponent<Outline>().effectColor = new Color(0.78f, 0.66f, 0.46f, 0.26f);
-            battleInfoText = CreateHudText("战况文字", panel.transform, Vector2.zero, Vector2.one, 20);
+            battleInfoText = CreateHudText("战况文字", panel.transform, Vector2.zero, Vector2.one, 19);
             battleInfoText.alignment = TextAnchor.MiddleLeft;
         }
 
@@ -630,20 +672,21 @@ namespace XTD.Presentation
                 new Vector2(1f, 0f),
                 new Vector2(-170f, 344f),
                 new Vector2(286f, 238f),
-                new Color(0.015f, 0.018f, 0.024f, 0.46f));
-            enemySkillPanel.gameObject.AddComponent<Outline>().effectColor = new Color(0.58f, 0.45f, 0.90f, 0.30f);
+                new Color(0.018f, 0.020f, 0.026f, 0.56f));
+            enemySkillPanel.gameObject.AddComponent<Outline>().effectColor = new Color(0.72f, 0.56f, 0.34f, 0.26f);
             enemySkillText = CreateHudText("首领技能文字", enemySkillPanel.transform, Vector2.zero, Vector2.one, 19);
             enemySkillText.alignment = TextAnchor.MiddleLeft;
-            enemySkillText.color = new Color(0.96f, 0.92f, 1f, 0.96f);
+            enemySkillText.color = new Color(0.94f, 0.90f, 0.76f, 0.96f);
         }
 
         private void BuildDivinePowerHud(Transform root)
         {
             divinePowerButton = CreateButton("边境\n战令", root, new Vector2(1f, 0f), new Vector2(142f, 142f));
-            divinePowerButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(-232f, 258f);
+            divinePowerButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(-228f, 150f);
             var image = divinePowerButton.GetComponent<Image>();
             image.sprite = CircleSprite();
-            image.color = new Color(0.42f, 0.27f, 0.08f, 0.95f);
+            image.color = new Color(0.25f, 0.17f, 0.06f, 0.88f);
+            divinePowerButton.gameObject.AddComponent<Outline>().effectColor = new Color(0.90f, 0.68f, 0.34f, 0.34f);
             divinePowerButton.onClick.AddListener(() => battle?.TryReleaseDivinePower());
 
             divinePowerText = divinePowerButton.GetComponentInChildren<Text>();
@@ -662,6 +705,46 @@ namespace XTD.Presentation
             divineChargeFill.rectTransform.offsetMax = Vector2.zero;
             divineChargeFill.rectTransform.pivot = new Vector2(0f, 0.5f);
             divineChargeFill.raycastTarget = false;
+        }
+
+        private void BuildTacticalRedrawHud(Transform root)
+        {
+            tacticalRedrawButton = CreateButton("急令\n换手", root, new Vector2(1f, 0f), new Vector2(120f, 68f));
+            tacticalRedrawButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(-82f, 246f);
+            var image = tacticalRedrawButton.GetComponent<Image>();
+            image.color = new Color(0.028f, 0.070f, 0.076f, 0.88f);
+            tacticalRedrawButton.gameObject.AddComponent<Outline>().effectColor = new Color(0.56f, 0.86f, 0.76f, 0.30f);
+            tacticalRedrawButton.onClick.AddListener(() => battle?.TryTacticalRedraw());
+
+            tacticalRedrawText = tacticalRedrawButton.GetComponentInChildren<Text>();
+            if (tacticalRedrawText != null)
+            {
+                tacticalRedrawText.fontSize = 20;
+                tacticalRedrawText.resizeTextMaxSize = 20;
+                tacticalRedrawText.resizeTextMinSize = 12;
+                tacticalRedrawText.color = new Color(0.86f, 1f, 0.94f, 0.98f);
+            }
+        }
+
+        private void ToggleDebugPanel()
+        {
+            if (debugPanel == null)
+            {
+                return;
+            }
+
+            var nextVisible = !debugPanel.gameObject.activeSelf;
+            debugPanel.gameObject.SetActive(nextVisible);
+            if (debugToggleButton == null)
+            {
+                return;
+            }
+
+            var text = debugToggleButton.GetComponentInChildren<Text>();
+            if (text != null)
+            {
+                text.text = nextVisible ? "收起" : "调试";
+            }
         }
 
         private void TickNotice()

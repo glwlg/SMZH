@@ -463,28 +463,28 @@ namespace XTD.Content
             Artifact(catalog, "artifact_permanent_relic", "通关遗珍", ArtifactRarity.Legendary, "最终首领掉落的永久神器占位。");
 
             Encounter(catalog, "encounter_training_camp", "妖物营地", MapNodeType.NormalMonster, 100, 140, 2.2f, 25, null,
-                SpawnEnemy(grunt, 1), SpawnEnemy(brute, 1));
+                SpawnEnemy(grunt, 1, 1.9f), SpawnEnemy(brute, 1, 2.7f));
             Encounter(catalog, "encounter_bone_ford", "白骨渡口", MapNodeType.NormalMonster, 100, 160, 2.0f, 30, null,
-                SpawnEnemy(grunt, 2), SpawnEnemy(impArcher, 1));
+                SpawnEnemy(grunt, 2, 1.85f), SpawnEnemy(impArcher, 1, 2.35f));
             Encounter(catalog, "encounter_poison_copse", "毒雾林", MapNodeType.NormalMonster, 100, 175, 2.15f, 34, null,
-                SpawnEnemy(grunt, 1), SpawnEnemy(venomShaman, 1));
+                SpawnEnemy(grunt, 1, 1.95f), SpawnEnemy(venomShaman, 1, 2.65f));
 
             Encounter(catalog, "encounter_elite_wolf", "妖狼先锋", MapNodeType.EliteMonster, 105, 220, 2.0f, 58, wolfElite, EncounterPressurePattern.VanguardRush,
-                SpawnEnemy(grunt, 2), SpawnEnemy(impArcher, 1));
+                SpawnEnemy(grunt, 2, 1.65f), SpawnEnemy(impArcher, 1, 2.25f));
             Encounter(catalog, "encounter_elite_bone", "白骨督军", MapNodeType.EliteMonster, 105, 245, 1.95f, 66, boneElite, EncounterPressurePattern.ShieldStandard,
-                SpawnEnemy(grunt, 2), SpawnEnemy(brute, 1));
+                SpawnEnemy(grunt, 2, 1.75f), SpawnEnemy(brute, 1, 2.55f));
             Encounter(catalog, "encounter_elite_ox", "牛魔校尉", MapNodeType.EliteMonster, 105, 270, 1.85f, 75, oxElite, EncounterPressurePattern.VanguardRush,
-                SpawnEnemy(brute, 1), SpawnEnemy(venomShaman, 1));
+                SpawnEnemy(brute, 1, 2.35f), SpawnEnemy(venomShaman, 1, 2.15f));
 
             Encounter(catalog, "encounter_black_wind", "黑风小圣", MapNodeType.SmallBoss, 110, 320, 1.75f, 110, blackWindBoss, EncounterPressurePattern.BacklineVolley,
-                SpawnEnemy(grunt, 2), SpawnEnemy(brute, 1), SpawnEnemy(impArcher, 1));
+                SpawnEnemy(grunt, 2, 1.55f), SpawnEnemy(brute, 1, 2.35f), SpawnEnemy(impArcher, 1, 1.9f));
             Encounter(catalog, "encounter_bone_queen", "白骨军主", MapNodeType.SmallBoss, 110, 360, 1.65f, 125, boneQueenBoss, EncounterPressurePattern.ShieldStandard,
-                SpawnEnemy(grunt, 2), SpawnEnemy(venomShaman, 1), SpawnEnemy(brute, 1));
+                SpawnEnemy(grunt, 2, 1.55f), SpawnEnemy(venomShaman, 1, 1.95f), SpawnEnemy(brute, 1, 2.45f));
 
-            Encounter(catalog, "encounter_chaos_lord", "混沌魔君", MapNodeType.FinalBoss, 120, 520, 1.45f, 220, finalBoss,
-                SpawnEnemy(grunt, 3), SpawnEnemy(brute, 1), SpawnEnemy(impArcher, 2), SpawnEnemy(venomShaman, 1));
+            Encounter(catalog, "encounter_chaos_lord", "混沌魔君", MapNodeType.FinalBoss, 120, 520, 1.45f, 220, finalBoss, EncounterPressurePattern.ChaosRift,
+                SpawnEnemy(grunt, 3, 1.25f), SpawnEnemy(brute, 1, 2.1f), SpawnEnemy(impArcher, 2, 1.55f), SpawnEnemy(venomShaman, 1, 1.8f));
             Encounter(catalog, "encounter_mystery_punishment", "误入凶阵", MapNodeType.Mystery, 105, 300, 1.55f, 0, oxElite, EncounterPressurePattern.ShieldStandard,
-                SpawnEnemy(brute, 2), SpawnEnemy(venomShaman, 1));
+                SpawnEnemy(brute, 2, 2.1f), SpawnEnemy(venomShaman, 1, 1.85f));
         }
 
         public static HeroClassType DefaultHeroClass =>
@@ -969,9 +969,9 @@ namespace XTD.Content
             };
         }
 
-        private static EnemySpawnEntry SpawnEnemy(UnitDefinition unit, int count)
+        private static EnemySpawnEntry SpawnEnemy(UnitDefinition unit, int count, float interval = 0f)
         {
-            return new EnemySpawnEntry { unit = unit, count = count };
+            return new EnemySpawnEntry { unit = unit, count = count, interval = interval };
         }
 
         private static void Artifact(ContentCatalog catalog, string id, string displayName, ArtifactRarity rarity, string description)

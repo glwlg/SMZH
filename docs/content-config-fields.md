@@ -1,6 +1,6 @@
 # 神魔镇荒 内容配置字段清单
 
-更新时间：2026-05-02  
+更新时间：2026-05-08
 用途：记录当前 ScriptableObject 配置字段，方便后续改成 CSV/JSON 导入或继续扩展编辑器工具。
 
 ## ContentCatalog
@@ -100,6 +100,7 @@
 | `rewardGold` | 胜利金币奖励基础值 |
 | `enemySpawns` | 敌方派兵池 |
 | `coreEnemy` | 精英和首领节点的核心敌人；普通怪物节点应为空 |
+| `pressurePattern` | 精英和首领的压力机制：突袭压线、后排箭雨、护阵军旗、混沌裂隙等 |
 
 ## EnemySpawnEntry
 
@@ -107,7 +108,7 @@
 | --- | --- |
 | `unit` | 敌方派出的单位 |
 | `count` | 每次派兵数量 |
-| `interval` | 预留单条派兵间隔 |
+| `interval` | 单条派兵间隔；大于 0 时覆盖遭遇的 `enemySpawnInterval`，用于把小怪快潮、重怪慢潮和远程补压分开 |
 
 ## MapNodeRuntime
 

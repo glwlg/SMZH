@@ -52,6 +52,7 @@ namespace XTD.Flow
         public bool HasPendingCardReward => CurrentRun != null && CurrentRun.pendingCardRewardPickCount > 0 && CurrentRun.pendingCardRewardIds.Count > 0;
         public int PendingCardRewardPickCount => CurrentRun != null ? CurrentRun.pendingCardRewardPickCount : 0;
         public int PendingCardRewardSkipGold => CurrentRun != null ? CurrentRun.pendingCardRewardSkipGold : 0;
+        public int PendingCardRewardResolvedSkipGold => CurrentRun != null ? Mathf.CeilToInt(CurrentRun.pendingCardRewardSkipGold * GoldMultiplier()) : 0;
         public int ShopRerollCost => CurrentRun != null ? DiscountedShopUtilityCost(ShopBaseRerollCost + CurrentRun.shopOfferRerollCount * 5) : ShopBaseRerollCost;
         public int ShopRemoveCost => CurrentRun != null ? DiscountedShopUtilityCost(ShopBaseRemoveCost) : ShopBaseRemoveCost;
         public bool CanRemoveCardAtShop => CurrentRun != null && !CurrentRun.shopRemoveUsed && CurrentRun.deckCardIds.Count > MinimumDeckSizeAfterRemove;
@@ -153,6 +154,99 @@ namespace XTD.Flow
             }
 
             return row.Where(node => CurrentRun.availableNodeIndices.Contains(node.NodeIndex)).ToList();
+        }
+
+        public string BuildNodePreview(MapNodeRuntime node, bool reachable)
+        {
+            if (node == null)
+            {
+                return "未知房间 · 暂未连通\n收益：未知\n风险：情报不足\n建议：先确认路线连线";
+            }
+
+            var state = reachable ? "当前路线可达" : "暂未连通";
+            return $"{NodeTypeName(node.NodeType)} · {state}\n{NodeRewardPreview(node)}\n{NodeRiskPreview(node)}\n{NodeDecisionHint(node)}";
+        }
+
+        public string NodeRewardPreview(MapNodeRuntime node)
+        {
+            if (node == null)
+            {
+                return "收益：未知";
+            }
+
+            return node.NodeType switch
+            {
+                MapNodeType.NormalMonster => BattleRewardPreview(node, "从 3 张等级 1 卡中选 1，弃选可换金币"),
+                MapNodeType.EliteMonster => BattleRewardPreview(node, "从 3 张高质量卡中选 1"),
+                MapNodeType.SmallBoss => BattleRewardPreview(node, "经验 +12，从 4 张卡中选 2"),
+                MapNodeType.FinalBoss => BattleRewardPreview(node, "经验 +60，永久神器，从 5 张卡中选 3"),
+                MapNodeType.Shop => $"收益：买牌、卖牌、净化；刷新 {ShopRerollCost} 金币，净化 {ShopRemoveCost} 金币",
+                MapNodeType.Rest => RestRewardPreview(),
+                MapNodeType.Opportunity => "收益：三选一事件，可能拿金币、卡牌、回血或升级",
+                MapNodeType.Mystery => "收益：稳妥拿资源，或赌高收益凶阵/献祭换宝",
+                MapNodeType.Artifact => $"收益：从 {ArtifactChoiceCountForPreview()} 个神器中选 1，刷新 {ArtifactRefreshCost} 金币",
+                _ => "收益：未知"
+            };
+        }
+
+        public string NodeRiskPreview(MapNodeRuntime node)
+        {
+            if (node == null)
+            {
+                return "风险：情报不足";
+            }
+
+            if (IsBattleNode(node.NodeType))
+            {
+                var encounter = PreviewEncounter(node);
+                var name = encounter != null ? encounter.displayName : NodeTypeName(node.NodeType);
+                var interval = encounter != null ? encounter.enemySpawnInterval : 2.5f;
+                return $"风险：{name}，约 {interval:0.0}s 出兵；{PressureRiskPreview(encounter != null ? encounter.pressurePattern : EncounterPressurePattern.None)}";
+            }
+
+            return node.NodeType switch
+            {
+                MapNodeType.Shop => "风险：无战斗，但主要消耗金币和卡组厚度",
+                MapNodeType.Rest => "风险：无战斗，但会错过同层资源节点",
+                MapNodeType.Opportunity => "风险：部分选项会失血，升级目标也可能随机",
+                MapNodeType.Mystery => "风险：深入凶阵 48% 惩罚战；献祭会加诅咒",
+                MapNodeType.Artifact => "风险：无战斗，但神器选择不可回退",
+                _ => "风险：未知"
+            };
+        }
+
+        public string NodeDecisionHint(MapNodeRuntime node)
+        {
+            if (node == null || CurrentRun == null)
+            {
+                return "建议：路线情报不足";
+            }
+
+            var healthRatio = CurrentHealthRatioForPreview();
+            var upgradableGroups = UpgradableGroupCountForPreview();
+
+            return node.NodeType switch
+            {
+                MapNodeType.Shop when CurrentRun.gold >= ShopRemoveCost + ShopRerollCost + 18 => "建议：金币充足，优先净化废牌或找核心牌",
+                MapNodeType.Shop when CurrentRun.gold >= 24 => "建议：可买一张关键牌，刷新前先看货架",
+                MapNodeType.Shop => "建议：金币偏少，除非要卖牌或急需净化",
+                MapNodeType.Rest when healthRatio <= 0.55f => "建议：低血量优先修整，避免精英/首领前崩盘",
+                MapNodeType.Rest when upgradableGroups > 0 => "建议：已有三张同级牌，休息升级收益很高",
+                MapNodeType.Rest => "建议：战前补血，或等卡组出现可合成目标",
+                MapNodeType.Opportunity when healthRatio <= 0.55f => "建议：优先选回血或稳收益事件",
+                MapNodeType.Opportunity when upgradableGroups > 0 => "建议：有可合成牌，升级事件价值更高",
+                MapNodeType.Opportunity => "建议：用来补经济和构筑，不要只走战斗线",
+                MapNodeType.Mystery when healthRatio <= 0.65f => "建议：血量不足时选稳妥探查，少碰献祭",
+                MapNodeType.Mystery => "建议：血量和防线够强时再赌凶阵/献祭",
+                MapNodeType.Artifact when CurrentRun.artifactIds.Count <= 1 => "建议：早拿神器，后续战斗收益会被放大",
+                MapNodeType.Artifact => "建议：补当前缺口，优先经济、生存或职业联动",
+                MapNodeType.EliteMonster when healthRatio <= 0.45f => "建议：生命偏低，确认防线和爆发再进精英",
+                MapNodeType.EliteMonster => "建议：奖励质量高，适合主动找核心牌",
+                MapNodeType.SmallBoss => "建议：先检查血量、神器和卡组曲线再开战",
+                MapNodeType.FinalBoss => "建议：最后一战，优先保证解场和基地生存",
+                MapNodeType.NormalMonster => "建议：标准战斗，用来补金币和基础卡牌",
+                _ => "建议：根据当前生命和金币决定"
+            };
         }
 
         public void SelectNode(MapNodeRuntime node)
@@ -1200,6 +1294,69 @@ namespace XTD.Flow
             return multiplier;
         }
 
+        private string BattleRewardPreview(MapNodeRuntime node, string cardRewardText)
+        {
+            var encounter = PreviewEncounter(node);
+            var gold = encounter != null ? encounter.rewardGold : 20;
+            return $"收益：约 {PreviewGold(gold)} 金币，{cardRewardText}";
+        }
+
+        private string RestRewardPreview()
+        {
+            var minPercent = HasArtifact("artifact_taiji_map") ? 20 : 10;
+            var maxPercent = HasArtifact("artifact_taiji_map") ? 40 : 30;
+            var suffix = HasArtifact("artifact_taiji_map") ? "，升级返 20 金币" : string.Empty;
+            return $"收益：恢复约 {minPercent}-{maxPercent}% 最大生命，或三合一升级{suffix}";
+        }
+
+        private int ArtifactChoiceCountForPreview()
+        {
+            return HasArtifact("artifact_artifact_eye") ? 4 : 3;
+        }
+
+        private int UpgradableGroupCountForPreview()
+        {
+            return Catalog != null && CurrentRun != null ? UpgradableCardGroups().Count : 0;
+        }
+
+        private EncounterDefinition PreviewEncounter(MapNodeRuntime node)
+        {
+            if (node == null || Catalog == null || CurrentRun == null)
+            {
+                return null;
+            }
+
+            var encounterId = ResolveEncounterId(node);
+            return string.IsNullOrWhiteSpace(encounterId) ? null : Catalog.FindEncounter(encounterId);
+        }
+
+        private int PreviewGold(int amount)
+        {
+            return Mathf.CeilToInt(Mathf.Max(0, amount) * GoldMultiplier());
+        }
+
+        private float CurrentHealthRatioForPreview()
+        {
+            if (CurrentRun == null)
+            {
+                return 1f;
+            }
+
+            return Mathf.Clamp01(CurrentRun.playerHp / Mathf.Max(1f, PlayerMaxHpForRun()));
+        }
+
+        private static string PressureRiskPreview(EncounterPressurePattern pattern)
+        {
+            return pattern switch
+            {
+                EncounterPressurePattern.VanguardRush => "9.5s 突袭压线",
+                EncounterPressurePattern.BacklineVolley => "11s 后排箭雨",
+                EncounterPressurePattern.ShieldStandard => "12s 护阵军旗",
+                EncounterPressurePattern.ChaosRift => "13s 混沌裂隙",
+                _ => "无额外场压"
+            };
+        }
+
         private int ArtifactBonusOpportunityGold()
         {
             return HasArtifact("artifact_fox_coin") ? 15 : 0;
@@ -1849,10 +2006,77 @@ namespace XTD.Flow
                 messages.Add("永久神器通关遗珍生效：本次探索初始金币 +20，生命 +5");
             }
 
+            if (heroLevel >= 3 && TryAddPermanentStarterCard(run, "card_treasure_talisman"))
+            {
+                messages.Add("主角等级 3 训练：开局牌组加入聚宝符");
+            }
+
+            var classStarterCardId = PermanentClassStarterCard(run.heroClass);
+            if (heroLevel >= 5 && TryAddPermanentStarterCard(run, classStarterCardId))
+            {
+                var card = Catalog.FindCard(classStarterCardId);
+                messages.Add($"主角等级 5 专精：开局牌组加入{card.displayName}");
+            }
+
+            if (profile.completedRuns >= 2 && TryAddPermanentStartingArtifact(run, "artifact_command_seal"))
+            {
+                messages.Add("通关 2 次传承：开局携带兵符");
+            }
+
+            if (profile.completedRuns >= 3 && TryAddPermanentStartingArtifact(run, "artifact_market_token"))
+            {
+                messages.Add("通关 3 次商路：开局携带通宝令");
+            }
+
             if (messages.Count > 0)
             {
                 run.lastMessage = string.Join("；", messages) + "。";
             }
+        }
+
+        private bool TryAddPermanentStarterCard(RunState run, string cardId)
+        {
+            if (run == null || string.IsNullOrWhiteSpace(cardId) || run.deckCardIds.Contains(cardId))
+            {
+                return false;
+            }
+
+            var card = Catalog != null ? Catalog.FindCard(cardId) : null;
+            if (card == null)
+            {
+                return false;
+            }
+
+            run.deckCardIds.Add(card.id);
+            return true;
+        }
+
+        private bool TryAddPermanentStartingArtifact(RunState run, string artifactId)
+        {
+            if (run == null || string.IsNullOrWhiteSpace(artifactId) || run.artifactIds.Contains(artifactId))
+            {
+                return false;
+            }
+
+            var artifact = Catalog != null ? Catalog.FindArtifact(artifactId) : null;
+            if (artifact == null)
+            {
+                return false;
+            }
+
+            run.artifactIds.Add(artifact.id);
+            return true;
+        }
+
+        private static string PermanentClassStarterCard(HeroClassType heroClass)
+        {
+            return heroClass switch
+            {
+                HeroClassType.SpiritSummoner => "card_spirit_reserves",
+                HeroClassType.ThunderMage => "card_lightning_step",
+                HeroClassType.TalismanSealer => "card_karmic_conversion",
+                _ => "card_dragon_banner"
+            };
         }
 
         private void RecordRunFinished(bool completed, int gainedExperience)
@@ -1997,6 +2221,17 @@ namespace XTD.Flow
         public static string HeroClassShortStyle(HeroClassType heroClass)
         {
             return GameContentFactory.GetHeroClassDefinition(heroClass).shortStyle;
+        }
+
+        public static string HeroClassBattlePlan(HeroClassType heroClass)
+        {
+            return heroClass switch
+            {
+                HeroClassType.SpiritSummoner => "决策：先铺召唤物挡线，再用后备回费续场",
+                HeroClassType.ThunderMage => "决策：攒法术窗口，优先清后排和压力点",
+                HeroClassType.TalismanSealer => "决策：控场接符阵，把敌潮拖进爆发回合",
+                _ => "决策：用士气强化军令，稳住前排后滚雪球"
+            };
         }
 
         public static string HeroClassDescription(HeroClassType heroClass)

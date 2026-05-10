@@ -109,6 +109,13 @@ namespace XTD.Flow
                 report.issues.Add($"精英和小首领至少需要 3 类压力机制，当前为 {pressurePatterns} 类。");
             }
 
+            if (catalog.encounters.Any(encounter => encounter != null
+                    && encounter.nodeType == MapNodeType.FinalBoss
+                    && encounter.pressurePattern == EncounterPressurePattern.None))
+            {
+                report.issues.Add("最终首领必须配置独立压力机制。");
+            }
+
             if (playableCards.Count == 0)
             {
                 report.issues.Add("卡牌奖励池不能为空。");
@@ -140,6 +147,19 @@ namespace XTD.Flow
             if (catalog.encounters.Any(encounter => encounter != null && encounter.enemySpawns.Count == 0))
             {
                 report.issues.Add("所有遭遇至少需要一组敌方派兵配置。");
+            }
+
+            foreach (var encounter in catalog.encounters.Where(encounter => encounter != null && encounter.enemySpawns.Count > 0))
+            {
+                if (encounter.enemySpawns.Any(spawn => spawn != null && spawn.interval < 0f))
+                {
+                    report.issues.Add($"{encounter.displayName} 的单条派兵间隔不能为负数。");
+                }
+
+                if (encounter.enemySpawns.All(spawn => spawn == null || spawn.interval <= 0f))
+                {
+                    report.issues.Add($"{encounter.displayName} 至少需要一组单条派兵间隔，避免所有敌潮共用同一节奏。");
+                }
             }
 
             ValidateHeroClassStartingDecks(catalog, report);

@@ -96,6 +96,65 @@ namespace XTD.Tests
         }
 
         [Test]
+        public void PendingCardRewardResolvedSkipGold_AppliesCurrentRunMultipliers()
+        {
+            var catalog = GameContentFactory.CreateCatalog();
+            var run = GameContentFactory.CreateStartingRun(catalog);
+            run.seed = 3333;
+            run.floor = 1;
+            run.pendingCardRewardIds.Add("card_fireball");
+            run.pendingCardRewardPickCount = 1;
+            run.pendingCardRewardSkipGold = 8;
+            run.artifactIds.Add("artifact_field_purse");
+            run.floorAffixes.Add(FloorAffixType.DemonTide);
+
+            var flow = CreateFlow(catalog, run);
+
+            Assert.That(flow.PendingCardRewardResolvedSkipGold, Is.EqualTo(11));
+        }
+
+        [Test]
+        public void BuildNodePreview_ReflectsCurrentGoldAndHealthAdvice()
+        {
+            var catalog = GameContentFactory.CreateCatalog();
+            var run = GameContentFactory.CreateStartingRun(catalog);
+            run.seed = 4444;
+            run.gold = 100;
+
+            var flow = CreateFlow(catalog, run);
+            var shop = new MapNodeRuntime(1, 6, 0, MapNodeType.Shop, string.Empty, new[] { 0 });
+            var shopPreview = flow.BuildNodePreview(shop, reachable: true);
+
+            Assert.That(shopPreview, Does.Contain("商店 · 当前路线可达"));
+            Assert.That(shopPreview, Does.Contain($"刷新 {flow.ShopRerollCost} 金币"));
+            Assert.That(shopPreview, Does.Contain("金币充足"));
+
+            run.playerHp = 20f;
+            var rest = new MapNodeRuntime(1, 7, 0, MapNodeType.Rest, string.Empty, new[] { 0 });
+            var restPreview = flow.BuildNodePreview(rest, reachable: true);
+
+            Assert.That(restPreview, Does.Contain("低血量优先"));
+            Assert.That(restPreview, Does.Contain("恢复约 10-30%"));
+        }
+
+        [Test]
+        public void BuildNodePreview_BattleNodesUseEncounterRewardsAndPressure()
+        {
+            var catalog = GameContentFactory.CreateCatalog();
+            var run = GameContentFactory.CreateStartingRun(catalog);
+            run.seed = 5555;
+
+            var flow = CreateFlow(catalog, run);
+            var finalBoss = new MapNodeRuntime(3, 10, 0, MapNodeType.FinalBoss, string.Empty);
+            var preview = flow.BuildNodePreview(finalBoss, reachable: false);
+
+            Assert.That(preview, Does.Contain("最终首领 · 暂未连通"));
+            Assert.That(preview, Does.Contain("约 220 金币"));
+            Assert.That(preview, Does.Contain("经验 +60，永久神器"));
+            Assert.That(preview, Does.Contain("13s 混沌裂隙"));
+        }
+
+        [Test]
         public void ShopActions_UpdateOfferStateAndDeck()
         {
             var catalog = GameContentFactory.CreateCatalog();

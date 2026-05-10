@@ -55,6 +55,26 @@ namespace XTD.Tests
         }
 
         [Test]
+        public void DiscardHand_MovesCurrentHandToUsedPile()
+        {
+            var catalog = GameContentFactory.CreateCatalog();
+            var cards = catalog.cards.Take(6).ToList();
+            var deck = new DeckRuntime(cards, 1)
+            {
+                MaxHandSize = 5
+            };
+
+            deck.DrawFullHand();
+
+            var discarded = deck.DiscardHand();
+
+            Assert.That(discarded, Is.EqualTo(5));
+            Assert.That(deck.Hand.Count, Is.EqualTo(0));
+            Assert.That(deck.UsedPile.Count, Is.EqualTo(5));
+            Assert.That(deck.CardPool.Count, Is.EqualTo(1));
+        }
+
+        [Test]
         public void ExhaustCards_RemovesHeroAndDrawsReplacement()
         {
             var hero = ScriptableObject.CreateInstance<CardDefinition>();

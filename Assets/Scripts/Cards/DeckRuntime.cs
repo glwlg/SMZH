@@ -80,6 +80,19 @@ namespace XTD.Cards
             }
         }
 
+        public int DiscardHand()
+        {
+            var count = hand.Count;
+            if (count <= 0)
+            {
+                return 0;
+            }
+
+            usedPile.AddRange(hand);
+            hand.Clear();
+            return count;
+        }
+
         public int ExhaustCards(Predicate<CardDefinition> match)
         {
             if (match == null)

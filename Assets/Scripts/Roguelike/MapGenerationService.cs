@@ -121,9 +121,15 @@ namespace XTD.Roguelike
         {
             var result = new Dictionary<int, MapNodeType>();
             var counts = new Dictionary<MapNodeType, int>();
-            var maxSpecials = floor == 1 ? random.Next(3, 5) : random.Next(4, 6);
+            var maxSpecials = floor == 1 ? random.Next(4, 6) : random.Next(5, 7);
 
-            AddSpecial(random, result, counts, MapNodeType.Opportunity, SpecialStartRow, EarlySpecialEndRow);
+            var earlyType = random.NextDouble() < 0.65 ? MapNodeType.Opportunity : MapNodeType.Rest;
+            AddSpecial(random, result, counts, earlyType, SpecialStartRow, EarlySpecialEndRow);
+            if (CountOf(counts, MapNodeType.Opportunity) == 0)
+            {
+                AddSpecial(random, result, counts, MapNodeType.Opportunity, SpecialStartRow, EarlySpecialEndRow);
+            }
+
             if (forceShop)
             {
                 AddSpecial(random, result, counts, MapNodeType.Shop);
@@ -213,9 +219,9 @@ namespace XTD.Roguelike
         {
             return nodeType switch
             {
-                MapNodeType.Shop => row >= 8,
-                MapNodeType.Artifact => row >= 7,
-                MapNodeType.Mystery => row >= 7,
+                MapNodeType.Shop => row >= 6,
+                MapNodeType.Artifact => row >= 6,
+                MapNodeType.Mystery => row >= 6,
                 _ => row >= SpecialStartRow
             };
         }

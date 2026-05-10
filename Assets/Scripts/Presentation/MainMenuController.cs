@@ -114,11 +114,16 @@ namespace XTD.Presentation
             }
 
             var progress = flow.PermanentProgress;
-            var progressText = CreateText("永久进度", uiRoot.transform, selectingClass ? new Vector2(0.5f, 0.775f) : new Vector2(0.5f, 0.695f), new Vector2(920f, 42f), 20, TextAnchor.MiddleCenter);
+            var progressAnchor = selectingClass ? new Vector2(0.5f, 0.775f) : new Vector2(0.5f, 0.690f);
+            var progressPanel = CreatePanel("永久进度底", uiRoot.transform, progressAnchor, progressAnchor, Vector2.zero, selectingClass ? new Vector2(720f, 46f) : new Vector2(820f, 50f), new Color(0.018f, 0.020f, 0.024f, 0.52f));
+            progressPanel.raycastTarget = false;
+            progressPanel.gameObject.AddComponent<Outline>().effectColor = new Color(0.74f, 0.54f, 0.30f, 0.24f);
+            var progressText = CreateText("永久进度", progressPanel.transform, new Vector2(0.5f, 0.5f), progressPanel.rectTransform.sizeDelta - new Vector2(42f, 10f), 20, TextAnchor.MiddleCenter);
             progressText.text = selectingClass
                 ? $"探索记录  {progress.totalRuns} 次    通关  {progress.completedRuns} 次    主角等级  {flow.PermanentHeroLevel()}"
                 : $"永久进度：探索 {progress.totalRuns} 次    通关 {progress.completedRuns} 次    总经验 {progress.totalHeroExperience}    主角等级 {flow.PermanentHeroLevel()}";
             progressText.color = selectingClass ? new Color(0.80f, 0.82f, 0.72f, 0.90f) : new Color(0.86f, 0.94f, 0.92f, 0.90f);
+            progressText.raycastTarget = false;
 
             if (titlePanelMode == TitlePanelMode.HeroClassSelect)
             {
@@ -250,14 +255,11 @@ namespace XTD.Presentation
         {
             var definition = GameContentFactory.GetHeroClassDefinition(heroClass);
             var accent = HeroClassAccent(heroClass);
-            var panel = CreatePanel("职业详情面板", uiRoot.transform, new Vector2(0.805f, 0.425f), new Vector2(0.805f, 0.425f), Vector2.zero, new Vector2(510f, 720f), new Color(0.012f, 0.014f, 0.018f, 0.88f));
+            var panel = CreatePanel("职业详情面板", uiRoot.transform, new Vector2(0.805f, 0.425f), new Vector2(0.805f, 0.425f), Vector2.zero, new Vector2(500f, 700f), new Color(0.010f, 0.014f, 0.018f, 0.82f));
             var outline = panel.gameObject.AddComponent<Outline>();
-            outline.effectColor = WithAlpha(accent, 0.48f);
+            outline.effectColor = new Color(0.72f, 0.56f, 0.34f, 0.46f);
             outline.effectDistance = new Vector2(2f, -2f);
-            if (AddSpriteFrame(panel.transform, LoadClassSelectUiSprite("class_select_detail_frame"), Vector2.zero, new Vector2(552f, 764f)) == null)
-            {
-                AddPanelCornerOrnaments(panel.transform, new Vector2(510f, 720f), accent);
-            }
+            AddPanelCornerOrnaments(panel.transform, new Vector2(500f, 700f), accent);
 
             CreateHeroClassTab(panel.transform, "角色详情", new Vector2(-92f, -38f), !titleShowFullCardPool, accent, () =>
             {
@@ -279,14 +281,14 @@ namespace XTD.Presentation
                 BuildHeroClassOverview(panel.transform, heroClass, definition, accent);
             }
 
-            var secondary = CreateOrnateButton(titleShowFullCardPool ? "返回角色详情" : "查看完整卡包", panel.transform, new Vector2(0.5f, 0f), new Vector2(242f, 54f), new Vector2(0f, 108f), new Color(0.038f, 0.042f, 0.048f, 0.92f), WithAlpha(accent, 0.62f));
+            var secondary = CreateOrnateButton(titleShowFullCardPool ? "返回角色详情" : "查看完整卡包", panel.transform, new Vector2(0.5f, 0f), new Vector2(230f, 50f), new Vector2(0f, 84f), new Color(0.038f, 0.042f, 0.048f, 0.92f), WithAlpha(accent, 0.62f));
             secondary.onClick.AddListener(() =>
             {
                 titleShowFullCardPool = !titleShowFullCardPool;
                 BuildUi();
             });
 
-            var start = CreateOrnateButton("开始探索", panel.transform, new Vector2(0.5f, 0f), new Vector2(336f, 60f), new Vector2(0f, 44f), new Color(0.34f, 0.052f, 0.044f, 0.96f), new Color(0.86f, 0.62f, 0.34f, 0.82f));
+            var start = CreateOrnateButton("开始探索", panel.transform, new Vector2(0.5f, 0f), new Vector2(320f, 56f), new Vector2(0f, 28f), new Color(0.34f, 0.052f, 0.044f, 0.96f), new Color(0.86f, 0.62f, 0.34f, 0.82f));
             start.onClick.AddListener(() =>
             {
                 sidePanelMode = SidePanelMode.None;
@@ -395,8 +397,8 @@ namespace XTD.Presentation
                 var entry = cards[i];
                 var column = i / rowsPerColumn;
                 var row = i % rowsPerColumn;
-                var x = column == 0 ? -114f : 114f;
-                var y = -218f - row * 48f;
+                var x = column == 0 ? -108f : 108f;
+                var y = -210f - row * 40f;
                 CreateCardPoolEntry(parent, entry.Card, entry.Id, startingIds.Contains(entry.Id), new Vector2(x, y), accent);
             }
         }
@@ -442,12 +444,12 @@ namespace XTD.Presentation
 
         private void CreateCardPoolEntry(Transform parent, CardDefinition card, string fallbackId, bool inStartingDeck, Vector2 position, Color accent)
         {
-            var row = CreatePanel("完整卡包行", parent, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), position, new Vector2(212f, 40f), inStartingDeck ? WithAlpha(accent, 0.20f) : new Color(0.024f, 0.028f, 0.034f, 0.76f));
+            var row = CreatePanel("完整卡包行", parent, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), position, new Vector2(204f, 34f), inStartingDeck ? WithAlpha(accent, 0.20f) : new Color(0.024f, 0.028f, 0.034f, 0.76f));
             row.raycastTarget = false;
-            var mark = CreatePanel("卡包行标记", row.transform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(3f, 0f), new Vector2(6f, 28f), inStartingDeck ? new Color(0.86f, 0.62f, 0.34f, 0.88f) : WithAlpha(accent, 0.42f));
+            var mark = CreatePanel("卡包行标记", row.transform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(3f, 0f), new Vector2(5f, 24f), inStartingDeck ? new Color(0.86f, 0.62f, 0.34f, 0.88f) : WithAlpha(accent, 0.42f));
             mark.raycastTarget = false;
 
-            var text = CreateText("完整卡包文字", row.transform, new Vector2(0.53f, 0.5f), new Vector2(186f, 30f), 14, TextAnchor.MiddleLeft);
+            var text = CreateText("完整卡包文字", row.transform, new Vector2(0.53f, 0.5f), new Vector2(180f, 26f), 13, TextAnchor.MiddleLeft);
             text.text = card == null
                 ? fallbackId
                 : $"{card.displayName}  {CardTypeName(card.type)}  费{card.cost}";
@@ -710,17 +712,9 @@ namespace XTD.Presentation
             BuildSideDetailPanel();
 
             var run = flow.CurrentRun;
-            var subtitle = CreateText("当前消息", uiRoot.transform, new Vector2(0.5f, 0.875f), new Vector2(1040f, 34f), 20, TextAnchor.MiddleCenter);
-            subtitle.text = string.IsNullOrWhiteSpace(run.lastMessage) ? "边境指挥官正在选择下一处房间。" : run.lastMessage;
-            subtitle.color = new Color(0.84f, 0.94f, 0.92f, 0.92f);
-
             var title = CreateText("迷宫标题", uiRoot.transform, new Vector2(0.5f, 0.825f), new Vector2(920f, 68f), 42, TextAnchor.MiddleCenter);
             title.text = $"迷宫 {run.floor} · {FloorSceneName(run.floor)}";
             title.color = new Color(0.82f, 1f, 0.96f, 0.98f);
-
-            var affixText = CreateText("层词缀", uiRoot.transform, new Vector2(0.5f, 0.765f), new Vector2(1040f, 42f), 19, TextAnchor.MiddleCenter);
-            affixText.text = $"{flow.CurrentFloorAffixName()}：{flow.CurrentFloorAffixDescription()}";
-            affixText.color = new Color(0.56f, 0.92f, 0.88f, 0.95f);
 
             var currentChoices = flow.CurrentChoices().Select(node => node.Key).ToHashSet();
             var selectedNodes = flow.CurrentRun.selectedNodeKeys.ToHashSet();
@@ -733,11 +727,13 @@ namespace XTD.Presentation
             mapPanel.raycastTarget = false;
             var mapRoot = mapPanel.rectTransform;
             var previewAnchor = sidePanelMode == SidePanelMode.None ? new Vector2(0.84f, 0.70f) : new Vector2(0.18f, 0.70f);
-            var previewPanel = CreatePanel("房间情报底", uiRoot.transform, previewAnchor, previewAnchor, Vector2.zero, new Vector2(370f, 132f), new Color(0.025f, 0.030f, 0.035f, 0.56f));
+            var previewPanel = CreatePanel("房间情报底", uiRoot.transform, previewAnchor, previewAnchor, Vector2.zero, new Vector2(420f, 156f), new Color(0.025f, 0.030f, 0.035f, 0.56f));
+            previewPanel.raycastTarget = false;
             previewPanel.gameObject.AddComponent<Outline>().effectColor = new Color(0.36f, 0.82f, 0.78f, 0.42f);
-            var previewText = CreateText("房间预览", previewPanel.transform, new Vector2(0.5f, 0.5f), new Vector2(330f, 110f), 18, TextAnchor.MiddleLeft);
-            previewText.text = "把鼠标移到房间上，可以预览类型、奖励和风险。";
+            var previewText = CreateText("房间预览", previewPanel.transform, new Vector2(0.5f, 0.5f), new Vector2(376f, 132f), 16, TextAnchor.MiddleLeft);
+            previewText.text = $"{flow.CurrentFloorAffixName()}：{flow.CurrentFloorAffixDescription()}\n把鼠标移到房间上，可以预览收益、风险和当前建议。";
             previewText.color = new Color(0.88f, 0.95f, 0.93f, 0.94f);
+            previewText.raycastTarget = false;
             var positions = new Dictionary<string, Vector2>();
             foreach (var row in floorRows)
             {
@@ -847,8 +843,9 @@ namespace XTD.Presentation
             halo.transform.SetAsFirstSibling();
             AddSpriteIcon(button.transform, LoadNodeSprite(node.NodeType), new Vector2(0f, 6f), new Vector2(54f, 54f));
 
-            var labelPanel = CreatePanel("节点标签底", button.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -38f), new Vector2(96f, 24f), new Color(0.02f, 0.02f, 0.018f, 0.72f));
+            var labelPanel = CreatePanel("节点标签底", button.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -38f), new Vector2(96f, 24f), selected ? new Color(0.20f, 0.38f, 0.34f, 0.84f) : WithAlpha(NodeColor(node.NodeType), available ? 0.76f : 0.48f));
             labelPanel.raycastTarget = false;
+            labelPanel.gameObject.AddComponent<Outline>().effectColor = selected ? new Color(0.78f, 0.96f, 0.84f, 0.52f) : new Color(0f, 0f, 0f, 0.36f);
             var nodeLabel = CreateText("节点标签", labelPanel.transform, new Vector2(0.5f, 0.5f), new Vector2(90f, 20f), 16, TextAnchor.MiddleCenter);
             nodeLabel.text = NodeShortName(node.NodeType);
             nodeLabel.color = selected ? new Color(0.82f, 1f, 0.96f) : available ? Color.white : new Color(0.70f, 0.73f, 0.72f, 0.86f);
@@ -867,8 +864,8 @@ namespace XTD.Presentation
         private void AddNodePreview(Button button, MapNodeRuntime node, Text previewText, bool reachable)
         {
             var trigger = button.gameObject.AddComponent<EventTrigger>();
-            AddTrigger(trigger, EventTriggerType.PointerEnter, () => previewText.text = BuildNodePreview(node, reachable));
-            AddTrigger(trigger, EventTriggerType.PointerClick, () => previewText.text = BuildNodePreview(node, reachable));
+            AddTrigger(trigger, EventTriggerType.PointerEnter, () => previewText.text = flow.BuildNodePreview(node, reachable));
+            AddTrigger(trigger, EventTriggerType.PointerClick, () => previewText.text = flow.BuildNodePreview(node, reachable));
         }
 
         private static void AddTrigger(EventTrigger trigger, EventTriggerType type, Action callback)
@@ -876,24 +873,6 @@ namespace XTD.Presentation
             var entry = new EventTrigger.Entry { eventID = type };
             entry.callback.AddListener(_ => callback());
             trigger.triggers.Add(entry);
-        }
-
-        private static string BuildNodePreview(MapNodeRuntime node, bool reachable)
-        {
-            var state = reachable ? "当前路线可达" : "暂未连通";
-            return node.NodeType switch
-            {
-                MapNodeType.NormalMonster => $"普通怪物\n{state}\n奖励：金币\n目标：摧毁敌方基地。",
-                MapNodeType.EliteMonster => $"精英怪物\n{state}\n奖励：金币，从 3 张卡中选 1 张\n提示：敌方核心站桩输出并派兵。",
-                MapNodeType.Shop => $"商店\n{state}\n奖励：构筑调整\n提示：购买新牌，或半价出售已有牌。",
-                MapNodeType.Rest => $"休息\n{state}\n奖励：回血或三合一合成\n提示：合成最多升到 3 级。",
-                MapNodeType.Opportunity => $"机遇\n{state}\n奖励：事件收益\n提示：可能获得金币、卡牌、升级或承担小风险。",
-                MapNodeType.Mystery => $"神秘\n{state}\n奖励/风险：高收益或凶阵战斗\n提示：凶阵打赢也没有额外奖励。",
-                MapNodeType.Artifact => $"神器层\n{state}\n奖励：3 个神器选 1 个\n提示：观星镜可提高可选数量。",
-                MapNodeType.SmallBoss => $"小首领\n{state}\n奖励：金币、经验，从 4 张卡中选 2 张\n提示：核心生命低时技能节奏会加快。",
-                MapNodeType.FinalBoss => $"最终首领\n{state}\n奖励：大量金币、经验、永久神器，从 5 张卡中选 3 张\n提示：击败后结束本次探索。",
-                _ => $"房间\n{state}\n奖励：未知"
-            };
         }
 
         private static Image CreateMapLine(Transform parent, Vector2 from, Vector2 to, Color color, float thickness)
@@ -1565,9 +1544,9 @@ namespace XTD.Presentation
             }
 
             var skipLabel = flow.PendingCardRewardSkipGold > 0
-                ? $"放弃剩余奖励，换得 {Mathf.CeilToInt(flow.PendingCardRewardSkipGold)} 金"
+                ? $"放弃剩余奖励，换得 {flow.PendingCardRewardResolvedSkipGold} 金"
                 : "放弃剩余奖励";
-            var skip = CreateButton(skipLabel, uiRoot.transform, new Vector2(0.5f, 0.14f), new Vector2(320f, 64f));
+            var skip = CreateOrnateButton(skipLabel, uiRoot.transform, new Vector2(0.5f, 0.14f), new Vector2(340f, 68f), Vector2.zero, new Color(0.040f, 0.050f, 0.064f, 0.90f), new Color(0.58f, 0.48f, 0.32f, 0.58f));
             skip.onClick.AddListener(() =>
             {
                 flow.SkipCardRewardForGold();
@@ -1577,11 +1556,11 @@ namespace XTD.Presentation
 
         private void BuildShopPanel()
         {
-            var info = CreateText("商店说明", uiRoot.transform, new Vector2(0.5f, 0.69f), new Vector2(1000f, 52f), 22, TextAnchor.MiddleCenter);
+            var info = CreateText("商店说明", uiRoot.transform, new Vector2(0.5f, 0.705f), new Vector2(1120f, 46f), 21, TextAnchor.MiddleCenter);
             info.text = $"当前金币 {flow.CurrentRun.gold}。购买会移出当前货架；可以刷新商品、半价出售，或花金币净化移除 1 张牌。";
 
             var shopCards = flow.GenerateShopCards();
-            var buyTitle = CreateText("进货标题", uiRoot.transform, new Vector2(0.5f, 0.62f), new Vector2(1000f, 40f), 20, TextAnchor.MiddleCenter);
+            var buyTitle = CreateText("进货标题", uiRoot.transform, new Vector2(0.5f, 0.650f), new Vector2(1000f, 34f), 19, TextAnchor.MiddleCenter);
             buyTitle.text = "货架陈列";
             buyTitle.color = new Color(0.62f, 0.96f, 0.90f, 0.96f);
             if (shopCards.Count == 0)
@@ -1599,9 +1578,9 @@ namespace XTD.Presentation
                 var button = CreateCardChoiceCard(
                     card,
                     uiRoot.transform,
-                    new Vector2(0.5f, 0.49f),
-                    new Vector2(188f, 246f),
-                    new Vector2(-392f + i * 196f, 0f),
+                    new Vector2(0.5f, 0.545f),
+                    new Vector2(176f, 236f),
+                    new Vector2(-376f + i * 188f, 0f),
                     "商店",
                     canBuy ? "购入卡组" : "金币不足",
                     $"{buyPrice} 金",
@@ -1614,17 +1593,14 @@ namespace XTD.Presentation
                 });
             }
 
-            var reroll = CreateButton($"刷新货架\n{flow.ShopRerollCost} 金币", uiRoot.transform, new Vector2(0.83f, 0.56f), new Vector2(210f, 78f));
-            reroll.GetComponent<Image>().color = flow.CurrentRun.gold >= flow.ShopRerollCost
-                ? new Color(0.05f, 0.20f, 0.22f, 0.94f)
-                : new Color(0.08f, 0.08f, 0.08f, 0.70f);
+            var reroll = CreateOrnateButton($"刷新货架\n{flow.ShopRerollCost} 金币", uiRoot.transform, new Vector2(0.83f, 0.55f), new Vector2(210f, 76f), Vector2.zero, flow.CurrentRun.gold >= flow.ShopRerollCost ? new Color(0.05f, 0.20f, 0.22f, 0.94f) : new Color(0.08f, 0.08f, 0.08f, 0.70f), new Color(0.54f, 0.82f, 0.72f, 0.42f));
             reroll.onClick.AddListener(() =>
             {
                 flow.RerollShopCards();
                 BuildUi();
             });
 
-            var sellTitle = CreateText("出售标题", uiRoot.transform, new Vector2(0.5f, 0.425f), new Vector2(1000f, 42f), 20, TextAnchor.MiddleCenter);
+            var sellTitle = CreateText("出售标题", uiRoot.transform, new Vector2(0.5f, 0.400f), new Vector2(1000f, 32f), 18, TextAnchor.MiddleCenter);
             sellTitle.text = "半价出售已有卡牌";
             var sellCards = flow.CurrentRun.deckCardIds
                 .GroupBy(id => id)
@@ -1642,9 +1618,9 @@ namespace XTD.Presentation
                 var button = CreateCardChoiceCard(
                     entry.Card,
                     uiRoot.transform,
-                    new Vector2(0.5f, 0.27f),
-                    new Vector2(160f, 176f),
-                    new Vector2(-430f + i * 172f, 0f),
+                    new Vector2(0.5f, 0.305f),
+                    new Vector2(138f, 136f),
+                    new Vector2(-390f + i * 156f, 0f),
                     "出售",
                     "卖出一张",
                     $"+{sellPrice} 金",
@@ -1656,7 +1632,7 @@ namespace XTD.Presentation
                 });
             }
 
-            var removeTitle = CreateText("净化标题", uiRoot.transform, new Vector2(0.5f, 0.255f), new Vector2(1000f, 38f), 19, TextAnchor.MiddleCenter);
+            var removeTitle = CreateText("净化标题", uiRoot.transform, new Vector2(0.5f, 0.205f), new Vector2(880f, 30f), 16, TextAnchor.MiddleCenter);
             removeTitle.text = flow.CanRemoveCardAtShop
                 ? $"净化移除一张牌：{flow.ShopRemoveCost} 金币，本次商店限 1 次"
                 : "净化移除：本次不可用，可能已使用、金币不足或卡组过薄";
@@ -1670,9 +1646,9 @@ namespace XTD.Presentation
                 var button = CreateCardChoiceCard(
                     entry.Card,
                     uiRoot.transform,
-                    new Vector2(0.5f, 0.11f),
-                    new Vector2(168f, 148f),
-                    new Vector2(-276f + i * 184f, 0f),
+                    new Vector2(0.5f, 0.125f),
+                    new Vector2(128f, 102f),
+                    new Vector2(-225f + i * 150f, 0f),
                     "净化",
                     canRemove ? "移出卡组" : "当前不可用",
                     $"{flow.ShopRemoveCost} 金",
@@ -1685,7 +1661,7 @@ namespace XTD.Presentation
                 });
             }
 
-            var leave = CreateButton("离开商店", uiRoot.transform, new Vector2(0.5f, 0.045f), new Vector2(260f, 60f));
+            var leave = CreateOrnateButton("离开商店", uiRoot.transform, new Vector2(0.83f, 0.220f), new Vector2(220f, 60f), Vector2.zero, new Color(0.040f, 0.050f, 0.064f, 0.90f), new Color(0.58f, 0.48f, 0.32f, 0.58f));
             leave.onClick.AddListener(() =>
             {
                 flow.LeaveShop();
@@ -1695,9 +1671,13 @@ namespace XTD.Presentation
 
         private void BuildRestPanel()
         {
-            var info = CreateText("休息说明", uiRoot.transform, new Vector2(0.5f, 0.69f), new Vector2(1000f, 52f), 22, TextAnchor.MiddleCenter);
+            var info = CreateText("休息说明", uiRoot.transform, new Vector2(0.5f, 0.700f), new Vector2(1080f, 46f), 21, TextAnchor.MiddleCenter);
             info.text = "选择回血，或三张同级同名卡牌合成一张高一级卡牌。每次休息只能做一件事。";
 
+            var groups = flow.UpgradableCardGroups().ToList();
+            var visibleGroups = groups.Take(4).ToList();
+            var spacing = visibleGroups.Count <= 1 ? 360f : 208f;
+            var firstChoiceX = -visibleGroups.Count * spacing * 0.5f;
             var heal = CreateFeatureChoiceCard(
                 "调息回神",
                 "休整",
@@ -1705,9 +1685,9 @@ namespace XTD.Presentation
                 "静坐疗伤",
                 LoadEventUiSprite("event_opportunity_lotus_spring") ?? LoadNodeSprite(MapNodeType.Rest),
                 uiRoot.transform,
-                new Vector2(0.5f, 0.52f),
-                new Vector2(260f, 300f),
-                new Vector2(-360f, 0f),
+                new Vector2(0.5f, 0.430f),
+                new Vector2(238f, 282f),
+                new Vector2(firstChoiceX, 0f),
                 new Color(0.12f, 0.28f, 0.22f, 0.96f),
                 "10% - 30%");
             heal.onClick.AddListener(() =>
@@ -1716,21 +1696,20 @@ namespace XTD.Presentation
                 BuildUi();
             });
 
-            var groups = flow.UpgradableCardGroups().ToList();
-            var label = CreateText("合成标题", uiRoot.transform, new Vector2(0.5f, 0.46f), new Vector2(1000f, 42f), 20, TextAnchor.MiddleCenter);
+            var label = CreateText("合成标题", uiRoot.transform, new Vector2(0.5f, 0.595f), new Vector2(1000f, 36f), 19, TextAnchor.MiddleCenter);
             label.text = groups.Count > 0 ? "可合成卡牌" : "当前没有三张同级同名卡牌";
             label.color = new Color(0.62f, 0.96f, 0.90f, 0.96f);
 
-            for (var i = 0; i < groups.Count && i < 5; i++)
+            for (var i = 0; i < visibleGroups.Count; i++)
             {
-                var group = groups[i];
+                var group = visibleGroups[i];
                 var card = catalog.FindCard(group.Key);
                 var button = CreateCardChoiceCard(
                     card,
                     uiRoot.transform,
-                    new Vector2(0.5f, 0.27f),
-                    new Vector2(188f, 244f),
-                    new Vector2(-172f + i * 192f, 0f),
+                    new Vector2(0.5f, 0.430f),
+                    new Vector2(168f, 222f),
+                    new Vector2(firstChoiceX + (i + 1) * spacing, 0f),
                     "合成",
                     "三合一升阶",
                     "Lv.+1",
@@ -1962,8 +1941,8 @@ namespace XTD.Presentation
 
         private void BuildSideMenu()
         {
-            var panel = CreatePanel("左侧菜单", uiRoot.transform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(54f, 0f), new Vector2(86f, 520f), new Color(0.015f, 0.018f, 0.020f, 0.58f));
-            panel.gameObject.AddComponent<Outline>().effectColor = new Color(0.30f, 0.72f, 0.70f, 0.35f);
+            var panel = CreatePanel("左侧菜单", uiRoot.transform, new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(54f, 0f), new Vector2(86f, 520f), new Color(0.010f, 0.016f, 0.018f, 0.48f));
+            panel.gameObject.AddComponent<Outline>().effectColor = new Color(0.70f, 0.54f, 0.32f, 0.24f);
 
             var entries = new (string Label, SidePanelMode Mode)[]
             {
@@ -1979,8 +1958,12 @@ namespace XTD.Presentation
                 var entry = entries[i];
                 var button = CreateButton(entry.Label, panel.transform, new Vector2(0.5f, 1f), new Vector2(68f, 70f), new Vector2(0f, -54f - i * 84f));
                 button.GetComponent<Image>().color = sidePanelMode == entry.Mode
-                    ? new Color(0.04f, 0.20f, 0.20f, 0.92f)
-                    : new Color(0.04f, 0.05f, 0.055f, 0.62f);
+                    ? new Color(0.045f, 0.18f, 0.17f, 0.88f)
+                    : new Color(0.018f, 0.026f, 0.028f, 0.58f);
+                var outline = button.gameObject.AddComponent<Outline>();
+                outline.effectColor = sidePanelMode == entry.Mode
+                    ? new Color(0.66f, 0.88f, 0.76f, 0.42f)
+                    : new Color(0.72f, 0.54f, 0.32f, 0.18f);
                 var label = button.GetComponentInChildren<Text>();
                 if (label != null)
                 {

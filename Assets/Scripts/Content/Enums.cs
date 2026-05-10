@@ -132,6 +132,7 @@ namespace XTD.Content
         None,
         VanguardRush,
         BacklineVolley,
-        ShieldStandard
+        ShieldStandard,
+        ChaosRift
     }
 }
